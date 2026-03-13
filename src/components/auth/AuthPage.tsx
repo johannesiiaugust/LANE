@@ -7,10 +7,17 @@ import { DemoTimelineProvider } from '@/contexts/DemoTimelineContext'
 import { DemoTimelineView } from '@/components/DemoTimelineView'
 import { SkinProvider } from '@/contexts/SkinContext'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/Footer'
+import { Logo } from '@/components/Logo'
 
 type AuthMode = 'sign-in' | 'sign-up' | 'forgot-password' | 'check-email'
+
+const C = {
+  yale: '#124e78',
+  cream: '#f0f0c9',
+  gold: '#f2bb05',
+  orange: '#d74e09',
+} as const
 
 export function AuthPage() {
   const [mode, setMode] = useState<AuthMode>('sign-in')
@@ -21,7 +28,6 @@ export function AuthPage() {
     localStorage.setItem('timeline_import_demo', '1')
     setFromDemo(true)
     setMode('sign-up')
-    // Defer opening to let the dropdown finish closing before the popover opens
     setTimeout(() => setAuthOpen(true), 50)
   }
 
@@ -33,26 +39,39 @@ export function AuthPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background overflow-hidden">
+    <div
+      className="flex flex-col h-screen overflow-hidden"
+      style={{ backgroundColor: C.cream, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+    >
       {/* Top header bar */}
-      <div className="shrink-0 border-b shadow-sm bg-background px-4 py-3 flex items-center justify-between gap-4">
+      <div
+        className="shrink-0 shadow-sm px-6 md:px-10 py-3 flex items-center justify-between gap-4"
+        style={{ backgroundColor: `${C.cream}cc`, backdropFilter: 'blur(20px) saturate(1.8)', borderBottom: `1px solid ${C.yale}15` }}
+      >
         {/* Brand + tagline */}
         <div className="shrink-0">
-          <div className="text-xl font-bold leading-tight">TimeLANE</div>
-          <div className="text-xs text-muted-foreground italic">The operating system for your life</div>
+          <Logo size="md" />
+          <div className="text-xs italic" style={{ color: `${C.yale}88` }}>The operating system for your life</div>
         </div>
 
         {/* Short description — hidden on small screens */}
-        <p className="hidden sm:block text-sm text-muted-foreground text-center flex-1 max-w-md leading-snug">
+        <p className="hidden sm:block text-sm text-center flex-1 max-w-md leading-snug" style={{ color: `${C.yale}88` }}>
           Visualize your entire life across timelines and lanes —<br />from past memories to future plans.
         </p>
 
         {/* Auth popover anchored top-right */}
         <Popover open={authOpen} onOpenChange={setAuthOpen}>
           <PopoverTrigger asChild>
-            <Button size="sm">{modeLabel[mode]}</Button>
+            <button
+              className="px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200"
+              style={{ backgroundColor: C.yale, color: C.cream, border: `1px solid ${C.yale}` }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#0d3d5e' }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = C.yale }}
+            >
+              {modeLabel[mode]}
+            </button>
           </PopoverTrigger>
-          <PopoverContent align="end" sideOffset={8} className="w-80 p-4 max-h-[85vh] overflow-y-auto">
+          <PopoverContent align="end" sideOffset={8} className="theme-landing w-80 p-4 max-h-[85vh] overflow-y-auto">
             {mode === 'sign-in' && (
               <SignInForm
                 onSwitchToSignUp={() => setMode('sign-up')}
@@ -80,7 +99,7 @@ export function AuthPage() {
       </div>
 
       {/* Demo timeline fills remaining space */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden px-6 md:px-10 py-4">
         <SkinProvider>
           <DemoTimelineProvider>
             <DemoTimelineView onSignUpWithTimeline={handleSignUpWithTimeline} />
