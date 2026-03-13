@@ -123,7 +123,7 @@ setSubmitting(true)
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-gray-50 px-2 text-muted-foreground">or</span>
+          <span className="bg-popover px-2 text-muted-foreground">or</span>
         </div>
       </div>
 
