@@ -549,11 +549,10 @@ function App() {
     return <UpdatePasswordForm />
   }
 
-  if (route.type === 'demo') {
-    return <AuthPage />
-  }
-
   if (!user) {
+    if (route.type === 'demo') {
+      return <AuthPage />
+    }
     return <LandingPage />
   }
 
