@@ -39,7 +39,7 @@ export function OverlaySeparateTimeline({
         return (
           <div
             key={laneName}
-            className="relative border-b border-border/30"
+            className="relative border-b border-border/15"
             style={{ height: BASE_LANE_HEIGHT, width }}
           >
             {laneEvents.map(e => (

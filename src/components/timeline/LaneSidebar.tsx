@@ -1,5 +1,9 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { ChevronDown, ChevronRight, Eye, EyeOff, MoreHorizontal, Pencil, Trash2, TrendingUp, ArrowUp, ArrowDown } from 'lucide-react'
+import {
+  ChevronDown, ChevronRight, Eye, EyeOff, MoreHorizontal, Pencil, Trash2, TrendingUp, ArrowUp, ArrowDown,
+  MapPin, Briefcase, GraduationCap, Heart, Landmark, Zap, Plane, HeartPulse, Users, Car, Home, Trophy, Package, Layers,
+  type LucideIcon,
+} from 'lucide-react'
 import type { Lane } from '@/types/timeline'
 import {
   DropdownMenu,
@@ -9,6 +13,37 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
+
+// ── Lane icon mapping ──────────────────────────────────────────────────────────
+
+const LANE_ICON_MAP: Record<string, LucideIcon> = {
+  location: MapPin,
+  locations: MapPin,
+  work: Briefcase,
+  education: GraduationCap,
+  university: GraduationCap,
+  relationships: Heart,
+  relations: Heart,
+  assets: Landmark,
+  wealth: Landmark,
+  activities: Zap,
+  'other activities': Zap,
+  travel: Plane,
+  health: HeartPulse,
+  family: Users,
+  kids: Users,
+  parents: Users,
+  vehicles: Car,
+  cars: Car,
+  items: Package,
+  'type of house': Home,
+  housing: Home,
+  achievements: Trophy,
+}
+
+function getLaneIcon(name: string): LucideIcon {
+  return LANE_ICON_MAP[name.toLowerCase()] ?? Layers
+}
 
 export interface PersonaSidebarSection {
   personaId: string
@@ -150,11 +185,11 @@ export function LaneSidebar({
         return (
           <div
             key={lane.id}
-            className="border-b border-border/30 group"
+            className="border-b border-border/15 group"
             style={{ height, paddingLeft: Math.round(W * 0.04), paddingRight: Math.round(W * 0.04) }}
           >
             {/* Main lane label row */}
-            <div className="flex items-center" style={{ height: BASE_LANE_HEIGHT, gap: Math.round(ICON_SIZE / 6) }}>
+            <div className="flex items-center" style={{ height: BASE_LANE_HEIGHT, gap: Math.round(ICON_SIZE / 3) }}>
               {laneHasOverlaps.get(lane.id) ? (
                 <button
                   onClick={() => onToggleExpand(lane.id)}
@@ -167,11 +202,15 @@ export function LaneSidebar({
                     : <ChevronRight size={ICON_SIZE} />}
                 </button>
               ) : null}
+              {(() => {
+                const Icon = getLaneIcon(lane.name)
+                return <Icon size={ICON_SIZE} strokeWidth={1.5} className="shrink-0" style={{ color: lane.color, opacity: lane.visible ? 1 : 0.4 }} />
+              })()}
               <span
-                className="font-medium truncate flex-1"
+                className="font-medium truncate flex-1 text-muted-foreground hidden sm:inline"
                 style={{ fontSize: SIDEBAR_FONT, opacity: lane.visible ? 1 : 0.4 }}
               >
-                {lane.emoji && <span className="mr-1">{lane.emoji}</span>}{lane.name}
+                {lane.name}
               </span>
               <button
                 onClick={() => onToggleVisibility(lane.id)}
@@ -322,7 +361,7 @@ export function LaneSidebar({
           {section.laneNames.map(laneName => (
             <div
               key={laneName}
-              className="border-b border-border/30 flex items-center text-muted-foreground"
+              className="border-b border-border/15 flex items-center text-muted-foreground"
               style={{
                 height: BASE_LANE_HEIGHT,
                 paddingLeft: Math.round(W * 0.08),
@@ -361,7 +400,7 @@ export function LaneSidebar({
           {section.laneNames.map(laneName => (
             <div
               key={laneName}
-              className="border-b border-border/30 flex items-center text-muted-foreground"
+              className="border-b border-border/15 flex items-center text-muted-foreground"
               style={{
                 height: BASE_LANE_HEIGHT,
                 paddingLeft: Math.round(W * 0.08),
@@ -406,11 +445,15 @@ export function LaneSidebar({
                     padding: `${Math.round(SIDEBAR_FONT * 0.25)}px ${Math.round(W * 0.04)}px`,
                   }}
                 >
+                  {(() => {
+                    const Icon = getLaneIcon(lane.name)
+                    return <Icon size={ICON_SIZE} strokeWidth={1.5} className="shrink-0 text-muted-foreground" style={{ opacity: 0.5 }} />
+                  })()}
                   <span
                     className="text-muted-foreground truncate flex-1"
                     style={{ fontSize: SIDEBAR_FONT }}
                   >
-                    {lane.emoji && <span className="mr-1">{lane.emoji}</span>}{lane.name}
+                    {lane.name}
                   </span>
                   <button
                     onClick={() => onToggleVisibility(lane.id)}
