@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { ChevronDown, ChevronRight, Eye, EyeOff, MoreHorizontal, Pencil, Trash2, TrendingUp, ArrowUp, ArrowDown } from 'lucide-react'
 import type { Lane } from '@/types/timeline'
 import {
@@ -27,6 +27,59 @@ export interface OverlaySidebarSection {
   laneNames: string[]
 }
 
+// ── Drag-to-pan hook ──────────────────────────────────────────────────────────
+
+function useDragPan(onPan?: (dx: number) => void) {
+  const onPanRef = useRef(onPan)
+  useEffect(() => { onPanRef.current = onPan }, [onPan])
+  const lastXRef = useRef<number | null>(null)
+  const [dragging, setDragging] = useState(false)
+
+  const onMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!onPanRef.current) return
+    e.preventDefault()
+    lastXRef.current = e.clientX
+    setDragging(true)
+    const onMove = (ev: MouseEvent) => {
+      if (lastXRef.current === null || !onPanRef.current) return
+      const dx = ev.clientX - lastXRef.current
+      lastXRef.current = ev.clientX
+      onPanRef.current(dx)
+    }
+    const onUp = () => {
+      lastXRef.current = null
+      setDragging(false)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }, [])
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    if (!onPanRef.current || e.touches.length !== 1) return
+    lastXRef.current = e.touches[0].clientX
+  }, [])
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!onPanRef.current || e.touches.length !== 1 || lastXRef.current === null) return
+    const dx = e.touches[0].clientX - lastXRef.current
+    lastXRef.current = e.touches[0].clientX
+    onPanRef.current(dx)
+  }, [])
+
+  const onTouchEnd = useCallback(() => { lastXRef.current = null }, [])
+
+  if (!onPan) return {}
+  return {
+    onMouseDown,
+    onTouchStart,
+    onTouchMove,
+    onTouchEnd,
+    style: { cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' as const },
+  }
+}
+
 interface LaneSidebarProps {
   lanes: Lane[]
   hiddenLanes: Lane[]
@@ -43,6 +96,7 @@ interface LaneSidebarProps {
   onEditLane: (lane: Lane) => void
   onDeleteLane: (lane: Lane) => void
   totalAssetsHeight?: number
+  onPan?: (dx: number) => void
 }
 
 export function LaneSidebar({
@@ -61,6 +115,7 @@ export function LaneSidebar({
   onEditLane,
   onDeleteLane,
   totalAssetsHeight,
+  onPan,
 }: LaneSidebarProps) {
   const [showHidden, setShowHidden] = useState(false)
   const { sc } = useSizeConfig()
@@ -76,6 +131,7 @@ export function LaneSidebar({
   const W = Math.min(SIDEBAR_WIDTH, Math.max(72, Math.round(viewportWidth * 0.28)))
 
   const iconPad = Math.round(ICON_SIZE / 12)
+  const panHandlers = useDragPan(onPan)
 
   // Full sorted lane order (visible + hidden) for move-up/down boundary checks
   const sortedAllLanes = useMemo(
@@ -224,6 +280,7 @@ export function LaneSidebar({
             paddingRight: Math.round(W * 0.04),
             gap: Math.round(ICON_SIZE / 4),
           }}
+          {...panHandlers}
         >
           <TrendingUp size={ICON_SIZE} className="shrink-0 text-teal-500" />
           <span className="font-medium truncate flex-1 text-teal-600" style={{ fontSize: SIDEBAR_FONT }}>
@@ -234,7 +291,7 @@ export function LaneSidebar({
 
       {/* Separate persona sections */}
       {separatePersonaSections.map(section => (
-        <div key={section.personaId}>
+        <div key={section.personaId} {...panHandlers}>
           {/* Persona header row */}
           <div
             className="border-t-2 border-border/60 flex items-center bg-muted/40"
@@ -281,7 +338,7 @@ export function LaneSidebar({
 
       {/* Separate overlay timeline sections */}
       {separateOverlaySections.map(section => (
-        <div key={section.timelineId}>
+        <div key={section.timelineId} {...panHandlers}>
           <div
             className="border-t-2 border-border/60 flex items-center bg-muted/40"
             style={{
