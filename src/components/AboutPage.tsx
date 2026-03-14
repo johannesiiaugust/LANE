@@ -49,7 +49,7 @@ export function AboutPage() {
         {/* Terms & Conditions */}
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold">Terms & Conditions</h2>
-          <p className="text-xs text-muted-foreground italic">Draft — last updated March 2026</p>
+          <p className="text-xs text-muted-foreground italic">Last updated March 2026</p>
 
           <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
             <div>

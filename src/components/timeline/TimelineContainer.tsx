@@ -964,6 +964,7 @@ export function TimelineContainer({
             onEditLane={onEditLane}
             onDeleteLane={onDeleteLane}
             totalAssetsHeight={hasValueEvents ? TOTAL_ASSETS_HEIGHT : undefined}
+            onPan={handlePan}
           />
         </div>
       </div>
