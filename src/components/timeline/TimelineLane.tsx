@@ -178,7 +178,7 @@ export function TimelineLane({
     <div
       ref={laneRef}
       data-lane-id={lane.id}
-      className={`relative border-b border-border/30 select-none ${isPanning ? 'cursor-grabbing' : 'cursor-crosshair'}`}
+      className={`relative border-b border-border/15 select-none ${isPanning ? 'cursor-grabbing' : 'cursor-crosshair'}`}
       style={{ height: laneHeight, width }}
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
@@ -186,7 +186,7 @@ export function TimelineLane({
       {/* Separator at event-rows / sub-rows boundary */}
       {(hasPersonaRows || hasOverlayRows) && (
         <div
-          className="absolute left-0 right-0 border-t border-border/20"
+          className="absolute left-0 right-0 border-t border-border/15"
           style={{ top: numEventRows * BASE_LANE_HEIGHT }}
         />
       )}

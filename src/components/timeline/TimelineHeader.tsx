@@ -142,7 +142,7 @@ export function TimelineHeader({ yearStart, yearEnd, pixelsPerYear, currentYear,
 
   return (
     <div
-      className="sticky top-0 z-10 bg-background border-b"
+      className="sticky top-0 z-10 bg-background border-b border-border/15"
       style={{ width: '100%', height: sc.HEADER_HEIGHT }}
     >
       {filtered.map(({ key, left, label, major }) => (
@@ -172,7 +172,7 @@ export function TimelineHeader({ yearStart, yearEnd, pixelsPerYear, currentYear,
             width: 0, height: 0,
             borderLeft: '4px solid transparent',
             borderRight: '4px solid transparent',
-            borderTop: '4px solid #ef4444',
+            borderTop: '4px solid #d74e09',
           }}
         />
         <span
@@ -184,7 +184,7 @@ export function TimelineHeader({ yearStart, yearEnd, pixelsPerYear, currentYear,
             fontSize: sc.TICK_FONT,
             padding: '1px 4px',
             borderRadius: 3,
-            background: 'rgba(239,68,68,0.85)',
+            background: '#d74e09',
             color: '#fff',
             zIndex: 15,
           }}

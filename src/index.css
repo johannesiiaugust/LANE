@@ -1,31 +1,34 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #f0f0c9;
+  --color-background: #ffffff;
   --color-foreground: #124e78;
   --color-card: #ffffff;
   --color-card-foreground: #124e78;
-  --color-popover: #f0f0c9;
+  --color-popover: #ffffff;
   --color-popover-foreground: #124e78;
   --color-primary: #124e78;
-  --color-primary-foreground: #f0f0c9;
-  --color-secondary: #124e7812;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #124e780a;
   --color-secondary-foreground: #124e78;
-  --color-muted: #124e780a;
+  --color-muted: #124e7806;
   --color-muted-foreground: #124e78aa;
-  --color-accent: #124e7812;
+  --color-accent: #124e780a;
   --color-accent-foreground: #124e78;
   --color-destructive: #6e0e0a;
-  --color-destructive-foreground: #f0f0c9;
-  --color-border: #124e7825;
-  --color-input: #124e7830;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #124e7820;
+  --color-input: #124e7825;
   --color-ring: #124e78;
   --radius: 0.5rem;
 }
 
+body, input, button, select, textarea, table {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
 body {
   @apply bg-background text-foreground;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 .theme-landing {
