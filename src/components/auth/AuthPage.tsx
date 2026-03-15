@@ -44,7 +44,7 @@ export function AuthPage() {
 
         {/* Short description — hidden on small screens */}
         <p className="hidden sm:block text-sm text-muted-foreground text-center flex-1 max-w-md leading-snug">
-          Visualize your entire life across timelines and lanes —<br />from past memories to future plans.
+          Visualize lives. Compare with others. Shape your future.
         </p>
 
         {/* Auth popover anchored top-right */}
