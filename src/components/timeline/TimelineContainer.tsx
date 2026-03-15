@@ -94,7 +94,7 @@ interface TimelineContainerProps {
   dataYearMax: number
   scrollToTodayRef?: MutableRefObject<(() => void) | null>
   scrollToEventRef?: MutableRefObject<((event: TimelineEvent) => void) | null>
-  lifeSpan?: { birthYear: number; endYear: number | null }
+  lifeSpan?: { birthYear: number; endYear: number | null; color?: string }
   overlayEvents?: OverlayTimelineEvent[]
   overlayDisplayModes?: Map<string, OverlayDisplayMode>
   activeOverlayTimelines?: DbTimeline[]

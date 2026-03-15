@@ -6,6 +6,7 @@ import {
 interface LifeSpan {
   birthYear: number
   endYear: number | null  // null = unknown → fade 85→100
+  color?: string
 }
 
 interface YearGridProps {
@@ -83,7 +84,9 @@ export function YearGrid({ yearStart, yearEnd, pixelsPerYear, totalHeight, curre
       {/* Life span overlay */}
       {lifeSpan && (() => {
         const birthPx = (lifeSpan.birthYear - yearStart) * pixelsPerYear
-        const LIFE_COLOR = 'rgba(59,130,246,'  // blue
+        const c = lifeSpan.color ?? '#3b82f6'
+        const solid = c + '1a'   // ~10% opacity
+        const fade  = c + '00'   // 0% opacity
         if (lifeSpan.endYear != null) {
           // Known end date — solid block
           const endPx = (lifeSpan.endYear - yearStart) * pixelsPerYear
@@ -91,7 +94,7 @@ export function YearGrid({ yearStart, yearEnd, pixelsPerYear, totalHeight, curre
             <div className="absolute top-0 bottom-0 pointer-events-none" style={{
               left: Math.max(0, birthPx),
               width: Math.max(0, endPx - Math.max(0, birthPx)),
-              backgroundColor: LIFE_COLOR + '0.10)',
+              backgroundColor: solid,
             }} />
           )
         } else {
@@ -105,7 +108,7 @@ export function YearGrid({ yearStart, yearEnd, pixelsPerYear, totalHeight, curre
             <div className="absolute top-0 bottom-0 pointer-events-none" style={{
               left,
               width,
-              background: `linear-gradient(to right, ${LIFE_COLOR}0.10) 0px, ${LIFE_COLOR}0.10) ${solidStop}px, ${LIFE_COLOR}0) ${width}px)`,
+              background: `linear-gradient(to right, ${solid} 0px, ${solid} ${solidStop}px, ${fade} ${width}px)`,
             }} />
           )
         }
