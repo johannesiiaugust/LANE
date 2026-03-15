@@ -51,7 +51,7 @@ export function TotalAssetsLane({
   } | null>(null)
 
   const valueEvents = useMemo(
-    () => events.filter(e => e.type === 'range' && !!e.valueProjection),
+    () => events.filter(e => !!e.valueProjection),
     [events],
   )
 

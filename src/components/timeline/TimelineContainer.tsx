@@ -647,7 +647,7 @@ export function TimelineContainer({
   const visibleLanes = lanes.filter(l => l.visible)
   const hiddenLanes = lanes.filter(l => !l.visible)
   const currentYear = getCurrentYearFraction()
-  const hasValueEvents = events.some(e => e.type === 'range' && !!e.valueProjection)
+  const hasValueEvents = events.some(e => !!e.valueProjection)
 
   // Split persona events into integrated (sub-rows in lanes) vs separate (own section below)
   const integratedPersonaEvents = useMemo(
