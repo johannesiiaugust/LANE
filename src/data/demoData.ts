@@ -1,5 +1,9 @@
 import type { Lane, TimelineEvent } from '@/types/timeline'
 
+// Demo person (Alex Weber) timeline date range
+export const DEMO_TIMELINE_START_YEAR = 1980
+export const DEMO_TIMELINE_END_YEAR: number | null = null
+
 // Uses the same standard lane IDs/names/emojis/colors as seedData.ts
 export const DEMO_LANES: Lane[] = [
   { id: 'locations',     name: 'Locations',     emoji: '📍', color: '#3b82f6', visible: true, isDefault: true, order: 0 },

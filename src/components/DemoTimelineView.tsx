@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import type { Lane, TimelineEvent } from '@/types/timeline'
+import { DEMO_TIMELINE_START_YEAR, DEMO_TIMELINE_END_YEAR } from '@/data/demoData'
 import { useTimelineContext } from '@/contexts/TimelineContext'
 import { usePersonas } from '@/hooks/usePersonas'
 import { TimelineContainer } from '@/components/timeline/TimelineContainer'
@@ -70,7 +71,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   } = useTimelineContext()
 
   // Alex Weber's birth year — used for age-aligning persona overlays
-  const DEMO_BIRTH_YEAR = 1980
+  const DEMO_BIRTH_YEAR = DEMO_TIMELINE_START_YEAR
 
   const {
     personas,
@@ -440,7 +441,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
           scrollToTodayRef={scrollToTodayRef}
           scrollToEventRef={scrollToEventRef}
           onTodayVisibilityChange={setTodayOffScreen}
-          lifeSpan={{ birthYear: 1980, endYear: null }}
+          lifeSpan={{ birthYear: DEMO_TIMELINE_START_YEAR, endYear: DEMO_TIMELINE_END_YEAR }}
           overlayEvents={[]}
           overlayDisplayModes={new Map()}
           activeOverlayTimelines={[]}
