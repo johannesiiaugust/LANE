@@ -307,7 +307,7 @@ export function TimelineOverview({ onSelectTimeline, selectedTimelineEvents = []
 
   // ── Derive tooltip data ───────────────────────────────────────────────────
   const hoveredTimeline = hover ? timelines.find(t => t.id === hover.timelineId) : null
-  const valueEvents = selectedTimelineEvents.filter(e => e.type === 'range' && !!e.valueProjection)
+  const valueEvents = selectedTimelineEvents.filter(e => !!e.valueProjection)
   const hasWealth = hover?.timelineId === selectedTimelineId && valueEvents.length > 0
 
   // ── Render ────────────────────────────────────────────────────────────────

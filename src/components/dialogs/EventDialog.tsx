@@ -99,7 +99,6 @@ export function EventDialog({
   const [color, setColor] = useState('')
   const [emoji, setEmoji] = useState('')
   const [emojiOpen, setEmojiOpen] = useState(false)
-  const [pointValueStr, setPointValueStr] = useState('')
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
 
@@ -157,7 +156,6 @@ export function EventDialog({
       setEndDate(editingEvent.endYear != null ? fracYearToDMY(editingEvent.endYear) : '')
       setColor(editingEvent.color ?? '')
       setEmoji(editingEvent.emoji ?? '')
-      setPointValueStr(editingEvent.pointValue != null ? String(editingEvent.pointValue) : '')
       const st = fracYearToTimeStr(editingEvent.startYear)
       setStartTime(st === '00:00' ? '' : st)
       const et = editingEvent.endYear != null ? fracYearToTimeStr(editingEvent.endYear) : ''
@@ -166,7 +164,7 @@ export function EventDialog({
       const proj = editingEvent.valueProjection
       setValueEnabled(!!proj)
       if (proj) {
-        setStartValue(proj.startValue != null ? String(proj.startValue) : '')
+        setStartValue(proj.startValue != null ? String(proj.startValue) : editingEvent.pointValue != null ? String(editingEvent.pointValue) : '')
         setSpotChanges((proj.spotChanges ?? []).map(s => ({
           id: s.id,
           dateStr: fracYearToDMY(s.year),
@@ -194,7 +192,7 @@ export function EventDialog({
           endDateStr: d.endYear != null ? fracYearToDMY(d.endYear) : '',
         })))
       } else {
-        setStartValue('')
+        setStartValue(editingEvent.pointValue != null ? String(editingEvent.pointValue) : '')
         setSpotChanges([])
         setGrowthPeriods([])
         setDeposits([])
@@ -234,7 +232,6 @@ export function EventDialog({
       setEndDate(defaultEndYear != null ? fracYearToDMY(defaultEndYear) : '')
       setColor('')
       setEmoji('')
-      setPointValueStr('')
       setStartTime('')
       setEndTime('')
       setValueEnabled(false)
@@ -351,8 +348,14 @@ export function EventDialog({
       }
     }
 
-    const pv = !isRange && pointValueStr && !isNaN(Number(pointValueStr))
-      ? Number(pointValueStr) : undefined
+    if (!isRange && startValue && !isNaN(Number(startValue))) {
+      valueProjectionOut = {
+        startValue: Number(startValue),
+        spotChanges: [],
+        growthPeriods: [],
+        deposits: [],
+      }
+    }
 
     // Resolve start/end from link or from date fields
     const resolvedStart = computedLink?.startYear ?? dmyTimeToFracYear(startDate, startTime)
@@ -400,7 +403,6 @@ export function EventDialog({
       ...(resolvedEnd !== undefined ? { endYear: resolvedEnd } : {}),
       ...(color ? { color } : {}),
       ...(emoji ? { emoji } : {}),
-      ...(pv != null ? { pointValue: pv } : {}),
       ...(valueProjectionOut ? { valueProjection: valueProjectionOut } : {}),
       ...(linkOut ? { link: linkOut } : {}),
       ...(url.trim() ? { url: url.trim() } : {}),
@@ -542,8 +544,8 @@ export function EventDialog({
               </div>
             ) : (
               <div className="grid gap-1.5">
-                <Label htmlFor="pointval" className="text-xs text-muted-foreground">Point Value (optional)</Label>
-                <Input id="pointval" type="number" value={pointValueStr} placeholder="e.g. 50000" onChange={e => setPointValueStr(e.target.value)} className="h-8 text-xs" />
+                <Label htmlFor="pointval" className="text-xs text-muted-foreground">Value (optional)</Label>
+                <Input id="pointval" type="number" value={startValue} placeholder="e.g. 50000" onChange={e => setStartValue(e.target.value)} className="h-8 text-xs" />
               </div>
             )}
           </div>
