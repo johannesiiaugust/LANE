@@ -318,9 +318,9 @@ export function LaneSidebar({
         </div>
       ))}
 
-      {/* Hidden lanes recovery section */}
+      {/* Hidden lanes recovery section — list floats above the button via absolute positioning */}
       {hiddenLanes.length > 0 && (
-        <div className="border-t border-border/50">
+        <div className="border-t border-border/50 relative">
           <button
             onClick={() => setShowHidden(!showHidden)}
             className="flex items-center w-full text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
@@ -339,7 +339,10 @@ export function LaneSidebar({
             <span>Hidden ({hiddenLanes.length})</span>
           </button>
           {showHidden && (
-            <div style={{ paddingBottom: Math.round(SIDEBAR_FONT * 0.3) }}>
+            <div
+              className="absolute w-full bg-background border border-border/50 rounded-t shadow-md z-10"
+              style={{ bottom: '100%' }}
+            >
               {hiddenLanes.map(lane => (
                 <div
                   key={lane.id}
