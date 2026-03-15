@@ -63,11 +63,30 @@ export function TotalAssetsLane({
     const vizWidth   = Math.max(4, (rangeEnd - rangeStart) * pixelsPerYear)
     const leftOffset = (rangeStart - yearStart) * pixelsPerYear
 
-    const samples: { year: number; total: number }[] = []
-    for (let i = 0; i <= NUM_SAMPLES; i++) {
-      const year = rangeStart + (i / NUM_SAMPLES) * (rangeEnd - rangeStart)
-      samples.push({ year, total: computeTotalAtYear(year, valueEvents) })
+    // Collect spot-change years so we can insert sharp-step anchors
+    const spotYears = new Set<number>()
+    for (const ev of valueEvents) {
+      for (const sc of ev.valueProjection?.spotChanges ?? []) {
+        spotYears.add(sc.year)
+      }
     }
+
+    const yearSet = new Set<number>()
+    for (let i = 0; i <= NUM_SAMPLES; i++) {
+      yearSet.add(rangeStart + (i / NUM_SAMPLES) * (rangeEnd - rangeStart))
+    }
+    // For each spot change: add a sample just before (value without change)
+    // and exactly at (value with change) so the line shows an instant jump
+    for (const sy of spotYears) {
+      if (sy > rangeStart && sy < rangeEnd) {
+        yearSet.add(sy - 1e-6)
+        yearSet.add(sy)
+      }
+    }
+
+    const samples: { year: number; total: number }[] = Array.from(yearSet)
+      .sort((a, b) => a - b)
+      .map(year => ({ year, total: computeTotalAtYear(year, valueEvents) }))
 
     const totals  = samples.map(s => s.total)
     const minV    = Math.min(...totals)
