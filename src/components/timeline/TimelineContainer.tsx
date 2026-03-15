@@ -902,6 +902,11 @@ export function TimelineContainer({
   const fitRef = useRef({ grandTotalHeight, blh: sc.BASE_LANE_HEIGHT, hr: sc.HEADER_HEIGHT })
   fitRef.current = { grandTotalHeight, blh: sc.BASE_LANE_HEIGHT, hr: sc.HEADER_HEIGHT }
 
+  // Ratio of the hidden-lanes toggle button height to BASE_LANE_HEIGHT (derived from large preset)
+  const HIDDEN_BTN_RATIO = (Math.round(SIZE_PRESETS.large.SIDEBAR_FONT * 0.4) * 2 + SIZE_PRESETS.large.ICON_SIZE) / SIZE_PRESETS.large.BASE_LANE_HEIGHT
+  const hasHiddenRef = useRef(hiddenLanes.length > 0)
+  hasHiddenRef.current = hiddenLanes.length > 0
+
   const computeFitScreen = useCallback(() => {
     const el = containerRef.current
     if (!el) return
@@ -911,10 +916,12 @@ export function TimelineContainer({
     if (gh <= 0 || blh <= 0) return
     const K = gh / blh
     const headerRatio = hr / blh
-    const newBLH = containerHeight / (headerRatio + K)
+    // Reserve space for the hidden-lanes toggle button when there are hidden lanes
+    const hiddenRatio = hasHiddenRef.current ? HIDDEN_BTN_RATIO : 0
+    const newBLH = containerHeight / (headerRatio + K + hiddenRatio)
     const scale = newBLH / SIZE_PRESETS.large.BASE_LANE_HEIGHT
     updateFitScreenConfig(scaleSizeConfig(SIZE_PRESETS.large, scale))
-  }, [updateFitScreenConfig])
+  }, [updateFitScreenConfig, HIDDEN_BTN_RATIO])
 
   // Set up ResizeObserver on the container (fires when window/panel resizes)
   useEffect(() => {
@@ -931,7 +938,7 @@ export function TimelineContainer({
   useEffect(() => {
     if (size !== 'fitscreen') return
     computeFitScreen()
-  }, [size, grandTotalHeight, computeFitScreen])
+  }, [size, grandTotalHeight, hiddenLanes.length, computeFitScreen])
 
   return (
     <div ref={containerRef} className="relative flex-1 overflow-hidden">
