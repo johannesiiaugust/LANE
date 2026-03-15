@@ -75,7 +75,7 @@ export function TotalAssetsLane({
     const vRange  = maxV - minV || 1
 
     function toXY(year: number, total: number): [number, number] {
-      const x = ((year - rangeStart) / (rangeEnd - rangeStart)) * vizWidth
+      const x = (year - rangeStart) * pixelsPerYear
       const y = PAD_V + CHART_H - (CHART_H * (total - minV)) / vRange
       return [x, y]
     }
