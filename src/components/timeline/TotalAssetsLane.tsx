@@ -76,11 +76,16 @@ export function TotalAssetsLane({
       yearSet.add(rangeStart + (i / NUM_SAMPLES) * (rangeEnd - rangeStart))
     }
     // For each spot change: add a sample just before (value without change)
-    // and exactly at (value with change) so the line shows an instant jump
+    // and just after (value with change) so the line shows an instant jump.
+    // We use sy+1e-9 instead of sy because computeValueAtYear has an early
+    // return for targetYear <= startYear — when the spot change is at the
+    // event's own start date (common case: purchase on day one), sampling at
+    // sy returns startValue without the spot applied. sy+1e-9 forces the step
+    // loop to execute and includes the spot change.
     for (const sy of spotYears) {
-      if (sy > rangeStart && sy < rangeEnd) {
+      if (sy >= rangeStart && sy <= rangeEnd) {
         yearSet.add(sy - 1e-6)
-        yearSet.add(sy)
+        yearSet.add(sy + 1e-9)
       }
     }
 
