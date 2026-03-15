@@ -160,7 +160,7 @@ function TimelineView() {
     togglePersonaAlignment,
     personaDisplayModes,
     setPersonaDisplayMode,
-  } = usePersonas(birthYear)
+  } = usePersonas(selectedTimeline?.start_year ?? null)
 
   const {
     activeOverlayIds,
@@ -462,7 +462,7 @@ function TimelineView() {
               personaDisplayModes={personaDisplayModes}
               scrollToTodayRef={scrollToTodayRef}
               scrollToEventRef={scrollToEventRef}
-              lifeSpan={profile?.birth_date ? { birthYear: birthDateToFloatYear(profile.birth_date), endYear: profile.end_date ? birthDateToFloatYear(profile.end_date) : null } : undefined}
+              lifeSpan={profile?.birth_date ? { birthYear: birthDateToFloatYear(profile.birth_date), endYear: profile.end_date ? birthDateToFloatYear(profile.end_date) : null, color: selectedTimeline?.color ?? undefined } : undefined}
               onTodayVisibilityChange={setTodayOffScreen}
               overlayEvents={displayedOverlayEvents}
               overlayDisplayModes={mergedOverlayDisplayModes}
