@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import type { Lane, TimelineEvent } from '@/types/timeline'
-import { DEMO_TIMELINE_START_YEAR, DEMO_TIMELINE_END_YEAR } from '@/data/demoData'
+import { DEMO_TIMELINE_START_YEAR } from '@/data/demoData'
 import { useTimelineContext } from '@/contexts/TimelineContext'
 import { usePersonas } from '@/hooks/usePersonas'
 import { TimelineContainer } from '@/components/timeline/TimelineContainer'
@@ -33,8 +33,12 @@ import {
   Link2Off,
   LayoutList,
   ChevronDown,
+  Pencil,
+  Check,
+  X,
 } from 'lucide-react'
-import { MIN_PIXELS_PER_YEAR, MAX_PIXELS_PER_YEAR, SIDEBAR_WIDTH } from '@/lib/constants'
+import { MIN_PIXELS_PER_YEAR, MAX_PIXELS_PER_YEAR, SIDEBAR_WIDTH, fracYearToMs, msToFracYear } from '@/lib/constants'
+import { Input } from '@/components/ui/input'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,7 +72,12 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
     deleteLane,
     moveLane,
     toggleLaneVisibility,
+    timelines,
+    selectedTimelineId,
+    updateTimeline,
   } = useTimelineContext()
+
+  const currentTimeline = timelines.find(t => t.id === selectedTimelineId) ?? timelines[0]
 
   // Alex Weber's birth year — used for age-aligning persona overlays
   const DEMO_BIRTH_YEAR = DEMO_TIMELINE_START_YEAR
@@ -110,6 +119,39 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
     // Scroll to today after layout settles
     requestAnimationFrame(() => { scrollToTodayRef.current?.() })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Timeline edit state
+  const [tlEditOpen, setTlEditOpen] = useState(false)
+  const [tlEditName, setTlEditName] = useState('')
+  const [tlEditColor, setTlEditColor] = useState('')
+  const [tlEditStartDate, setTlEditStartDate] = useState('')
+
+  function fracToDateStr(fy: number | null): string {
+    if (fy == null) return ''
+    const d = new Date(fracYearToMs(fy))
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
+  }
+  function dateStrToFrac(s: string): number | null {
+    if (!s) return null
+    const [y, mo, da] = s.split('-').map(Number)
+    return msToFracYear(Date.UTC(y, mo - 1, da))
+  }
+
+  function openTlEdit() {
+    setTlEditName(currentTimeline?.name ?? '')
+    setTlEditColor(currentTimeline?.color ?? '#6366f1')
+    setTlEditStartDate(fracToDateStr(currentTimeline?.start_year ?? null))
+    setTlEditOpen(true)
+  }
+
+  async function saveTlEdit() {
+    await updateTimeline('demo', {
+      name: tlEditName.trim() || currentTimeline?.name,
+      color: tlEditColor,
+      start_year: dateStrToFrac(tlEditStartDate),
+    })
+    setTlEditOpen(false)
+  }
 
   const { size, setSize } = useSizeConfig()
   const { skinId, setSkinId } = useSkin()
@@ -231,16 +273,61 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
       <div className="flex items-center justify-between border-b bg-background px-3 py-2 gap-2 shrink-0">
         {/* ── Left side ── */}
         <div className="flex items-center gap-2 min-w-0">
-        {/* Compare with… persona selector */}
+        {/* Compare & edit */}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="gap-1.5">
               <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Compare with…</span>
+              <span className="hidden sm:inline">Compare & edit</span>
               <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0" />
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-72 p-0 max-h-[80vh] overflow-y-auto">
+
+            {/* ── Current timeline ── */}
+            <div className="px-3 pt-2 pb-1">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">My Timeline</p>
+            </div>
+            <div className="px-1 pb-1">
+              {!tlEditOpen ? (
+                <div className="flex items-center rounded-md px-2 py-1.5 bg-accent group gap-2">
+                  {currentTimeline?.color && (
+                    <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: currentTimeline.color }} />
+                  )}
+                  <span className="flex-1 text-sm font-semibold truncate">{currentTimeline?.name ?? 'My Timeline'}</span>
+                  <button
+                    className="p-0.5 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"
+                    onClick={openTlEdit}
+                    title="Edit timeline"
+                  >
+                    <Pencil className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <div className="px-2 py-2 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={tlEditColor} onChange={e => setTlEditColor(e.target.value)} className="w-6 h-6 rounded cursor-pointer border-0 p-0 shrink-0" />
+                    <Input value={tlEditName} onChange={e => setTlEditName(e.target.value)} placeholder="Name" className="h-7 text-xs flex-1" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground mb-0.5">Start date</p>
+                    <Input type="date" value={tlEditStartDate} onChange={e => setTlEditStartDate(e.target.value)} className="h-7 text-xs" />
+                  </div>
+                  <div className="flex gap-1.5 justify-end">
+                    <button onClick={() => setTlEditOpen(false)} className="p-1 text-muted-foreground hover:text-foreground rounded"><X className="h-3.5 w-3.5" /></button>
+                    <button onClick={saveTlEdit} className="p-1 text-primary hover:text-primary/80 rounded"><Check className="h-3.5 w-3.5" /></button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* ── Personas ── */}
+            <div className="border-t px-3 pt-2 pb-1">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+                <Users className="h-3 w-3" />
+                Compare with
+              </p>
+            </div>
             <div className="px-1 pt-1 pb-2">
               {personas.length === 0 ? (
                 <p className="px-2 py-2 text-xs text-muted-foreground text-center">No personas available</p>
@@ -441,7 +528,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
           scrollToTodayRef={scrollToTodayRef}
           scrollToEventRef={scrollToEventRef}
           onTodayVisibilityChange={setTodayOffScreen}
-          lifeSpan={{ birthYear: DEMO_TIMELINE_START_YEAR, endYear: DEMO_TIMELINE_END_YEAR }}
+          lifeSpan={currentTimeline?.start_year != null ? { birthYear: currentTimeline.start_year, endYear: currentTimeline.end_year ?? null, color: currentTimeline.color ?? undefined } : undefined}
           overlayEvents={[]}
           overlayDisplayModes={new Map()}
           activeOverlayTimelines={[]}
