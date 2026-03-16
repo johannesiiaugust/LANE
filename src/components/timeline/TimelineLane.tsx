@@ -31,9 +31,11 @@ interface TimelineLaneProps {
   onEventMoveStart?: (event: TimelineEvent, clientX: number, clientY: number, origin: 'longpress' | 'contextmenu') => void
   onEventExtendStart?: (event: TimelineEvent, direction: 'forward' | 'backward', clientX: number) => void
   overlayEvents?: OverlayTimelineEvent[]
-  overlaySubRowMap?: Map<string, number>       // timeline_id -> sub-row index
-  overlayBaseOffset?: number                   // y-offset where overlay rows start
+  overlaySubRowMap?: Map<string, number>                       // timeline_id -> base sub-row offset
+  overlayEventRowMaps?: Map<string, Map<string, number>>       // timeline_id -> event_id -> row within group
+  overlayBaseOffset?: number                                   // y-offset where overlay rows start
   overlayTimelineInfoMap?: Map<string, { label: string; name: string; color?: string | null }>
+  personaEventRowMaps?: Map<string, Map<string, number>>       // persona_id -> event_id -> row within group
 }
 
 export function TimelineLane({
@@ -57,8 +59,10 @@ export function TimelineLane({
   onEventExtendStart,
   overlayEvents = [],
   overlaySubRowMap,
+  overlayEventRowMaps,
   overlayBaseOffset = 0,
   overlayTimelineInfoMap,
+  personaEventRowMaps,
 }: TimelineLaneProps) {
   const { sc } = useSizeConfig()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT } = sc
@@ -229,12 +233,13 @@ export function TimelineLane({
           yearStart={yearStart}
           pixelsPerYear={pixelsPerYear}
           laneColor={lane.color}
-          subRowIndex={personaSubRowMap.get(pe.persona_id)}
+          subRowIndex={(personaSubRowMap.get(pe.persona_id) ?? 0) + (personaEventRowMaps?.get(pe.persona_id)?.get(pe.id) ?? 0)}
           currentYear={currentYear}
         />
       ))}
       {overlayEvents.map(oe => {
-        const subRowIndex = overlaySubRowMap?.get(oe.timeline_id) ?? 0
+        const baseSubRow = overlaySubRowMap?.get(oe.timeline_id) ?? 0
+        const eventRow = overlayEventRowMaps?.get(oe.timeline_id)?.get(oe.id) ?? 0
         const info = overlayTimelineInfoMap?.get(oe.timeline_id)
         return (
           <OverlayEventBar
@@ -245,7 +250,7 @@ export function TimelineLane({
             yearStart={yearStart}
             pixelsPerYear={pixelsPerYear}
             laneColor={lane.color}
-            rowTop={overlayBaseOffset + subRowIndex * PERSONA_SUB_ROW_HEIGHT}
+            rowTop={overlayBaseOffset + (baseSubRow + eventRow) * PERSONA_SUB_ROW_HEIGHT}
             rowHeight={PERSONA_SUB_ROW_HEIGHT}
             currentYear={currentYear}
           />

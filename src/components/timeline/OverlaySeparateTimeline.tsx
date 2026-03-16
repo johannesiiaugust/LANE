@@ -11,6 +11,8 @@ interface OverlaySeparateTimelineProps {
   pixelsPerYear: number
   laneColorMap: Map<string, string>
   currentYear: number
+  laneRowCounts?: Map<string, number>                    // lane name -> num rows
+  laneEventRowMaps?: Map<string, Map<string, number>>    // lane name -> event id -> row
 }
 
 export function OverlaySeparateTimeline({
@@ -22,6 +24,8 @@ export function OverlaySeparateTimeline({
   pixelsPerYear,
   laneColorMap,
   currentYear,
+  laneRowCounts,
+  laneEventRowMaps,
 }: OverlaySeparateTimelineProps) {
   const { sc } = useSizeConfig()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT } = sc
@@ -36,11 +40,13 @@ export function OverlaySeparateTimeline({
       {laneNames.map(laneName => {
         const laneEvents = events.filter(e => e.lane_name === laneName)
         const laneColor = laneColorMap.get(laneName) ?? '#6b7280'
+        const rowCount = laneRowCounts?.get(laneName) ?? 1
+        const eventRowMap = laneEventRowMaps?.get(laneName)
         return (
           <div
             key={laneName}
             className="relative border-b border-border/30"
-            style={{ height: BASE_LANE_HEIGHT, width }}
+            style={{ height: rowCount * BASE_LANE_HEIGHT, width }}
           >
             {laneEvents.map(e => (
               <OverlayEventBar
@@ -51,7 +57,7 @@ export function OverlaySeparateTimeline({
                 yearStart={yearStart}
                 pixelsPerYear={pixelsPerYear}
                 laneColor={laneColor}
-                rowTop={0}
+                rowTop={eventRowMap ? (eventRowMap.get(e.id) ?? 0) * BASE_LANE_HEIGHT : 0}
                 rowHeight={BASE_LANE_HEIGHT}
                 currentYear={currentYear}
               />
