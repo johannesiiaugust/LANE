@@ -479,7 +479,7 @@ export function EventDialog({
             </Label>
             <Input
               id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder="Event title"
-              className={submitAttempted && !title.trim() ? 'border-destructive focus-visible:ring-destructive' : ''}
+              className={submitAttempted && !title.trim() ? 'border-destructive focus-visible:ring-destructive text-destructive placeholder:text-destructive/50' : ''}
             />
           </div>
           <div className="grid gap-1.5">
@@ -737,7 +737,7 @@ export function EventDialog({
                         <Input
                           type="text" value={sc.dateStr} placeholder="DD/MM/YYYY"
                           onChange={e => updateSpotChange(i, 'dateStr', formatDMYInput(e.target.value))}
-                          className={`w-28 h-7 text-xs${isOutOfEventRange(sc.dateStr) ? ' border-destructive' : ''}`}
+                          className={`w-28 h-7 text-xs${isOutOfEventRange(sc.dateStr) ? ' border-destructive text-destructive' : ''}`}
                           title={isOutOfEventRange(sc.dateStr) ? 'Date is outside the event range' : undefined}
                         />
                         <Input
@@ -780,7 +780,7 @@ export function EventDialog({
                             placeholder="DD/MM/YYYY"
                             disabled={gp.wholeEvent}
                             onChange={e => updateGrowthPeriod(i, 'startDateStr', formatDMYInput(e.target.value))}
-                            className={`flex-1 h-7 text-xs${!gp.wholeEvent && isOutOfEventRange(gp.startDateStr) ? ' border-destructive' : ''}`}
+                            className={`flex-1 h-7 text-xs${!gp.wholeEvent && isOutOfEventRange(gp.startDateStr) ? ' border-destructive text-destructive' : ''}`}
                             title={!gp.wholeEvent && isOutOfEventRange(gp.startDateStr) ? 'Date is outside the event range' : undefined}
                           />
                           <span className="text-[10px] text-muted-foreground shrink-0">→</span>
@@ -790,7 +790,7 @@ export function EventDialog({
                             placeholder="DD/MM/YYYY"
                             disabled={gp.wholeEvent}
                             onChange={e => updateGrowthPeriod(i, 'endDateStr', formatDMYInput(e.target.value))}
-                            className={`flex-1 h-7 text-xs${!gp.wholeEvent && isOutOfEventRange(gp.endDateStr) ? ' border-destructive' : ''}`}
+                            className={`flex-1 h-7 text-xs${!gp.wholeEvent && isOutOfEventRange(gp.endDateStr) ? ' border-destructive text-destructive' : ''}`}
                             title={!gp.wholeEvent && isOutOfEventRange(gp.endDateStr) ? 'Date is outside the event range' : undefined}
                           />
                           <Input
@@ -894,7 +894,7 @@ export function EventDialog({
                             placeholder="From DD/MM/YYYY"
                             disabled={dep.wholeEvent}
                             onChange={e => updateDeposit(i, 'startDateStr', formatDMYInput(e.target.value))}
-                            className={`flex-1 h-7 text-xs${!dep.wholeEvent && isOutOfEventRange(dep.startDateStr) ? ' border-destructive' : ''}`}
+                            className={`flex-1 h-7 text-xs${!dep.wholeEvent && isOutOfEventRange(dep.startDateStr) ? ' border-destructive text-destructive' : ''}`}
                             title={!dep.wholeEvent && isOutOfEventRange(dep.startDateStr) ? 'Date is outside the event range' : undefined}
                           />
                           <Input
@@ -903,7 +903,7 @@ export function EventDialog({
                             placeholder="To DD/MM/YYYY"
                             disabled={dep.wholeEvent}
                             onChange={e => updateDeposit(i, 'endDateStr', formatDMYInput(e.target.value))}
-                            className={`flex-1 h-7 text-xs${!dep.wholeEvent && isOutOfEventRange(dep.endDateStr) ? ' border-destructive' : ''}`}
+                            className={`flex-1 h-7 text-xs${!dep.wholeEvent && isOutOfEventRange(dep.endDateStr) ? ' border-destructive text-destructive' : ''}`}
                             title={!dep.wholeEvent && isOutOfEventRange(dep.endDateStr) ? 'Date is outside the event range' : undefined}
                           />
                         </div>
