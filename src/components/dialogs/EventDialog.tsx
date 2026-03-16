@@ -56,27 +56,21 @@ interface EventDialogProps {
   userId?: string | null
 }
 
-interface DraftSpotChange { id: string; dateStr: string; amountStr: string; label: string }
-interface DraftGrowthPeriod {
-  id: string; startDateStr: string; endDateStr: string
-  rateStr: string; applyOnNegative: boolean; wholeEvent: boolean
-}
+interface DraftSpotChange { id: string; dateStr: string; amountStr: string; label: string; growthStr: string }
 interface DraftDeposit {
   id: string; label: string; amount: string
   frequency: 'monthly' | 'yearly' | 'weekly' | 'daily' | 'quarterly' | 'custom'
   customIntervalStr: string; customUnit: 'day' | 'week' | 'month' | 'quarter' | 'year'
-  annualGrowthStr: string
+  annualGrowthStr: string   // deposit amount increases X%/yr (e.g. salary raises)
+  balanceGrowthStr: string  // accumulated balance earns X%/yr (e.g. savings interest)
   wholeEvent: boolean; startDateStr: string; endDateStr: string
 }
 
 function newSpotChange(): DraftSpotChange {
-  return { id: crypto.randomUUID(), dateStr: '', amountStr: '', label: '' }
-}
-function newGrowthPeriod(): DraftGrowthPeriod {
-  return { id: crypto.randomUUID(), startDateStr: '', endDateStr: '', rateStr: '', applyOnNegative: false, wholeEvent: false }
+  return { id: crypto.randomUUID(), dateStr: '', amountStr: '', label: '', growthStr: '' }
 }
 function newDeposit(): DraftDeposit {
-  return { id: crypto.randomUUID(), label: '', amount: '', frequency: 'monthly', customIntervalStr: '1', customUnit: 'month', annualGrowthStr: '', wholeEvent: false, startDateStr: '', endDateStr: '' }
+  return { id: crypto.randomUUID(), label: '', amount: '', frequency: 'monthly', customIntervalStr: '1', customUnit: 'month', annualGrowthStr: '', balanceGrowthStr: '', wholeEvent: false, startDateStr: '', endDateStr: '' }
 }
 
 export function EventDialog({
@@ -109,8 +103,8 @@ export function EventDialog({
 
   const [valueEnabled, setValueEnabled] = useState(false)
   const [startValue, setStartValue] = useState('')
+  const [startValueGrowthStr, setStartValueGrowthStr] = useState('')
   const [spotChanges, setSpotChanges] = useState<DraftSpotChange[]>([])
-  const [growthPeriods, setGrowthPeriods] = useState<DraftGrowthPeriod[]>([])
   const [deposits, setDeposits] = useState<DraftDeposit[]>([])
 
   // Enrichment fields
@@ -168,36 +162,40 @@ export function EventDialog({
       setValueEnabled(!!proj)
       if (proj) {
         setStartValue(proj.startValue != null ? String(proj.startValue) : editingEvent.pointValue != null ? String(editingEvent.pointValue) : '')
-        setSpotChanges((proj.spotChanges ?? []).map(s => ({
-          id: s.id,
-          dateStr: fracYearToDMY(s.year),
-          amountStr: String(s.amount),
-          label: s.label ?? '',
-        })))
-        setGrowthPeriods((proj.growthPeriods ?? []).map(g => ({
-          id: g.id,
-          startDateStr: fracYearToDMY(g.startYear),
-          endDateStr: fracYearToDMY(g.endYear),
-          rateStr: String(g.growthPercent),
-          applyOnNegative: g.applyOnNegative,
-          wholeEvent: false,
-        })))
-        setDeposits((proj.deposits ?? []).map(d => ({
-          id: d.id,
-          label: d.label ?? '',
-          amount: String(d.amount),
-          frequency: d.frequency,
-          customIntervalStr: String(d.customInterval ?? 1),
-          customUnit: d.customUnit ?? 'month',
-          annualGrowthStr: d.annualGrowthPercent != null ? String(d.annualGrowthPercent) : '',
-          wholeEvent: false,
-          startDateStr: fracYearToDMY(d.startYear),
-          endDateStr: d.endYear != null ? fracYearToDMY(d.endYear) : '',
-        })))
+        // Map growth periods back to inline fields: period starting at event start → start value growth;
+        // period starting near a spot change → that spot change's growth.
+        const startGrowth = (proj.growthPeriods ?? []).find(g => Math.abs(g.startYear - editingEvent.startYear) < 0.01)
+        setStartValueGrowthStr(startGrowth ? String(startGrowth.growthPercent) : '')
+        setSpotChanges((proj.spotChanges ?? []).map(s => {
+          const matched = (proj.growthPeriods ?? []).find(g => Math.abs(g.startYear - s.year) < 0.01)
+          return {
+            id: s.id,
+            dateStr: fracYearToDMY(s.year),
+            amountStr: String(s.amount),
+            label: s.label ?? '',
+            growthStr: matched ? String(matched.growthPercent) : '',
+          }
+        }))
+        setDeposits((proj.deposits ?? []).map(d => {
+          const matchedBalGrowth = (proj.growthPeriods ?? []).find(g => Math.abs(g.startYear - d.startYear) < 0.01)
+          return {
+            id: d.id,
+            label: d.label ?? '',
+            amount: String(d.amount),
+            frequency: d.frequency,
+            customIntervalStr: String(d.customInterval ?? 1),
+            customUnit: d.customUnit ?? 'month',
+            annualGrowthStr: d.annualGrowthPercent != null ? String(d.annualGrowthPercent) : '',
+            balanceGrowthStr: matchedBalGrowth ? String(matchedBalGrowth.growthPercent) : '',
+            wholeEvent: false,
+            startDateStr: fracYearToDMY(d.startYear),
+            endDateStr: d.endYear != null ? fracYearToDMY(d.endYear) : '',
+          }
+        }))
       } else {
         setStartValue(editingEvent.pointValue != null ? String(editingEvent.pointValue) : '')
+        setStartValueGrowthStr('')
         setSpotChanges([])
-        setGrowthPeriods([])
         setDeposits([])
       }
       // Enrichment
@@ -239,8 +237,8 @@ export function EventDialog({
       setEndTime('')
       setValueEnabled(false)
       setStartValue('')
+      setStartValueGrowthStr('')
       setSpotChanges([])
-      setGrowthPeriods([])
       setDeposits([])
       setLinkEnabled(false)
       setLinkAnchorType('today')
@@ -329,16 +327,27 @@ export function EventDialog({
         }))
         .filter(s => !isNaN(s.year) && s.year >= evStart - 0.001 && s.year <= evEnd + 0.001)
 
-      const periods: ValueGrowthPeriod[] = growthPeriods
-        .filter(g => g.rateStr && !isNaN(Number(g.rateStr)))
-        .map(g => ({
-          id: g.id,
-          startYear: g.wholeEvent ? evStart : dmyToFracYear(g.startDateStr),
-          endYear: g.wholeEvent ? evEnd : dmyToFracYear(g.endDateStr),
-          growthPercent: Number(g.rateStr),
-          applyOnNegative: g.applyOnNegative,
-        }))
-        .filter(p => !isNaN(p.startYear) && !isNaN(p.endYear))
+      // Build growth periods from inline growth fields on start value and spot changes.
+      // Sort by startYear descending so later periods take priority in growthAt().
+      const periods: ValueGrowthPeriod[] = []
+      if (startValueGrowthStr && !isNaN(Number(startValueGrowthStr)) && Number(startValueGrowthStr) !== 0) {
+        periods.push({ id: crypto.randomUUID(), startYear: evStart, endYear: evEnd, growthPercent: Number(startValueGrowthStr), applyOnNegative: false })
+      }
+      for (const s of spots) {
+        const sc = spotChanges.find(d => d.id === s.id)
+        if (sc?.growthStr && !isNaN(Number(sc.growthStr)) && Number(sc.growthStr) !== 0) {
+          periods.push({ id: crypto.randomUUID(), startYear: s.year, endYear: evEnd, growthPercent: Number(sc.growthStr), applyOnNegative: false })
+        }
+      }
+      // Deposit balance growth (earns X%/yr on the accumulated total during that deposit's window)
+      for (const d of deposits) {
+        if (!d.balanceGrowthStr || isNaN(Number(d.balanceGrowthStr)) || Number(d.balanceGrowthStr) === 0) continue
+        const dStart = d.wholeEvent ? evStart : dmyToFracYear(d.startDateStr)
+        const dEnd = d.wholeEvent ? evEnd : d.endDateStr ? dmyToFracYear(d.endDateStr) : evEnd
+        if (isNaN(dStart)) continue
+        periods.push({ id: crypto.randomUUID(), startYear: dStart, endYear: dEnd, growthPercent: Number(d.balanceGrowthStr), applyOnNegative: false })
+      }
+      periods.sort((a, b) => b.startYear - a.startYear)
 
       const deps: ValueDeposit[] = deposits
         .filter(d => d.amount && !isNaN(Number(d.amount)) && (d.wholeEvent || d.startDateStr))
@@ -438,13 +447,6 @@ export function EventDialog({
   function removeSpotChange(i: number) { setSpotChanges(s => s.filter((_, j) => j !== i)) }
   function updateSpotChange(i: number, field: keyof DraftSpotChange, val: string) {
     setSpotChanges(s => s.map((sc, j) => j === i ? { ...sc, [field]: val } : sc))
-  }
-
-  // Growth periods CRUD
-  function addGrowthPeriod() { setGrowthPeriods(g => [...g, newGrowthPeriod()]) }
-  function removeGrowthPeriod(i: number) { setGrowthPeriods(g => g.filter((_, j) => j !== i)) }
-  function updateGrowthPeriod(i: number, field: keyof DraftGrowthPeriod, val: string | boolean) {
-    setGrowthPeriods(g => g.map((gp, j) => j === i ? { ...gp, [field]: val } : gp))
   }
 
   // Deposits CRUD
@@ -727,6 +729,13 @@ export function EventDialog({
                       onChange={e => setStartValue(e.target.value)}
                       className="w-36 h-7 text-xs"
                     />
+                    <span className="text-[10px] text-muted-foreground shrink-0">grows</span>
+                    <Input
+                      type="number" step="0.1" value={startValueGrowthStr} placeholder="0"
+                      onChange={e => setStartValueGrowthStr(e.target.value)}
+                      className="w-16 h-7 text-xs"
+                    />
+                    <span className="text-[10px] text-muted-foreground shrink-0">%/yr</span>
                   </div>
 
                   {/* Spot changes */}
@@ -750,6 +759,13 @@ export function EventDialog({
                           onChange={e => updateSpotChange(i, 'label', e.target.value)}
                           className="flex-1 h-7 text-xs"
                         />
+                        <span className="text-[10px] text-muted-foreground shrink-0">grows</span>
+                        <Input
+                          type="number" step="0.1" value={sc.growthStr} placeholder="0"
+                          onChange={e => updateSpotChange(i, 'growthStr', e.target.value)}
+                          className="w-14 h-7 text-xs"
+                        />
+                        <span className="text-[10px] text-muted-foreground shrink-0">%/yr</span>
                         <button type="button" onClick={() => removeSpotChange(i)} className="text-muted-foreground hover:text-destructive shrink-0">
                           <X className="h-3.5 w-3.5" />
                         </button>
@@ -760,69 +776,12 @@ export function EventDialog({
                     </Button>
                   </div>
 
-                  {/* Growth periods */}
-                  <div className="space-y-1.5 pt-1 border-t">
-                    <Label className="text-xs text-muted-foreground">Annual growth periods</Label>
-                    {growthPeriods.map((gp, i) => (
-                      <div key={gp.id} className="rounded border p-2 space-y-1.5">
-                        <div className="flex gap-1 items-center">
-                          <label className="flex items-center gap-1 text-[10px] text-muted-foreground shrink-0 cursor-pointer select-none">
-                            <input
-                              type="checkbox" checked={gp.wholeEvent}
-                              onChange={e => updateGrowthPeriod(i, 'wholeEvent', e.target.checked)}
-                              className="h-3 w-3"
-                            />
-                            Whole event
-                          </label>
-                          <Input
-                            type="text"
-                            value={gp.wholeEvent ? startDate : gp.startDateStr}
-                            placeholder="DD/MM/YYYY"
-                            disabled={gp.wholeEvent}
-                            onChange={e => updateGrowthPeriod(i, 'startDateStr', formatDMYInput(e.target.value))}
-                            className={`flex-1 h-7 text-xs${!gp.wholeEvent && isOutOfEventRange(gp.startDateStr) ? ' border-destructive text-destructive' : ''}`}
-                            title={!gp.wholeEvent && isOutOfEventRange(gp.startDateStr) ? 'Date is outside the event range' : undefined}
-                          />
-                          <span className="text-[10px] text-muted-foreground shrink-0">→</span>
-                          <Input
-                            type="text"
-                            value={gp.wholeEvent ? endDate : gp.endDateStr}
-                            placeholder="DD/MM/YYYY"
-                            disabled={gp.wholeEvent}
-                            onChange={e => updateGrowthPeriod(i, 'endDateStr', formatDMYInput(e.target.value))}
-                            className={`flex-1 h-7 text-xs${!gp.wholeEvent && isOutOfEventRange(gp.endDateStr) ? ' border-destructive text-destructive' : ''}`}
-                            title={!gp.wholeEvent && isOutOfEventRange(gp.endDateStr) ? 'Date is outside the event range' : undefined}
-                          />
-                          <Input
-                            type="number" step="0.1" value={gp.rateStr} placeholder="Rate"
-                            onChange={e => updateGrowthPeriod(i, 'rateStr', e.target.value)}
-                            className="w-16 h-7 text-xs"
-                          />
-                          <span className="text-[10px] shrink-0">%</span>
-                          <button type="button" onClick={() => removeGrowthPeriod(i)} className="text-muted-foreground hover:text-destructive shrink-0">
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                        <label className="flex items-center gap-1 text-[10px] text-muted-foreground cursor-pointer select-none">
-                          <input
-                            type="checkbox" checked={gp.applyOnNegative}
-                            onChange={e => updateGrowthPeriod(i, 'applyOnNegative', e.target.checked)}
-                            className="h-3 w-3"
-                          />
-                          Apply growth on negative balance
-                        </label>
-                      </div>
-                    ))}
-                    <Button type="button" variant="outline" size="sm" onClick={addGrowthPeriod} className="h-7 text-xs">
-                      <Plus className="h-3 w-3 mr-1" /> Add growth period
-                    </Button>
-                  </div>
-
                   {/* Recurring changes */}
                   <div className="space-y-1.5 pt-1 border-t">
                     <Label className="text-xs text-muted-foreground">Recurring changes (within event range)</Label>
                     {deposits.map((dep, i) => (
                       <div key={dep.id} className="rounded border p-2 space-y-1.5">
+                        {/* Row 1: label · amount · frequency · X */}
                         <div className="flex gap-1 items-center">
                           <Input
                             value={dep.label} placeholder="Label (opt)"
@@ -832,13 +791,8 @@ export function EventDialog({
                           <Input
                             type="number" value={dep.amount} placeholder="Amount (+/-)"
                             onChange={e => updateDeposit(i, 'amount', e.target.value)}
-                            className="w-28 h-7 text-xs"
+                            className="w-24 h-7 text-xs"
                           />
-                          <button type="button" onClick={() => removeDeposit(i)} className="text-muted-foreground hover:text-destructive shrink-0">
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                        <div className="flex gap-1 items-center flex-wrap">
                           <select
                             value={dep.frequency}
                             onChange={e => updateDeposit(i, 'frequency', e.target.value)}
@@ -856,7 +810,7 @@ export function EventDialog({
                               <Input
                                 type="number" min="1" value={dep.customIntervalStr} placeholder="1"
                                 onChange={e => updateDeposit(i, 'customIntervalStr', e.target.value)}
-                                className="w-14 h-7 text-xs"
+                                className="w-12 h-7 text-xs"
                               />
                               <select
                                 value={dep.customUnit}
@@ -871,14 +825,11 @@ export function EventDialog({
                               </select>
                             </>
                           )}
-                          <span className="text-[10px] text-muted-foreground shrink-0">grows</span>
-                          <Input
-                            type="number" step="0.1" value={dep.annualGrowthStr} placeholder="0"
-                            onChange={e => updateDeposit(i, 'annualGrowthStr', e.target.value)}
-                            className="w-16 h-7 text-xs"
-                          />
-                          <span className="text-[10px] text-muted-foreground shrink-0">%/yr</span>
+                          <button type="button" onClick={() => removeDeposit(i)} className="text-muted-foreground hover:text-destructive shrink-0">
+                            <X className="h-3.5 w-3.5" />
+                          </button>
                         </div>
+                        {/* Row 2: date range */}
                         <div className="flex gap-1 items-center">
                           <label className="flex items-center gap-1 text-[10px] text-muted-foreground shrink-0 cursor-pointer select-none">
                             <input
@@ -906,6 +857,24 @@ export function EventDialog({
                             className={`flex-1 h-7 text-xs${!dep.wholeEvent && isOutOfEventRange(dep.endDateStr) ? ' border-destructive text-destructive' : ''}`}
                             title={!dep.wholeEvent && isOutOfEventRange(dep.endDateStr) ? 'Date is outside the event range' : undefined}
                           />
+                        </div>
+                        {/* Row 3: increase %/yr · grows %/yr */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-[10px] text-muted-foreground shrink-0">increase</span>
+                          <Input
+                            type="number" step="0.1" value={dep.annualGrowthStr} placeholder="0"
+                            onChange={e => updateDeposit(i, 'annualGrowthStr', e.target.value)}
+                            className="w-16 h-7 text-xs"
+                            title="Deposit amount increases by this % each year (e.g. salary raise)"
+                          />
+                          <span className="text-[10px] text-muted-foreground shrink-0">%/yr · grows</span>
+                          <Input
+                            type="number" step="0.1" value={dep.balanceGrowthStr} placeholder="0"
+                            onChange={e => updateDeposit(i, 'balanceGrowthStr', e.target.value)}
+                            className="w-16 h-7 text-xs"
+                            title="Accumulated balance grows at this % per year (e.g. savings interest)"
+                          />
+                          <span className="text-[10px] text-muted-foreground shrink-0">%/yr</span>
                         </div>
                       </div>
                     ))}
