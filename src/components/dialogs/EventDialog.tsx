@@ -102,6 +102,9 @@ export function EventDialog({
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
 
+  // Validation
+  const [submitAttempted, setSubmitAttempted] = useState(false)
+
   // Value tracking (range events)
 
   const [valueEnabled, setValueEnabled] = useState(false)
@@ -254,6 +257,7 @@ export function EventDialog({
       setTags('')
       setSource('')
       setShowDetails(false)
+      setSubmitAttempted(false)
     }
   }, [editingEvent, open, lanes, defaultLaneId, defaultStartYear, defaultEndYear])
 
@@ -288,8 +292,22 @@ export function EventDialog({
     return { startYear, endYear }
   }, [linkEnabled, linkAnchorType, linkFixedDate, linkFixedTime, linkEventId, linkEventAnchor, linkStartOffsetStr, linkDurationStr, events])
 
+  // Fractional years for the event boundaries — used to validate value-tracking dates
+  const evStartFrac = startDate.length === 10 ? dmyToFracYear(startDate) : null
+  const evEndFrac = endDate.length === 10 ? dmyToFracYear(endDate) : null
+
+  function isOutOfEventRange(dateStr: string): boolean {
+    if (!dateStr || dateStr.length < 10) return false
+    const y = dmyToFracYear(dateStr)
+    if (isNaN(y)) return false
+    if (evStartFrac !== null && !isNaN(evStartFrac) && y < evStartFrac - 0.001) return true
+    if (evEndFrac !== null && !isNaN(evEndFrac) && y > evEndFrac + 0.001) return true
+    return false
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setSubmitAttempted(true)
     // When link is active, start date isn't required (computed); otherwise validate
     if (!title.trim() || !laneId) return
     if (!linkEnabled && !startDate) return
@@ -456,8 +474,13 @@ export function EventDialog({
             </Select>
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="title">Title</Label>
-            <Input id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder="Event title" />
+            <Label htmlFor="title" className={submitAttempted && !title.trim() ? 'text-destructive' : ''}>
+              Title <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder="Event title"
+              className={submitAttempted && !title.trim() ? 'border-destructive focus-visible:ring-destructive' : ''}
+            />
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor="desc">Description</Label>
@@ -509,7 +532,9 @@ export function EventDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">
-              <Label htmlFor="start">Start Date</Label>
+              <Label htmlFor="start" className={submitAttempted && !startDate && !linkEnabled ? 'text-destructive' : ''}>
+                Start Date <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="start" type="text"
                 value={linkEnabled && computedLink ? fracYearToDMY(computedLink.startYear) : startDate}
@@ -517,7 +542,7 @@ export function EventDialog({
                 onChange={e => !linkEnabled && setStartDate(formatDMYInput(e.target.value))}
                 disabled={linkEnabled}
                 required={!linkEnabled}
-                className={linkEnabled ? 'opacity-60' : ''}
+                className={linkEnabled ? 'opacity-60' : submitAttempted && !startDate ? 'border-destructive focus-visible:ring-destructive' : ''}
               />
             </div>
             <div className="grid gap-1.5">
@@ -712,7 +737,8 @@ export function EventDialog({
                         <Input
                           type="text" value={sc.dateStr} placeholder="DD/MM/YYYY"
                           onChange={e => updateSpotChange(i, 'dateStr', formatDMYInput(e.target.value))}
-                          className="w-28 h-7 text-xs"
+                          className={`w-28 h-7 text-xs${isOutOfEventRange(sc.dateStr) ? ' border-destructive' : ''}`}
+                          title={isOutOfEventRange(sc.dateStr) ? 'Date is outside the event range' : undefined}
                         />
                         <Input
                           type="number" value={sc.amountStr} placeholder="Amount (+/-)"
@@ -754,7 +780,8 @@ export function EventDialog({
                             placeholder="DD/MM/YYYY"
                             disabled={gp.wholeEvent}
                             onChange={e => updateGrowthPeriod(i, 'startDateStr', formatDMYInput(e.target.value))}
-                            className="flex-1 h-7 text-xs"
+                            className={`flex-1 h-7 text-xs${!gp.wholeEvent && isOutOfEventRange(gp.startDateStr) ? ' border-destructive' : ''}`}
+                            title={!gp.wholeEvent && isOutOfEventRange(gp.startDateStr) ? 'Date is outside the event range' : undefined}
                           />
                           <span className="text-[10px] text-muted-foreground shrink-0">→</span>
                           <Input
@@ -763,7 +790,8 @@ export function EventDialog({
                             placeholder="DD/MM/YYYY"
                             disabled={gp.wholeEvent}
                             onChange={e => updateGrowthPeriod(i, 'endDateStr', formatDMYInput(e.target.value))}
-                            className="flex-1 h-7 text-xs"
+                            className={`flex-1 h-7 text-xs${!gp.wholeEvent && isOutOfEventRange(gp.endDateStr) ? ' border-destructive' : ''}`}
+                            title={!gp.wholeEvent && isOutOfEventRange(gp.endDateStr) ? 'Date is outside the event range' : undefined}
                           />
                           <Input
                             type="number" step="0.1" value={gp.rateStr} placeholder="Rate"
@@ -866,7 +894,8 @@ export function EventDialog({
                             placeholder="From DD/MM/YYYY"
                             disabled={dep.wholeEvent}
                             onChange={e => updateDeposit(i, 'startDateStr', formatDMYInput(e.target.value))}
-                            className="flex-1 h-7 text-xs"
+                            className={`flex-1 h-7 text-xs${!dep.wholeEvent && isOutOfEventRange(dep.startDateStr) ? ' border-destructive' : ''}`}
+                            title={!dep.wholeEvent && isOutOfEventRange(dep.startDateStr) ? 'Date is outside the event range' : undefined}
                           />
                           <Input
                             type="text"
@@ -874,7 +903,8 @@ export function EventDialog({
                             placeholder="To DD/MM/YYYY"
                             disabled={dep.wholeEvent}
                             onChange={e => updateDeposit(i, 'endDateStr', formatDMYInput(e.target.value))}
-                            className="flex-1 h-7 text-xs"
+                            className={`flex-1 h-7 text-xs${!dep.wholeEvent && isOutOfEventRange(dep.endDateStr) ? ' border-destructive' : ''}`}
+                            title={!dep.wholeEvent && isOutOfEventRange(dep.endDateStr) ? 'Date is outside the event range' : undefined}
                           />
                         </div>
                       </div>
