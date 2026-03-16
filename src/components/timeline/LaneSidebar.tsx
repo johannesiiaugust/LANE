@@ -16,7 +16,7 @@ export interface PersonaSidebarSection {
   initials: string
   birthYear: number
   deathYear?: number | null
-  laneNames: string[]
+  laneRowData: { name: string; hasOverlaps: boolean; rowCount: number }[]
 }
 
 export interface OverlaySidebarSection {
@@ -24,20 +24,28 @@ export interface OverlaySidebarSection {
   name: string
   label: string   // emoji or 2-char abbreviation
   color: string
-  laneNames: string[]
+  laneRowData: { name: string; hasOverlaps: boolean; rowCount: number }[]
 }
 
 interface LaneSidebarProps {
   lanes: Lane[]
   hiddenLanes: Lane[]
   laneHeights: number[]
-  lanePersonaLabels: Map<string, { initials: string; name: string }[]>
-  laneOverlayLabels?: Map<string, { label: string; name: string }[]>
+  lanePersonaLabels: Map<string, { initials: string; name: string; personaId: string; hasOverlaps: boolean; rowCount: number }[]>
+  laneOverlayLabels?: Map<string, { label: string; name: string; timelineId: string; hasOverlaps: boolean; rowCount: number }[]>
   laneHasOverlaps: Map<string, boolean>
   expandedLanes: Set<string>
+  expandedPersonaRows: Set<string>
+  expandedOverlayRows: Set<string>
+  expandedSeparatePersonaLanes: Set<string>
+  expandedSeparateOverlayLanes: Set<string>
   separatePersonaSections?: PersonaSidebarSection[]
   separateOverlaySections?: OverlaySidebarSection[]
   onToggleExpand: (id: string) => void
+  onTogglePersonaExpand: (laneId: string, personaId: string) => void
+  onToggleOverlayExpand: (laneId: string, timelineId: string) => void
+  onToggleSeparatePersonaLane: (personaId: string, laneName: string) => void
+  onToggleSeparateOverlayLane: (timelineId: string, laneName: string) => void
   onToggleVisibility: (id: string) => void
   onMoveLane: (id: string, direction: 'up' | 'down') => void
   onEditLane: (lane: Lane) => void
@@ -53,9 +61,17 @@ export function LaneSidebar({
   laneOverlayLabels,
   laneHasOverlaps,
   expandedLanes,
+  expandedPersonaRows,
+  expandedOverlayRows,
+  expandedSeparatePersonaLanes,
+  expandedSeparateOverlayLanes,
   separatePersonaSections = [],
   separateOverlaySections = [],
   onToggleExpand,
+  onTogglePersonaExpand,
+  onToggleOverlayExpand,
+  onToggleSeparatePersonaLane,
+  onToggleSeparateOverlayLane,
   onToggleVisibility,
   onMoveLane,
   onEditLane,
@@ -166,50 +182,86 @@ export function LaneSidebar({
             </div>
 
             {/* Persona sub-row labels */}
-            {personaLabels.map((pl, j) => (
-              <div
-                key={j}
-                className="flex items-center text-muted-foreground"
-                style={{
-                  height: PERSONA_SUB_ROW_HEIGHT,
-                  paddingLeft: Math.round(W * 0.08),
-                  gap: Math.round(ICON_SIZE / 6),
-                }}
-              >
-                <span
-                  className="font-semibold bg-muted rounded shrink-0"
-                  style={{ fontSize: Math.round(SIDEBAR_FONT * 0.85), padding: '0 4px' }}
+            {personaLabels.map((pl, j) => {
+              const isPersonaExpanded = expandedPersonaRows.has(`${lane.id}:${pl.personaId}`)
+              const rowH = pl.rowCount * PERSONA_SUB_ROW_HEIGHT
+              const topPad = Math.round((PERSONA_SUB_ROW_HEIGHT - SIDEBAR_FONT * 1.4) / 2)
+              return (
+                <div
+                  key={j}
+                  className="flex items-start text-muted-foreground"
+                  style={{
+                    height: rowH,
+                    paddingLeft: pl.hasOverlaps ? Math.round(W * 0.04) : Math.round(W * 0.08),
+                    paddingTop: topPad,
+                    gap: Math.round(ICON_SIZE / 6),
+                  }}
                 >
-                  {pl.initials}
-                </span>
-                <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>
-                  {pl.name}
-                </span>
-              </div>
-            ))}
+                  {pl.hasOverlaps && (
+                    <button
+                      onClick={() => onTogglePersonaExpand(lane.id, pl.personaId)}
+                      className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+                      style={{ padding: iconPad }}
+                      title={isPersonaExpanded ? 'Collapse rows' : 'Expand overlapping events'}
+                    >
+                      {isPersonaExpanded
+                        ? <ChevronDown size={ICON_SIZE} />
+                        : <ChevronRight size={ICON_SIZE} />}
+                    </button>
+                  )}
+                  <span
+                    className="font-semibold bg-muted rounded shrink-0"
+                    style={{ fontSize: Math.round(SIDEBAR_FONT * 0.85), padding: '0 4px' }}
+                  >
+                    {pl.initials}
+                  </span>
+                  <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>
+                    {pl.name}
+                  </span>
+                </div>
+              )
+            })}
 
             {/* Overlay sub-row labels */}
-            {(laneOverlayLabels?.get(lane.name) ?? []).map((ol, j) => (
-              <div
-                key={`ov-${j}`}
-                className="flex items-center text-muted-foreground"
-                style={{
-                  height: PERSONA_SUB_ROW_HEIGHT,
-                  paddingLeft: Math.round(W * 0.08),
-                  gap: Math.round(ICON_SIZE / 6),
-                }}
-              >
-                <span
-                  className="font-semibold bg-primary/15 text-primary rounded shrink-0"
-                  style={{ fontSize: Math.round(SIDEBAR_FONT * 0.85), padding: '0 4px' }}
+            {(laneOverlayLabels?.get(lane.name) ?? []).map((ol, j) => {
+              const isOverlayExpanded = expandedOverlayRows.has(`${lane.id}:${ol.timelineId}`)
+              const rowH = ol.rowCount * PERSONA_SUB_ROW_HEIGHT
+              const topPad = Math.round((PERSONA_SUB_ROW_HEIGHT - SIDEBAR_FONT * 1.4) / 2)
+              return (
+                <div
+                  key={`ov-${j}`}
+                  className="flex items-start text-muted-foreground"
+                  style={{
+                    height: rowH,
+                    paddingLeft: ol.hasOverlaps ? Math.round(W * 0.04) : Math.round(W * 0.08),
+                    paddingTop: topPad,
+                    gap: Math.round(ICON_SIZE / 6),
+                  }}
                 >
-                  {ol.label}
-                </span>
-                <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>
-                  {ol.name}
-                </span>
-              </div>
-            ))}
+                  {ol.hasOverlaps && (
+                    <button
+                      onClick={() => onToggleOverlayExpand(lane.id, ol.timelineId)}
+                      className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+                      style={{ padding: iconPad }}
+                      title={isOverlayExpanded ? 'Collapse rows' : 'Expand overlapping events'}
+                    >
+                      {isOverlayExpanded
+                        ? <ChevronDown size={ICON_SIZE} />
+                        : <ChevronRight size={ICON_SIZE} />}
+                    </button>
+                  )}
+                  <span
+                    className="font-semibold bg-primary/15 text-primary rounded shrink-0"
+                    style={{ fontSize: Math.round(SIDEBAR_FONT * 0.85), padding: '0 4px' }}
+                  >
+                    {ol.label}
+                  </span>
+                  <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>
+                    {ol.name}
+                  </span>
+                </div>
+              )
+            })}
           </div>
         )
       })}
@@ -262,20 +314,35 @@ export function LaneSidebar({
             </span>
           </div>
           {/* One label row per lane */}
-          {section.laneNames.map(laneName => (
-            <div
-              key={laneName}
-              className="border-b border-border/30 flex items-center text-muted-foreground"
-              style={{
-                height: BASE_LANE_HEIGHT,
-                paddingLeft: Math.round(W * 0.08),
-                paddingRight: Math.round(W * 0.04),
-                gap: Math.round(ICON_SIZE / 4),
-              }}
-            >
-              <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>{laneName}</span>
-            </div>
-          ))}
+          {section.laneRowData.map(row => {
+            const sepKey = `${section.personaId}:${row.name}`
+            const isRowExpanded = expandedSeparatePersonaLanes.has(sepKey)
+            return (
+              <div
+                key={row.name}
+                className="border-b border-border/30 flex items-start text-muted-foreground"
+                style={{
+                  height: row.rowCount * BASE_LANE_HEIGHT,
+                  paddingLeft: row.hasOverlaps ? Math.round(W * 0.04) : Math.round(W * 0.08),
+                  paddingRight: Math.round(W * 0.04),
+                  paddingTop: Math.round((BASE_LANE_HEIGHT - SIDEBAR_FONT * 1.4) / 2),
+                  gap: Math.round(ICON_SIZE / 4),
+                }}
+              >
+                {row.hasOverlaps && (
+                  <button
+                    onClick={() => onToggleSeparatePersonaLane(section.personaId, row.name)}
+                    className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+                    style={{ padding: iconPad }}
+                    title={isRowExpanded ? 'Collapse rows' : 'Expand overlapping events'}
+                  >
+                    {isRowExpanded ? <ChevronDown size={ICON_SIZE} /> : <ChevronRight size={ICON_SIZE} />}
+                  </button>
+                )}
+                <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>{row.name}</span>
+              </div>
+            )
+          })}
         </div>
       ))}
 
@@ -301,20 +368,35 @@ export function LaneSidebar({
               {section.name}
             </span>
           </div>
-          {section.laneNames.map(laneName => (
-            <div
-              key={laneName}
-              className="border-b border-border/30 flex items-center text-muted-foreground"
-              style={{
-                height: BASE_LANE_HEIGHT,
-                paddingLeft: Math.round(W * 0.08),
-                paddingRight: Math.round(W * 0.04),
-                gap: Math.round(ICON_SIZE / 4),
-              }}
-            >
-              <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>{laneName}</span>
-            </div>
-          ))}
+          {section.laneRowData.map(row => {
+            const sepKey = `${section.timelineId}:${row.name}`
+            const isRowExpanded = expandedSeparateOverlayLanes.has(sepKey)
+            return (
+              <div
+                key={row.name}
+                className="border-b border-border/30 flex items-start text-muted-foreground"
+                style={{
+                  height: row.rowCount * BASE_LANE_HEIGHT,
+                  paddingLeft: row.hasOverlaps ? Math.round(W * 0.04) : Math.round(W * 0.08),
+                  paddingRight: Math.round(W * 0.04),
+                  paddingTop: Math.round((BASE_LANE_HEIGHT - SIDEBAR_FONT * 1.4) / 2),
+                  gap: Math.round(ICON_SIZE / 4),
+                }}
+              >
+                {row.hasOverlaps && (
+                  <button
+                    onClick={() => onToggleSeparateOverlayLane(section.timelineId, row.name)}
+                    className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+                    style={{ padding: iconPad }}
+                    title={isRowExpanded ? 'Collapse rows' : 'Expand overlapping events'}
+                  >
+                    {isRowExpanded ? <ChevronDown size={ICON_SIZE} /> : <ChevronRight size={ICON_SIZE} />}
+                  </button>
+                )}
+                <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>{row.name}</span>
+              </div>
+            )
+          })}
         </div>
       ))}
 
