@@ -63,11 +63,26 @@ export function TotalAssetsLane({
     const vizWidth   = Math.max(4, (rangeEnd - rangeStart) * pixelsPerYear)
     const leftOffset = (rangeStart - yearStart) * pixelsPerYear
 
-    // Collect spot-change years so we can insert sharp-step anchors
-    const spotYears = new Set<number>()
+    // Collect years that need sharp-step anchors (instant jumps in the graph).
+    // We use sy-1e-6 (value before) and sy+1e-9 (value after) to bracket each
+    // jump. sy+1e-9 rather than sy itself is needed because computeValueAtYear
+    // has an early return for targetYear <= startYear, so sampling exactly at
+    // startYear misses spot changes scheduled there.
+    const jumpYears = new Set<number>()
+
+    // Spot-change years
     for (const ev of valueEvents) {
       for (const sc of ev.valueProjection?.spotChanges ?? []) {
-        spotYears.add(sc.year)
+        jumpYears.add(sc.year)
+      }
+    }
+
+    // Event start years with a non-zero starting value — these also appear as
+    // instant jumps (the value goes from 0 to startValue the moment the event
+    // begins, whether it is a momentary "spot" event or a longer range event).
+    for (const ev of valueEvents) {
+      if ((ev.valueProjection?.startValue ?? 0) !== 0) {
+        jumpYears.add(ev.startYear)
       }
     }
 
@@ -75,14 +90,7 @@ export function TotalAssetsLane({
     for (let i = 0; i <= NUM_SAMPLES; i++) {
       yearSet.add(rangeStart + (i / NUM_SAMPLES) * (rangeEnd - rangeStart))
     }
-    // For each spot change: add a sample just before (value without change)
-    // and just after (value with change) so the line shows an instant jump.
-    // We use sy+1e-9 instead of sy because computeValueAtYear has an early
-    // return for targetYear <= startYear — when the spot change is at the
-    // event's own start date (common case: purchase on day one), sampling at
-    // sy returns startValue without the spot applied. sy+1e-9 forces the step
-    // loop to execute and includes the spot change.
-    for (const sy of spotYears) {
+    for (const sy of jumpYears) {
       if (sy >= rangeStart && sy <= rangeEnd) {
         yearSet.add(sy - 1e-6)
         yearSet.add(sy + 1e-9)

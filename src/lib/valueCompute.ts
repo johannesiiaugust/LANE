@@ -100,16 +100,27 @@ export function generateSparklineSeries(
   numSamples = 80,
 ): { year: number; value: number; projected: boolean }[] {
   if (endYear <= startYear) return []
-  const result: { year: number; value: number; projected: boolean }[] = []
+
+  const yearSet = new Set<number>()
   for (let i = 0; i <= numSamples; i++) {
-    const year = startYear + (i / numSamples) * (endYear - startYear)
-    result.push({
+    yearSet.add(startYear + (i / numSamples) * (endYear - startYear))
+  }
+  // Insert sharp-step anchors for spot changes so they render as instant jumps
+  // rather than interpolated slopes (same sy+1e-9 trick used in TotalAssetsLane).
+  for (const sc of projection.spotChanges ?? []) {
+    if (sc.year > startYear && sc.year <= endYear) {
+      yearSet.add(sc.year - 1e-6)
+      yearSet.add(sc.year + 1e-9)
+    }
+  }
+
+  return Array.from(yearSet)
+    .sort((a, b) => a - b)
+    .map(year => ({
       year,
       value: computeValueAtYear(year, startYear, projection),
       projected: year > currentYear,
-    })
-  }
-  return result
+    }))
 }
 
 export function formatValue(v: number): string {
