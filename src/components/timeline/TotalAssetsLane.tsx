@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import type { TimelineEvent } from '@/types/timeline'
-import { computeValueAtYear, formatValue } from '@/lib/valueCompute'
+import { computeValueAtYear, formatValue, getDiscreteDepositYears } from '@/lib/valueCompute'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
 
 const TEAL = '#14b8a6'
@@ -83,6 +83,16 @@ export function TotalAssetsLane({
     for (const ev of valueEvents) {
       if ((ev.valueProjection?.startValue ?? 0) !== 0) {
         jumpYears.add(ev.startYear)
+      }
+    }
+
+    // Discrete deposit occurrence years (monthly/quarterly/yearly) — each
+    // occurrence is a lump-sum addition and must render as an instant jump.
+    for (const ev of valueEvents) {
+      if (!ev.valueProjection) continue
+      const evEnd = ev.endYear ?? rangeEnd
+      for (const occ of getDiscreteDepositYears(ev.valueProjection, rangeStart, evEnd)) {
+        jumpYears.add(occ)
       }
     }
 
