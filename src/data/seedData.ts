@@ -1,10 +1,10 @@
 import type { Lane, TimelineEvent } from '@/types/timeline'
 
 export const defaultLanes: Lane[] = [
-  { id: 'place',      name: 'Place',      emoji: '📍', color: '#3b82f6', visible: true, isDefault: true, order: 0 },
-  { id: 'work',       name: 'Work',       emoji: '💼', color: '#10b981', visible: true, isDefault: true, order: 1 },
-  { id: 'health',     name: 'Health',     emoji: '❤️', color: '#ef4444', visible: true, isDefault: true, order: 2 },
-  { id: 'relations',  name: 'Relations',  emoji: '👪', color: '#ec4899', visible: true, isDefault: true, order: 3 },
+  { id: 'place',      name: 'Place & Travel',       emoji: '📍', color: '#3b82f6', visible: true, isDefault: true, order: 0 },
+  { id: 'work',       name: 'Work & Education',     emoji: '💼', color: '#10b981', visible: true, isDefault: true, order: 1 },
+  { id: 'health',     name: 'Health',               emoji: '❤️', color: '#ef4444', visible: true, isDefault: true, order: 2 },
+  { id: 'relations',  name: 'Relations & Family',   emoji: '👪', color: '#ec4899', visible: true, isDefault: true, order: 3 },
   { id: 'activities', name: 'Activities', emoji: '🎯', color: '#f59e0b', visible: true, isDefault: true, order: 4 },
   { id: 'assets',     name: 'Assets',     emoji: '💰', color: '#14b8a6', visible: true, isDefault: true, order: 5 },
   { id: 'items',      name: 'Items',      emoji: '🚗', color: '#64748b', visible: true, isDefault: true, order: 6 },

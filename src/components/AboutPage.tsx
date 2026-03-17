@@ -31,7 +31,7 @@ export function AboutPage() {
         <section className="space-y-4">
           <h1 className="text-3xl font-bold">About TimeLANE</h1>
           <p className="text-muted-foreground leading-relaxed">
-            TimeLANE is a personal life timeline tool that lets you visualize your entire life — past, present, and future — on a single horizontal canvas. Organize events across swim lanes like Place, Work, Health, Relations, Activities, Assets, Items, and more. Drag, zoom, and scroll through decades in seconds.
+            TimeLANE is a personal life timeline tool that lets you visualize your entire life — past, present, and future — on a single horizontal canvas. Organize events across swim lanes like Place & Travel, Work & Education, Relations & Family, Health, Activities, Assets, Items, and more. Drag, zoom, and scroll through decades in seconds.
           </p>
           <p className="text-muted-foreground leading-relaxed">
             Beyond recording the past, TimeLANE is built for planning ahead. Add future events — job changes, moves, purchases — and attach value projections to track the financial impact of your decisions over time. See how a career change, a boat, or a business venture affects your long-term picture.

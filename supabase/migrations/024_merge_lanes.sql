@@ -1,13 +1,13 @@
 -- ============================================================
 -- 024_merge_lanes.sql
 -- Consolidate 12 default lanes into 7:
---   Locations + Travel    → Place       (📍 #3b82f6)
---   Work + Education      → Work        (💼 #10b981)
---   Relationships + Family → Relations  (👪 #ec4899)
---   Activities + Achievements → Activities (🎯 #f59e0b)
---   Items + Vehicles      → Items       (🚗 #64748b)
---   Health                → unchanged
---   Assets                → unchanged
+--   Locations + Travel      → Place & Travel       (📍 #3b82f6)
+--   Work + Education        → Work & Education     (💼 #10b981)
+--   Relationships + Family  → Relations & Family   (👪 #ec4899)
+--   Activities + Achievements → Activities         (🎯 #f59e0b)
+--   Items + Vehicles        → Items                (🚗 #64748b)
+--   Health                  → unchanged
+--   Assets                  → unchanged
 -- ============================================================
 
 -- ── Step 1: Move events from secondary lanes into primary lanes ───────────────
@@ -67,25 +67,25 @@ WHERE e.lane_id = secondary_lane.id;
 -- ── Step 2: Rename orphan secondary lanes (timelines that only have the ──────
 -- secondary lane but not the primary, so we rename rather than delete).
 
--- Travel (no Locations sibling) → rename to Place
+-- Travel (no Locations sibling) → rename to Place & Travel
 UPDATE public.lanes
-SET name = 'Place', emoji = '📍', color = '#3b82f6'
+SET name = 'Place & Travel', emoji = '📍', color = '#3b82f6'
 WHERE name = 'Travel'
   AND timeline_id NOT IN (
     SELECT timeline_id FROM public.lanes WHERE name = 'Locations'
   );
 
--- Education (no Work sibling) → rename to Work
+-- Education (no Work sibling) → rename to Work & Education
 UPDATE public.lanes
-SET name = 'Work', emoji = '💼', color = '#10b981'
+SET name = 'Work & Education', emoji = '💼', color = '#10b981'
 WHERE name = 'Education'
   AND timeline_id NOT IN (
     SELECT timeline_id FROM public.lanes WHERE name = 'Work'
   );
 
--- Family (no Relationships sibling) → rename to Relations
+-- Family (no Relationships sibling) → rename to Relations & Family
 UPDATE public.lanes
-SET name = 'Relations', emoji = '👪', color = '#ec4899'
+SET name = 'Relations & Family', emoji = '👪', color = '#ec4899'
 WHERE name = 'Family'
   AND timeline_id NOT IN (
     SELECT timeline_id FROM public.lanes WHERE name = 'Relationships'
@@ -111,17 +111,17 @@ WHERE name = 'Vehicles'
 DELETE FROM public.lanes WHERE name IN ('Travel', 'Education', 'Family', 'Achievements', 'Vehicles');
 
 -- ── Step 4: Rename primary lanes and update emoji/color/order ─────────────────
-UPDATE public.lanes SET name = 'Place',     emoji = '📍', color = '#3b82f6', "order" = 0 WHERE name = 'Locations';
-UPDATE public.lanes SET                                                        "order" = 1 WHERE name = 'Work';
-UPDATE public.lanes SET                                                        "order" = 2 WHERE name = 'Health';
-UPDATE public.lanes SET name = 'Relations', emoji = '👪', color = '#ec4899', "order" = 3 WHERE name = 'Relationships';
-UPDATE public.lanes SET                      emoji = '🎯',                    "order" = 4 WHERE name = 'Activities';
-UPDATE public.lanes SET                                                        "order" = 5 WHERE name = 'Assets';
-UPDATE public.lanes SET                      emoji = '🚗', color = '#64748b', "order" = 6 WHERE name = 'Items';
+UPDATE public.lanes SET name = 'Place & Travel',     emoji = '📍', color = '#3b82f6', "order" = 0 WHERE name = 'Locations';
+UPDATE public.lanes SET name = 'Work & Education',                                     "order" = 1 WHERE name = 'Work';
+UPDATE public.lanes SET                                                                  "order" = 2 WHERE name = 'Health';
+UPDATE public.lanes SET name = 'Relations & Family', emoji = '👪', color = '#ec4899', "order" = 3 WHERE name = 'Relationships';
+UPDATE public.lanes SET                               emoji = '🎯',                    "order" = 4 WHERE name = 'Activities';
+UPDATE public.lanes SET                                                                  "order" = 5 WHERE name = 'Assets';
+UPDATE public.lanes SET                               emoji = '🚗', color = '#64748b', "order" = 6 WHERE name = 'Items';
 
 -- ── Step 5: Update persona_events lane_names ──────────────────────────────────
-UPDATE public.persona_events SET lane_name = 'Place'     WHERE lane_name IN ('Locations', 'Travel');
-UPDATE public.persona_events SET lane_name = 'Work'      WHERE lane_name = 'Education';
-UPDATE public.persona_events SET lane_name = 'Relations' WHERE lane_name IN ('Relationships', 'Family');
-UPDATE public.persona_events SET lane_name = 'Items'     WHERE lane_name = 'Vehicles';
+UPDATE public.persona_events SET lane_name = 'Place & Travel'     WHERE lane_name IN ('Locations', 'Travel');
+UPDATE public.persona_events SET lane_name = 'Work & Education'   WHERE lane_name = 'Education';
+UPDATE public.persona_events SET lane_name = 'Relations & Family' WHERE lane_name IN ('Relationships', 'Family');
+UPDATE public.persona_events SET lane_name = 'Items'              WHERE lane_name = 'Vehicles';
 -- Activities and Assets are already correct
