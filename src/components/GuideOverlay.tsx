@@ -10,12 +10,13 @@ interface Step {
   text: string
   side: 'top' | 'bottom' | 'left' | 'right'
   align: 'start' | 'center' | 'end'
+  centerOnMobile?: boolean // center card horizontally and place above year line on small screens
 }
 
 const STEPS: Step[] = [
   {
     target: 'compare',
-    title: 'Compare with anyone',
+    title: 'Compare your life with anyone',
     text: 'Compare yourself with famous people, friends and others.',
     side: 'bottom',
     align: 'start',
@@ -33,6 +34,7 @@ const STEPS: Step[] = [
     text: 'Add your life — and your friends\' — from CVs, social networks, calendars and other sources. Simply copy-paste any marked text with our AI.',
     side: 'bottom',
     align: 'end',
+    centerOnMobile: true,
   },
   {
     target: 'compare',
@@ -138,6 +140,11 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
     const vw = window.innerWidth
     const vh = window.innerHeight
 
+    // On small screens, center the card horizontally and place it above the year line
+    if (current.centerOnMobile && vw < 640) {
+      return { top: 70, left: Math.max(12, (vw - TIP_W) / 2) }
+    }
+
     switch (current.side) {
       case 'bottom': {
         const tipTop = hole.top + hole.height + gap
@@ -175,6 +182,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
   type ArrowStyle = React.CSSProperties
   const getArrowStyle = (): ArrowStyle => {
     if (!hole) return {}
+    if (current.centerOnMobile && window.innerWidth < 640) return {}
     const base: ArrowStyle = { position: 'absolute', width: 0, height: 0 }
     switch (current.side) {
       case 'bottom': return {
