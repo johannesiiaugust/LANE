@@ -168,8 +168,8 @@ export function TimelineEventBar({
     return (
       <>
         <div
-          className={`absolute rounded-full cursor-pointer hover:ring-2 hover:ring-offset-1 hover:ring-black/20 transition-all select-none ${grabRing}`}
-          style={{ left: left - DOT_SIZE / 2, top, width: DOT_SIZE, height: DOT_SIZE, backgroundColor: color, ...pastStyle, ...draggingStyle }}
+          className={`absolute rounded-full cursor-pointer transition-all select-none hover:scale-125 hover:shadow-lg ${grabRing}`}
+          style={{ left: left - DOT_SIZE / 2, top, width: DOT_SIZE, height: DOT_SIZE, backgroundColor: color, boxShadow: '0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.35)', ...pastStyle, ...draggingStyle }}
           {...interactionProps}
           onMouseEnter={e => {
             if (hasPointValue) setTooltip({ clientX: e.clientX, clientY: e.clientY, value: event.pointValue! })
@@ -219,8 +219,8 @@ export function TimelineEventBar({
   return (
     <>
       <div
-        className={`absolute rounded-sm cursor-pointer hover:brightness-110 transition-all overflow-hidden select-none ${grabRing}`}
-        style={{ left, top, width: Math.max(width, 4), height: BAR_HEIGHT, backgroundColor: color, ...pastStyle, ...draggingStyle }}
+        className={`absolute rounded-lg cursor-pointer transition-all overflow-hidden select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg ${grabRing}`}
+        style={{ left, top, width: Math.max(width, 4), height: BAR_HEIGHT, backgroundColor: color, boxShadow: '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)', ...pastStyle, ...draggingStyle }}
         title={event.title}
         {...interactionProps}
         onMouseMove={e => {
@@ -229,6 +229,8 @@ export function TimelineEventBar({
         }}
         onMouseLeave={() => { handleMouseLeave(); setTooltip(null); setImageHover(null) }}
       >
+        {/* 3D sheen */}
+        <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)' }} />
         {sparklineSeries.length >= 2 && (
           <svg className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%', overflow: 'hidden' }} preserveAspectRatio="none">
             {sparklinePath && <polyline points={sparklinePath} fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth={1.5} strokeLinejoin="round" />}
