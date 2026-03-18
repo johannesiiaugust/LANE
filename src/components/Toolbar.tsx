@@ -232,10 +232,10 @@ export function Toolbar({
                   {todayOffScreen.direction === 'left' ? '← ' : '→ '}Back to Today
                 </button>
               )}
-              <Button variant="outline" size="sm" onClick={() => stepZoom(1 / 1.3)} title="Zoom out">
+              <Button variant="outline" size="sm" onClick={() => stepZoom(1 / 1.69)} title="Zoom out">
                 <ZoomOut className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm" onClick={() => stepZoom(1.3)} title="Zoom in">
+              <Button variant="outline" size="sm" onClick={() => stepZoom(1.69)} title="Zoom in">
                 <ZoomIn className="h-4 w-4" />
               </Button>
             </>
