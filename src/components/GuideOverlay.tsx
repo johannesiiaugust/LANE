@@ -140,8 +140,8 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
     const vw = window.innerWidth
     const vh = window.innerHeight
 
-    // On small screens, center the card horizontally and place it above the year line
-    if (current.centerOnMobile && vw < 640) {
+    // Center the card horizontally and place it above the year line
+    if (current.centerOnMobile) {
       return { top: 70, left: Math.max(12, (vw - TIP_W) / 2) }
     }
 
@@ -182,7 +182,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
   type ArrowStyle = React.CSSProperties
   const getArrowStyle = (): ArrowStyle => {
     if (!hole) return {}
-    if (current.centerOnMobile && window.innerWidth < 640) return {}
+    if (current.centerOnMobile) return {}
     const base: ArrowStyle = { position: 'absolute', width: 0, height: 0 }
     switch (current.side) {
       case 'bottom': return {
