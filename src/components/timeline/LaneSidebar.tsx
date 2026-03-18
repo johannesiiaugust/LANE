@@ -115,20 +115,7 @@ export function LaneSidebar({
           >
             {/* Main lane label row */}
             <div className="relative flex items-center" style={{ height: BASE_LANE_HEIGHT, paddingLeft: Math.round(W * 0.04) }}>
-              {/* Text: starts flush-left, fades out on the right */}
-              <span
-                className="font-medium flex-1 min-w-0 whitespace-nowrap overflow-hidden"
-                style={{
-                  fontSize: SIDEBAR_FONT,
-                  opacity: lane.visible ? 1 : 0.4,
-                  maskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
-                  WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
-                }}
-              >
-                {lane.emoji && <span className="mr-1">{lane.emoji}</span>}{lane.name}
-              </span>
-
-              {/* Expand chevron — compact, right side, always visible when overlaps exist */}
+              {/* Expand chevron — left side, compact */}
               {laneHasOverlaps.get(lane.id) && (
                 <button
                   onClick={() => onToggleExpand(lane.id)}
@@ -141,6 +128,19 @@ export function LaneSidebar({
                     : <ChevronRight size={Math.round(ICON_SIZE * 0.75)} />}
                 </button>
               )}
+
+              {/* Text: fades out on the right */}
+              <span
+                className="font-medium flex-1 min-w-0 whitespace-nowrap overflow-hidden"
+                style={{
+                  fontSize: SIDEBAR_FONT,
+                  opacity: lane.visible ? 1 : 0.4,
+                  maskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
+                  WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
+                }}
+              >
+                {lane.emoji && <span className="mr-1">{lane.emoji}</span>}{lane.name}
+              </span>
 
               {/* Action buttons — absolute overlay on hover, no layout cost when hidden */}
               <div
