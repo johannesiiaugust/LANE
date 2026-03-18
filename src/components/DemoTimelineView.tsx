@@ -162,6 +162,12 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [searchOpen, setSearchOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
 
+  // Auto-open guide after 5 seconds on the landing page
+  useEffect(() => {
+    const t = setTimeout(() => setGuideOpen(true), 5000)
+    return () => clearTimeout(t)
+  }, [])
+
   const stepZoom = useCallback((factor: number) => {
     const next = Math.max(MIN_PIXELS_PER_YEAR, Math.min(MAX_PIXELS_PER_YEAR, pixelsPerYear * factor))
     setPixelsPerYear(Math.round(next * 10) / 10)
