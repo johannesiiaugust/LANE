@@ -28,7 +28,7 @@ const DEFAULT_META: DemoTimelineMeta = {
   name: "My Life",
   color: '#6366f1',
   start_year: 1980,
-  end_year: 2065,
+  end_year: null,
   emoji: '👤',
 }
 
