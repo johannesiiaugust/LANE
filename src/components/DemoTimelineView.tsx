@@ -14,6 +14,7 @@ import { useSkin, SKINS } from '@/contexts/SkinContext'
 import { SkinDialog } from '@/components/SkinDialog'
 import { ImportDialog, type ImportTab } from '@/components/ImportDialog'
 import { SearchDialog } from '@/components/SearchDialog'
+import { GuideOverlay } from '@/components/GuideOverlay'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
@@ -159,6 +160,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [importDialogOpen, setImportDialogOpen] = useState(false)
   const [importTab, setImportTab] = useState<ImportTab>('calendar-file')
   const [searchOpen, setSearchOpen] = useState(false)
+  const [guideOpen, setGuideOpen] = useState(false)
 
   const stepZoom = useCallback((factor: number) => {
     const next = Math.max(MIN_PIXELS_PER_YEAR, Math.min(MAX_PIXELS_PER_YEAR, pixelsPerYear * factor))
@@ -276,7 +278,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
         {/* Compare & edit */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5">
+            <Button variant="outline" size="sm" className="gap-1.5" data-guide="compare">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Compare & edit</span>
               <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0" />
@@ -413,7 +415,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
         )}
 
         {/* Zoom out */}
-        <Button variant="outline" size="sm" onClick={() => stepZoom(1 / 1.3)} title="Zoom out">
+        <Button variant="outline" size="sm" onClick={() => stepZoom(1 / 1.3)} title="Zoom out" data-guide="zoom">
           <ZoomOut className="h-4 w-4" />
         </Button>
 
@@ -425,7 +427,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
         {/* Add dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="sm" className="px-2.5" title="Add…">
+            <Button size="sm" className="px-2.5" title="Add…" data-guide="add-events">
               <Plus className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -444,12 +446,17 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
         {/* Three-dot overflow menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="px-2">
+            <Button variant="outline" size="sm" className="px-2" data-guide="overflow-menu">
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-52">
             <div className="max-h-[70vh] overflow-y-auto">
+              <DropdownMenuItem onClick={() => setGuideOpen(true)}>
+                <span className="mr-2 text-sm">❓</span>
+                How to use
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setSearchOpen(true)}>
                 <Search className="h-4 w-4 mr-2" />
                 Search Events
@@ -555,6 +562,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
       <SkinDialog open={skinDialogOpen} onOpenChange={setSkinDialogOpen} />
       <ImportDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} defaultTab={importTab} lanes={lanes} addEvent={addEvent} addLane={addLane} />
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} events={events} lanes={lanes} onNavigate={handleSearchNavigate} />
+      <GuideOverlay open={guideOpen} onClose={() => setGuideOpen(false)} />
     </div>
   )
 }
