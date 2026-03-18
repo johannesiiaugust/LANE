@@ -12,6 +12,7 @@ export interface TimelineEventProps {
   onClick: (event: TEvent, element: HTMLElement, clientX: number, clientY: number) => void
   currentYear: number
   topOffset?: number
+  stackDepth?: number
   scrollLeft?: number
   // drag-drop
   isDragging?: boolean
@@ -22,14 +23,19 @@ export interface TimelineEventProps {
 interface TooltipState { clientX: number; clientY: number; value: number }
 interface HoverPos { clientX: number; clientY: number }
 
+const STACK_PX = 3  // px shift per depth level
+
 export function TimelineEventBar({
-  event, yearStart, pixelsPerYear, laneColor, onClick, currentYear, topOffset = 0, scrollLeft = 0,
+  event, yearStart, pixelsPerYear, laneColor, onClick, currentYear, topOffset = 0, stackDepth, scrollLeft = 0,
   isDragging, onMoveStart, onExtendStart,
 }: TimelineEventProps) {
   const { sc } = useSizeConfig()
   const { BASE_LANE_HEIGHT, BAR_HEIGHT, DOT_SIZE, EVENT_FONT, EVENT_LINE_HEIGHT } = sc
   const color = event.color || laneColor
   const left = (event.startYear - yearStart) * pixelsPerYear
+
+  const stackOff = stackDepth !== undefined ? Math.min(stackDepth, 4) * STACK_PX : 0
+  const stackZ   = stackDepth !== undefined ? 20 - Math.min(stackDepth, 10) : undefined
 
   const isPast = event.type === 'point'
     ? event.startYear < currentYear
@@ -168,8 +174,8 @@ export function TimelineEventBar({
     return (
       <>
         <div
-          className={`absolute rounded-full cursor-pointer hover:ring-2 hover:ring-offset-1 hover:ring-black/20 transition-all select-none ${grabRing}`}
-          style={{ left: left - DOT_SIZE / 2, top, width: DOT_SIZE, height: DOT_SIZE, backgroundColor: color, ...pastStyle, ...draggingStyle }}
+          className={`absolute rounded-full cursor-pointer transition-all select-none hover:scale-125 hover:shadow-lg ${grabRing}`}
+          style={{ left: left - DOT_SIZE / 2, top, width: DOT_SIZE, height: DOT_SIZE, backgroundColor: color, boxShadow: '0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.35)', ...pastStyle, ...draggingStyle }}
           {...interactionProps}
           onMouseEnter={e => {
             if (hasPointValue) setTooltip({ clientX: e.clientX, clientY: e.clientY, value: event.pointValue! })
@@ -189,12 +195,13 @@ export function TimelineEventBar({
   }
 
   const width = ((event.endYear ?? event.startYear + 1) - event.startYear) * pixelsPerYear
-  const top = (BASE_LANE_HEIGHT - BAR_HEIGHT) / 2 + topOffset
+  const top = (BASE_LANE_HEIGHT - BAR_HEIGHT) / 2 + topOffset + stackOff
   const textLeft = Math.max(4, scrollLeft - left + sc.SIDEBAR_WIDTH + 4)
 
   // Sparkline geometry
   let sparklinePath: string | null = null
   let projectionPath: string | null = null
+  let sparklineFill: string | null = null
   if (sparklineSeries.length >= 2) {
     const values = sparklineSeries.map(p => p.value)
     const minV = Math.min(...values)
@@ -202,6 +209,7 @@ export function TimelineEventBar({
     const range = maxV - minV || 1
     const pad = 2
     const chartH = BAR_HEIGHT - pad * 2
+    const bottomY = (BAR_HEIGHT - pad).toFixed(1)
     const toXY = (p: { year: number; value: number }) => {
       const x = (p.year - event.startYear) * pixelsPerYear
       const y = pad + chartH - chartH * (p.value - minV) / range
@@ -212,6 +220,11 @@ export function TimelineEventBar({
     const projPts = splitIdx >= 0 ? sparklineSeries.slice(splitIdx) : []
     if (histPts.length >= 2) sparklinePath = histPts.map(toXY).join(' ')
     if (projPts.length >= 2) projectionPath = projPts.map(toXY).join(' ')
+    // Filled area under the full line for 3D depth
+    const allPts = sparklineSeries.map(toXY)
+    const firstX = ((sparklineSeries[0].year - event.startYear) * pixelsPerYear).toFixed(1)
+    const lastX  = ((sparklineSeries[sparklineSeries.length - 1].year - event.startYear) * pixelsPerYear).toFixed(1)
+    sparklineFill = `${firstX},${bottomY} ${allPts.join(' ')} ${lastX},${bottomY}`
   }
 
   const label = event.emoji ? `${event.emoji} ${event.title}` : event.title
@@ -219,8 +232,8 @@ export function TimelineEventBar({
   return (
     <>
       <div
-        className={`absolute rounded-sm cursor-pointer hover:brightness-110 transition-all overflow-hidden select-none ${grabRing}`}
-        style={{ left, top, width: Math.max(width, 4), height: BAR_HEIGHT, backgroundColor: color, ...pastStyle, ...draggingStyle }}
+        className={`absolute rounded-lg cursor-pointer transition-all overflow-hidden select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50 ${grabRing}`}
+        style={{ left, top, width: Math.max(width, 4), height: BAR_HEIGHT, backgroundColor: color, zIndex: stackZ, boxShadow: '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)', ...pastStyle, ...draggingStyle }}
         title={event.title}
         {...interactionProps}
         onMouseMove={e => {
@@ -229,10 +242,13 @@ export function TimelineEventBar({
         }}
         onMouseLeave={() => { handleMouseLeave(); setTooltip(null); setImageHover(null) }}
       >
+        {/* 3D sheen */}
+        <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)' }} />
         {sparklineSeries.length >= 2 && (
           <svg className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%', overflow: 'hidden' }} preserveAspectRatio="none">
-            {sparklinePath && <polyline points={sparklinePath} fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth={1.5} strokeLinejoin="round" />}
-            {projectionPath && <polyline points={projectionPath} fill="none" stroke="rgba(255,255,255,0.65)" strokeWidth={1.5} strokeDasharray="3 2" strokeLinejoin="round" />}
+            {sparklineFill && <polygon points={sparklineFill} fill="rgba(255,255,255,0.13)" />}
+            {sparklinePath && <polyline points={sparklinePath} fill="none" stroke="rgba(255,255,255,0.95)" strokeWidth={2} strokeLinejoin="round" />}
+            {projectionPath && <polyline points={projectionPath} fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth={1.5} strokeDasharray="3 2" strokeLinejoin="round" />}
           </svg>
         )}
         {width > EVENT_FONT * 2 && (

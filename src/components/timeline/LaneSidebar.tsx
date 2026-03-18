@@ -114,71 +114,90 @@ export function LaneSidebar({
             style={{ height, paddingLeft: Math.round(W * 0.04), paddingRight: Math.round(W * 0.04) }}
           >
             {/* Main lane label row */}
-            <div className="flex items-center" style={{ height: BASE_LANE_HEIGHT, gap: Math.round(ICON_SIZE / 6) }}>
-              {laneHasOverlaps.get(lane.id) ? (
+            <div className="relative flex items-center" style={{ height: BASE_LANE_HEIGHT, paddingLeft: Math.round(W * 0.04) }}>
+              {/* Expand chevron — left side, compact */}
+              {laneHasOverlaps.get(lane.id) && (
                 <button
                   onClick={() => onToggleExpand(lane.id)}
-                  className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
-                  style={{ padding: iconPad }}
+                  className="shrink-0 text-muted-foreground/50 hover:text-foreground transition-colors"
+                  style={{ padding: iconPad, marginRight: Math.round(W * 0.02) }}
                   title={expandedLanes.has(lane.id) ? 'Collapse rows' : 'Expand overlapping events'}
                 >
                   {expandedLanes.has(lane.id)
-                    ? <ChevronDown size={ICON_SIZE} />
-                    : <ChevronRight size={ICON_SIZE} />}
+                    ? <ChevronDown size={Math.round(ICON_SIZE * 0.75)} />
+                    : <ChevronRight size={Math.round(ICON_SIZE * 0.75)} />}
                 </button>
-              ) : null}
+              )}
+
+              {/* Text: fades out on the right */}
               <span
-                className="font-medium truncate flex-1"
-                style={{ fontSize: SIDEBAR_FONT, opacity: lane.visible ? 1 : 0.4 }}
+                className="font-medium flex-1 min-w-0 whitespace-nowrap overflow-hidden"
+                style={{
+                  fontSize: SIDEBAR_FONT,
+                  opacity: lane.visible ? 1 : 0.4,
+                  maskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
+                  WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
+                }}
               >
                 {lane.emoji && <span className="mr-1">{lane.emoji}</span>}{lane.name}
               </span>
-              <button
-                onClick={() => onToggleVisibility(lane.id)}
-                className="text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ padding: iconPad }}
+
+              {/* Action buttons — absolute overlay on hover, no layout cost when hidden */}
+              <div
+                className="absolute inset-y-0 right-0 flex items-center opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity"
+                style={{
+                  paddingRight: Math.round(W * 0.02),
+                  paddingLeft: ICON_SIZE * 2,
+                  background: `linear-gradient(to right, transparent, hsl(var(--background)) ${ICON_SIZE * 2}px)`,
+                }}
               >
-                {lane.visible ? <Eye size={ICON_SIZE} /> : <EyeOff size={ICON_SIZE} />}
-              </button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className="text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ padding: iconPad }}
-                  >
-                    <MoreHorizontal size={ICON_SIZE} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" sideOffset={4}>
-                  <DropdownMenuItem onClick={() => onEditLane(lane)}>
-                    <Pencil className="h-4 w-4 mr-2" />
-                    Edit Lane
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => onMoveLane(lane.id, 'up')}
-                    disabled={sortedAllLanes[0]?.id === lane.id}
-                  >
-                    <ArrowUp className="h-4 w-4 mr-2" />
-                    Move Up
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onMoveLane(lane.id, 'down')}
-                    disabled={sortedAllLanes[sortedAllLanes.length - 1]?.id === lane.id}
-                  >
-                    <ArrowDown className="h-4 w-4 mr-2" />
-                    Move Down
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onClick={() => onDeleteLane(lane)}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Lane
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                <button
+                  onClick={() => onToggleVisibility(lane.id)}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  style={{ padding: iconPad }}
+                >
+                  {lane.visible ? <Eye size={ICON_SIZE} /> : <EyeOff size={ICON_SIZE} />}
+                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                      style={{ padding: iconPad }}
+                    >
+                      <MoreHorizontal size={ICON_SIZE} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" sideOffset={4}>
+                    <DropdownMenuItem onClick={() => onEditLane(lane)}>
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Edit Lane
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => onMoveLane(lane.id, 'up')}
+                      disabled={sortedAllLanes[0]?.id === lane.id}
+                    >
+                      <ArrowUp className="h-4 w-4 mr-2" />
+                      Move Up
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onMoveLane(lane.id, 'down')}
+                      disabled={sortedAllLanes[sortedAllLanes.length - 1]?.id === lane.id}
+                    >
+                      <ArrowDown className="h-4 w-4 mr-2" />
+                      Move Down
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive"
+                      onClick={() => onDeleteLane(lane)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Lane
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
 
             {/* Persona sub-row labels */}
@@ -435,8 +454,12 @@ export function LaneSidebar({
                   }}
                 >
                   <span
-                    className="text-muted-foreground truncate flex-1"
-                    style={{ fontSize: SIDEBAR_FONT }}
+                    className="text-muted-foreground flex-1 min-w-0 whitespace-nowrap overflow-hidden"
+                    style={{
+                      fontSize: SIDEBAR_FONT,
+                      maskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
+                      WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
+                    }}
                   >
                     {lane.emoji && <span className="mr-1">{lane.emoji}</span>}{lane.name}
                   </span>
