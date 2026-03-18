@@ -10,7 +10,6 @@ interface Step {
   text: string
   side: 'top' | 'bottom' | 'left' | 'right'
   align: 'start' | 'center' | 'end'
-  center?: boolean // always center card horizontally near top of screen
 }
 
 const STEPS: Step[] = [
@@ -29,17 +28,9 @@ const STEPS: Step[] = [
     align: 'end',
   },
   {
-    target: 'import',
-    title: 'Import from anywhere',
-    text: 'Add your life — and your friends\' — from CVs, social networks, calendars and other sources. Simply copy-paste any marked text with our AI.',
-    side: 'bottom',
-    align: 'end',
-    center: true,
-  },
-  {
     target: 'compare',
     title: 'Manage timelines',
-    text: 'Create and modify timelines for family, friends and others to organize and compare.',
+    text: 'Create and modify timelines for family, friends and others. Import from CVs, social networks, calendars and other sources — or simply copy-paste any text with our AI.',
     side: 'bottom',
     align: 'start',
   },
@@ -140,11 +131,6 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
     const vw = window.innerWidth
     const vh = window.innerHeight
 
-    // Center the card horizontally and place it above the year line
-    if (current.center) {
-      return { top: 70, left: Math.max(12, (vw - TIP_W) / 2) }
-    }
-
     switch (current.side) {
       case 'bottom': {
         const tipTop = hole.top + hole.height + gap
@@ -182,7 +168,6 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
   type ArrowStyle = React.CSSProperties
   const getArrowStyle = (): ArrowStyle => {
     if (!hole) return {}
-    if (current.center) return {}
     const base: ArrowStyle = { position: 'absolute', width: 0, height: 0 }
     switch (current.side) {
       case 'bottom': return {
@@ -239,7 +224,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
       onClick={handleBackdropClick}
     >
       {/* ── Dimmed backdrop with spotlight hole ── */}
-      {hole && !current.center ? (
+      {hole ? (
         <div
           className="pointer-events-none absolute rounded-md"
           style={{
