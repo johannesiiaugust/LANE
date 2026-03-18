@@ -239,7 +239,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
       onClick={handleBackdropClick}
     >
       {/* ── Dimmed backdrop with spotlight hole ── */}
-      {hole ? (
+      {hole && !current.centerOnMobile ? (
         <div
           className="pointer-events-none absolute rounded-md"
           style={{

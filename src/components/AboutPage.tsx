@@ -14,7 +14,7 @@ export function AboutPage() {
           onClick={() => navigate('/')}
           className="text-xl font-bold hover:opacity-80 transition-opacity"
         >
-          TimeLANE
+          LifeLANE
         </button>
         <button
           onClick={() => navigate('/')}
@@ -29,18 +29,18 @@ export function AboutPage() {
 
         {/* About */}
         <section className="space-y-4">
-          <h1 className="text-3xl font-bold">About TimeLANE</h1>
+          <h1 className="text-3xl font-bold">About LifeLANE</h1>
           <p className="text-muted-foreground leading-relaxed">
-            TimeLANE is a personal life timeline tool that lets you visualize your entire life — past, present, and future — on a single horizontal canvas. Organize events across swim lanes like Place & Travel, Work & Education, Relations & Family, Health, Activities, Assets, Items, and more. Drag, zoom, and scroll through decades in seconds.
+            LifeLANE is a personal life timeline tool that lets you visualize your entire life — past, present, and future — on a single horizontal canvas. Organize events across swim lanes like Place & Travel, Work & Education, Relations & Family, Health, Activities, Assets, Items, and more. Drag, zoom, and scroll through decades in seconds.
           </p>
           <p className="text-muted-foreground leading-relaxed">
-            Beyond recording the past, TimeLANE is built for planning ahead. Add future events — job changes, moves, purchases — and attach value projections to track the financial impact of your decisions over time. See how a career change, a boat, or a business venture affects your long-term picture.
+            Beyond recording the past, LifeLANE is built for planning ahead. Add future events — job changes, moves, purchases — and attach value projections to track the financial impact of your decisions over time. See how a career change, a boat, or a business venture affects your long-term picture.
           </p>
           <p className="text-muted-foreground leading-relaxed">
             Overlay historical personas (Einstein, Marie Curie, da Vinci and others) age-aligned to your own life to gain perspective. Import from Google Calendar or upload an ICS file to populate your timeline instantly.
           </p>
           <p className="text-muted-foreground leading-relaxed">
-            TimeLANE is a personal project built with React, TypeScript, and Supabase. It is currently in early development.
+            LifeLANE is a personal project built with React, TypeScript, and Supabase. It is currently in early development.
           </p>
         </section>
 
@@ -54,12 +54,12 @@ export function AboutPage() {
           <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
             <div>
               <h3 className="font-semibold text-foreground mb-1">1. Acceptance of Terms</h3>
-              <p>By accessing or using TimeLANE ("the Service"), you agree to be bound by these Terms & Conditions. If you do not agree, please do not use the Service.</p>
+              <p>By accessing or using LifeLANE ("the Service"), you agree to be bound by these Terms & Conditions. If you do not agree, please do not use the Service.</p>
             </div>
 
             <div>
               <h3 className="font-semibold text-foreground mb-1">2. Use of the Service</h3>
-              <p>TimeLANE is provided for personal, non-commercial use. You are responsible for all content you create and store. You may not use the Service for any unlawful purpose or in a way that could harm other users.</p>
+              <p>LifeLANE is provided for personal, non-commercial use. You are responsible for all content you create and store. You may not use the Service for any unlawful purpose or in a way that could harm other users.</p>
             </div>
 
             <div>
@@ -74,7 +74,7 @@ export function AboutPage() {
 
             <div>
               <h3 className="font-semibold text-foreground mb-1">5. Intellectual Property</h3>
-              <p>All intellectual property rights in and to the TimeLANE application — including its code, design, branding, and all content provided by TimeLANE — are and remain the exclusive property of TimeLANE.</p>
+              <p>All intellectual property rights in and to the LifeLANE application — including its code, design, branding, and all content provided by LifeLANE — are and remain the exclusive property of LifeLANE.</p>
             </div>
 
             <div>
@@ -84,7 +84,7 @@ export function AboutPage() {
 
             <div>
               <h3 className="font-semibold text-foreground mb-1">7. Limitation of Liability</h3>
-              <p>To the fullest extent permitted by law, TimeLANE and its operators shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Service.</p>
+              <p>To the fullest extent permitted by law, LifeLANE and its operators shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Service.</p>
             </div>
 
             <div>
@@ -99,7 +99,7 @@ export function AboutPage() {
 
             <div>
               <h3 className="font-semibold text-foreground mb-1">10. Historical Personas</h3>
-              <p>The historical personas available in TimeLANE (such as public figures, scientists, and other notable individuals) are provided for illustrative and inspirational purposes only. While we aim for reasonable accuracy, the information may contain errors or omissions. TimeLANE makes no warranty as to the completeness or accuracy of any persona data. If you are the subject of a persona, a representative, or otherwise have a legitimate concern, you may request its removal by contacting us at <a href="mailto:hello@timelane.space" className="underline text-foreground hover:opacity-70">hello@timelane.space</a> and we will action the request promptly.</p>
+              <p>The historical personas available in LifeLANE (such as public figures, scientists, and other notable individuals) are provided for illustrative and inspirational purposes only. While we aim for reasonable accuracy, the information may contain errors or omissions. LifeLANE makes no warranty as to the completeness or accuracy of any persona data. If you are the subject of a persona, a representative, or otherwise have a legitimate concern, you may request its removal by contacting us at <a href="mailto:hello@timelane.space" className="underline text-foreground hover:opacity-70">hello@timelane.space</a> and we will action the request promptly.</p>
             </div>
           </div>
         </section>
