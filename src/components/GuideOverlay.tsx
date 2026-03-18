@@ -23,7 +23,7 @@ const STEPS: Step[] = [
   {
     target: 'zoom',
     title: 'Navigate time',
-    text: 'Zoom in and out in time — both past and the future.',
+    text: 'Zoom in and out in time — slide to your future and past.',
     side: 'bottom',
     align: 'end',
   },
