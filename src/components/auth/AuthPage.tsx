@@ -38,7 +38,7 @@ export function AuthPage() {
       <div className="shrink-0 border-b shadow-sm bg-background px-4 py-3 flex items-center justify-between gap-4">
         {/* Brand + tagline */}
         <div className="shrink-0">
-          <div className="text-xl font-bold leading-tight">TimeLANE</div>
+          <div className="text-xl font-bold leading-tight">LifeLANE</div>
           <div className="text-xs text-muted-foreground italic">The operating system for your life</div>
         </div>
 
