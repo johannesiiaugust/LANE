@@ -161,12 +161,20 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [importTab, setImportTab] = useState<ImportTab>('calendar-file')
   const [searchOpen, setSearchOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
+  const [showExampleOverlay, setShowExampleOverlay] = useState(true)
+  const guideWasOpenRef = useRef(false)
 
   // Auto-open guide after 5 seconds on the landing page
   useEffect(() => {
     const t = setTimeout(() => setGuideOpen(true), 5000)
     return () => clearTimeout(t)
   }, [])
+
+  // Fade overlay when guide closes
+  useEffect(() => {
+    if (guideOpen) { guideWasOpenRef.current = true }
+    else if (guideWasOpenRef.current) { setShowExampleOverlay(false) }
+  }, [guideOpen])
 
   const stepZoom = useCallback((factor: number) => {
     const next = Math.max(MIN_PIXELS_PER_YEAR, Math.min(MAX_PIXELS_PER_YEAR, pixelsPerYear * factor))
@@ -517,7 +525,22 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden flex flex-col">
+      <div
+        className="flex-1 overflow-hidden flex flex-col relative"
+        onClick={() => setShowExampleOverlay(false)}
+      >
+        {/* Example overlay text */}
+        <div
+          className="pointer-events-none absolute inset-0 flex items-center justify-center z-30 transition-opacity duration-700"
+          style={{ opacity: showExampleOverlay ? 1 : 0 }}
+        >
+          <p
+            className="text-4xl font-black text-foreground/30 select-none whitespace-nowrap"
+            style={{ transform: 'rotate(-45deg)', letterSpacing: '0.04em' }}
+          >
+            Example life — adjust to be your story
+          </p>
+        </div>
         <TimelineContainer
           lanes={lanes}
           events={displayedEvents}

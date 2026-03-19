@@ -198,13 +198,14 @@ export function AboutPage() {
           >
             Early Access · Be First
           </div>
-          <h1
-            className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-tight"
+          <button
+            onClick={() => navigate('/demo')}
+            className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-tight hover:opacity-80 transition-opacity"
             style={{ animation: 'fadeDown 0.6s ease 0.1s both' }}
           >
             Your entire life,<br />
             <span className="text-primary">in one view.</span>
-          </h1>
+          </button>
           <p
             className="text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed"
             style={{ animation: 'fadeDown 0.6s ease 0.2s both' }}
@@ -216,7 +217,7 @@ export function AboutPage() {
             style={{ animation: 'fadeDown 0.6s ease 0.3s both' }}
           >
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/demo')}
               className="px-7 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 text-sm"
             >
               Start mapping your life →
@@ -237,7 +238,9 @@ export function AboutPage() {
       {/* ── App preview ── */}
       <section className="px-6 pb-24 max-w-4xl mx-auto w-full">
         <FadeIn>
-          <MiniTimeline />
+          <button onClick={() => navigate('/demo')} className="w-full text-left cursor-pointer hover:opacity-90 transition-opacity" title="Try the live demo">
+            <MiniTimeline />
+          </button>
         </FadeIn>
       </section>
 
@@ -291,7 +294,9 @@ export function AboutPage() {
             </div>
           </FadeIn>
           <FadeIn delay={150}>
-            <ComparePreview />
+            <button onClick={() => navigate('/demo')} className="w-full text-left hover:opacity-90 transition-opacity" title="Try comparing timelines">
+              <ComparePreview />
+            </button>
           </FadeIn>
         </div>
       </section>
@@ -344,7 +349,9 @@ export function AboutPage() {
         <FadeIn>
           <div className="relative max-w-xl mx-auto space-y-6">
             <div className="text-4xl">⚡</div>
-            <h2 className="text-3xl font-bold tracking-tight">The earlier you start,<br />the more you have to look back on.</h2>
+            <button onClick={() => navigate('/demo')} className="text-3xl font-bold tracking-tight hover:opacity-80 transition-opacity">
+              The earlier you start,<br />the more you have to look back on.
+            </button>
             <p className="text-muted-foreground leading-relaxed">
               LifeLANE is early. The people joining now are shaping what it becomes. There's no better time to plant your flag.
             </p>
