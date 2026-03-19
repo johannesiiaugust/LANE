@@ -26,23 +26,26 @@ import { UiSizeProvider } from '@/contexts/UiSizeContext'
 import { SkinProvider } from '@/contexts/SkinContext'
 import { PublicProfilePage } from '@/components/PublicProfilePage'
 import { AboutPage } from '@/components/AboutPage'
+import { TermsPage } from '@/components/TermsPage'
 import { Footer } from '@/components/Footer'
 
 // ── Top-level route detection ─────────────────────────────────────────────────
 
-const RESERVED_PATHS = new Set(['/', '/kanban', '/overview', '/about'])
+const RESERVED_PATHS = new Set(['/', '/kanban', '/overview', '/about', '/terms'])
 const USERNAME_PATH_RE = /^\/([a-z0-9_]{3,32})$/
 const USERNAME_TIMELINE_PATH_RE = /^\/([a-z0-9_]{3,32})\/(\d+)$/
 
 type TopLevelRoute =
   | { type: 'app' }
   | { type: 'about' }
+  | { type: 'terms' }
   | { type: 'public'; username: string; timelineIndex?: number }
 
 // Returns a string (primitive) so useSyncExternalStore can compare with Object.is
 function getTopLevelRouteKey(): string {
   const p = window.location.pathname
   if (p === '/about') return 'about'
+  if (p === '/terms') return 'terms'
   if (RESERVED_PATHS.has(p)) return 'app'
   const matchWithIndex = p.match(USERNAME_TIMELINE_PATH_RE)
   if (matchWithIndex) return `public:${matchWithIndex[1]}:${matchWithIndex[2]}`
@@ -60,6 +63,7 @@ function useTopLevelRoute(): TopLevelRoute {
     getTopLevelRouteKey,
   )
   if (key === 'about') return { type: 'about' }
+  if (key === 'terms') return { type: 'terms' }
   if (key.startsWith('public:')) {
     const parts = key.slice(7).split(':')
     const username = parts[0]
@@ -526,6 +530,10 @@ function App() {
 
   if (route.type === 'about') {
     return <AboutPage />
+  }
+
+  if (route.type === 'terms') {
+    return <TermsPage />
   }
 
   // Public profile pages render without auth
