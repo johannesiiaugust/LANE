@@ -29,6 +29,7 @@ import {
   parseTextToEvents,
   transcribeAudio,
 } from '@/lib/openai'
+import { fracYearToMs } from '@/lib/constants'
 
 export type ImportTab = 'calendar-file' | 'google-calendar' | 'text' | 'voice'
 
@@ -41,6 +42,17 @@ interface ImportDialogProps {
   addLane: (lane: Omit<Lane, 'id' | 'order' | 'isDefault'>) => Promise<Lane | null>
 }
 
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+function formatImportDate(startYear: number, endYear?: number | null): string {
+  const d = new Date(fracYearToMs(startYear))
+  const start = `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`
+  if (!endYear) return start
+  const sy = Math.floor(startYear), ey = Math.floor(endYear)
+  if (sy === ey) return start
+  const de = new Date(fracYearToMs(endYear))
+  return `${start} – ${de.getUTCDate()} ${MONTHS[de.getUTCMonth()]} ${de.getUTCFullYear()}`
+}
+
 const TABS: { id: ImportTab; label: string; icon: React.ReactNode }[] = [
   { id: 'calendar-file', label: 'Calendar File', icon: <CalendarDays className="h-4 w-4" /> },
   { id: 'google-calendar', label: 'Google Calendar', icon: <Globe className="h-4 w-4" /> },
@@ -51,13 +63,17 @@ const TABS: { id: ImportTab; label: string; icon: React.ReactNode }[] = [
 interface CalendarFileTabProps {
   lanes: Lane[]
   addEvent: (event: Omit<TimelineEvent, 'id'>) => Promise<TimelineEvent | null>
+  addLane: (lane: Omit<Lane, 'id' | 'order' | 'isDefault'>) => Promise<Lane | null>
   onDone: () => void
 }
 
-function CalendarFileTab({ lanes, addEvent, onDone }: CalendarFileTabProps) {
+function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabProps) {
   const [parsedEvents, setParsedEvents] = useState<ParsedCalendarEvent[]>([])
   const [laneAssignments, setLaneAssignments] = useState<Map<number, string>>(new Map())
   const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set())
+  const [availableLanes, setAvailableLanes] = useState<Lane[]>(lanes)
+  const [bulkLane, setBulkLane] = useState('')
+  const [newLaneName, setNewLaneName] = useState('')
   const [fileName, setFileName] = useState('')
   const [error, setError] = useState('')
   const [importing, setImporting] = useState(false)
@@ -66,7 +82,7 @@ function CalendarFileTab({ lanes, addEvent, onDone }: CalendarFileTabProps) {
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const laneNames = lanes.map(l => l.name)
+  const laneNames = availableLanes.map(l => l.name)
 
   // Group events by year (descending)
   const yearGroups = useMemo(() => {
@@ -164,7 +180,7 @@ function CalendarFileTab({ lanes, addEvent, onDone }: CalendarFileTabProps) {
     for (let j = 0; j < selected.length; j++) {
       const { ev, i } = selected[j]
       const laneName = laneAssignments.get(i) || 'Other Activities'
-      const lane = lanes.find(l => l.name === laneName)
+      const lane = availableLanes.find(l => l.name === laneName)
       if (!lane) continue
       const result = await addEvent({
         laneId: lane.id,
@@ -189,6 +205,28 @@ function CalendarFileTab({ lanes, addEvent, onDone }: CalendarFileTabProps) {
     setImportProgress(0)
     setLaneAssignments(new Map())
     setSelectedIndices(new Set())
+    setBulkLane('')
+    setNewLaneName('')
+  }
+
+  const applyBulkLane = () => {
+    if (!bulkLane || bulkLane === '__new__') return
+    const next = new Map(laneAssignments)
+    for (const idx of selectedIndices) next.set(idx, bulkLane)
+    setLaneAssignments(next)
+  }
+
+  const handleCreateAndApplyLane = async () => {
+    const name = newLaneName.trim()
+    if (!name) return
+    const created = await addLane({ name, color: '#6366f1', visible: true, emoji: '' })
+    if (!created) return
+    setAvailableLanes(prev => [...prev, created])
+    const next = new Map(laneAssignments)
+    for (const idx of selectedIndices) next.set(idx, name)
+    setLaneAssignments(next)
+    setBulkLane(name)
+    setNewLaneName('')
   }
 
   // Success state
@@ -239,6 +277,48 @@ function CalendarFileTab({ lanes, addEvent, onDone }: CalendarFileTabProps) {
           </div>
         </div>
 
+        {/* Bulk lane assignment */}
+        <div className="flex flex-col gap-1.5 rounded-md border border-border/50 bg-muted/30 p-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground shrink-0">Assign all selected to:</span>
+            <select
+              value={bulkLane}
+              onChange={(e) => { setBulkLane(e.target.value); setNewLaneName('') }}
+              className="flex-1 text-xs bg-background border rounded px-1 py-0.5"
+            >
+              <option value="">— keep individual —</option>
+              {availableLanes.map(l => (
+                <option key={l.id} value={l.name}>{l.emoji ? `${l.emoji} ` : ''}{l.name}</option>
+              ))}
+              <option value="__new__">+ Create new lane…</option>
+            </select>
+            {bulkLane && bulkLane !== '__new__' && (
+              <Button size="sm" variant="outline" onClick={applyBulkLane} className="shrink-0 h-6 text-xs px-2">
+                Apply
+              </Button>
+            )}
+          </div>
+          {bulkLane === '__new__' && (
+            <div className="flex items-center gap-2">
+              <input
+                value={newLaneName}
+                onChange={(e) => setNewLaneName(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleCreateAndApplyLane() }}
+                placeholder="New lane name…"
+                className="flex-1 text-xs bg-background border rounded px-2 py-0.5 h-6"
+              />
+              <Button
+                size="sm"
+                onClick={handleCreateAndApplyLane}
+                disabled={!newLaneName.trim()}
+                className="shrink-0 h-6 text-xs px-2"
+              >
+                Create & Apply
+              </Button>
+            </div>
+          )}
+        </div>
+
         <div className="max-h-72 overflow-y-auto rounded-md border">
           <table className="w-full text-xs">
             <thead className="sticky top-0 bg-muted z-10">
@@ -259,7 +339,7 @@ function CalendarFileTab({ lanes, addEvent, onDone }: CalendarFileTabProps) {
                   />
                 </th>
                 <th className="text-left px-2 py-1.5 font-medium">Event</th>
-                <th className="text-left px-2 py-1.5 font-medium w-20">Date</th>
+                <th className="text-left px-2 py-1.5 font-medium">Date</th>
                 <th className="text-left px-2 py-1.5 font-medium w-28">Lane</th>
               </tr>
             </thead>
@@ -402,7 +482,7 @@ function FileYearGroup({
             {ev.title}
           </td>
           <td className="px-2 py-1 text-muted-foreground whitespace-nowrap">
-            {Math.floor(ev.startYear)}{ev.endYear ? `\u2013${Math.floor(ev.endYear)}` : ''}
+            {formatImportDate(ev.startYear, ev.endYear)}
           </td>
           <td className="px-2 py-1">
             <select
@@ -458,6 +538,8 @@ function GoogleCalendarTab({ lanes, addEvent, addLane, onDone }: GoogleCalendarT
   // Import
   const [importedCount, setImportedCount] = useState(0)
   const [importProgress, setImportProgress] = useState(0)
+  const [bulkLane, setBulkLane] = useState('')
+  const [newLaneName, setNewLaneName] = useState('')
 
   // Load GIS script on mount
   useEffect(() => {
@@ -477,7 +559,7 @@ function GoogleCalendarTab({ lanes, addEvent, addLane, onDone }: GoogleCalendarT
     return [...groups.entries()].sort((a, b) => b[0] - a[0])
   }, [allEvents])
 
-  const laneNames = lanes.map(l => l.name)
+  const [laneNames, setLaneNames] = useState<string[]>(() => lanes.map(l => l.name))
 
   const selectedCount = selectedEventIds.size
 
@@ -615,6 +697,26 @@ function GoogleCalendarTab({ lanes, addEvent, addLane, onDone }: GoogleCalendarT
     setLaneAssignments(new Map())
     setImportedCount(0)
     setError('')
+  }
+
+  const applyBulkLane = () => {
+    if (!bulkLane || bulkLane === '__new__') return
+    const next = new Map(laneAssignments)
+    for (const id of selectedEventIds) next.set(id, bulkLane)
+    setLaneAssignments(next)
+  }
+
+  const handleCreateAndApplyLane = async () => {
+    const name = newLaneName.trim()
+    if (!name) return
+    const created = await addLane({ name, color: '#6366f1', visible: true, emoji: '' })
+    if (!created) return
+    setLaneNames(prev => [...prev, name])
+    const next = new Map(laneAssignments)
+    for (const id of selectedEventIds) next.set(id, name)
+    setLaneAssignments(next)
+    setBulkLane(name)
+    setNewLaneName('')
   }
 
   // ── No client ID ──
@@ -761,13 +863,55 @@ function GoogleCalendarTab({ lanes, addEvent, addLane, onDone }: GoogleCalendarT
         <span className="text-xs text-muted-foreground">{selectedCount} selected</span>
       </div>
 
+      {/* Bulk lane assignment */}
+      <div className="flex flex-col gap-1.5 rounded-md border border-border/50 bg-muted/30 p-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground shrink-0">Assign all selected to:</span>
+          <select
+            value={bulkLane}
+            onChange={(e) => { setBulkLane(e.target.value); setNewLaneName('') }}
+            className="flex-1 text-xs bg-background border rounded px-1 py-0.5"
+          >
+            <option value="">— keep individual —</option>
+            {laneNames.map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+            <option value="__new__">+ Create new lane…</option>
+          </select>
+          {bulkLane && bulkLane !== '__new__' && (
+            <Button size="sm" variant="outline" onClick={applyBulkLane} className="shrink-0 h-6 text-xs px-2">
+              Apply
+            </Button>
+          )}
+        </div>
+        {bulkLane === '__new__' && (
+          <div className="flex items-center gap-2">
+            <input
+              value={newLaneName}
+              onChange={(e) => setNewLaneName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleCreateAndApplyLane() }}
+              placeholder="New lane name…"
+              className="flex-1 text-xs bg-background border rounded px-2 py-0.5 h-6"
+            />
+            <Button
+              size="sm"
+              onClick={handleCreateAndApplyLane}
+              disabled={!newLaneName.trim()}
+              className="shrink-0 h-6 text-xs px-2"
+            >
+              Create & Apply
+            </Button>
+          </div>
+        )}
+      </div>
+
       <div className="max-h-72 overflow-y-auto rounded-md border">
         <table className="w-full text-xs">
           <thead className="sticky top-0 bg-muted z-10">
             <tr>
               <th className="w-7 px-2 py-1.5" />
               <th className="text-left px-2 py-1.5 font-medium">Event</th>
-              <th className="text-left px-2 py-1.5 font-medium w-20">Date</th>
+              <th className="text-left px-2 py-1.5 font-medium">Date</th>
               <th className="text-left px-2 py-1.5 font-medium w-28">Lane</th>
             </tr>
           </thead>
@@ -880,7 +1024,7 @@ function YearGroup({
               {ev.title}
             </td>
             <td className="px-2 py-1 text-muted-foreground whitespace-nowrap">
-              {Math.floor(ev.startYear)}{ev.endYear ? `\u2013${Math.floor(ev.endYear)}` : ''}
+              {formatImportDate(ev.startYear, ev.endYear)}
             </td>
             <td className="px-2 py-1">
               <select
@@ -924,10 +1068,11 @@ function YearGroup({
 interface TextTabProps {
   lanes: Lane[]
   addEvent: (event: Omit<TimelineEvent, 'id'>) => Promise<TimelineEvent | null>
+  addLane: (lane: Omit<Lane, 'id' | 'order' | 'isDefault'>) => Promise<Lane | null>
   onDone: () => void
 }
 
-function TextTab({ lanes, addEvent, onDone }: TextTabProps) {
+function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
   const [text, setText] = useState('')
   const [phase, setPhase] = useState<'input' | 'parsing' | 'preview' | 'importing' | 'success'>('input')
   const [error, setError] = useState('')
@@ -936,8 +1081,11 @@ function TextTab({ lanes, addEvent, onDone }: TextTabProps) {
   const [laneAssignments, setLaneAssignments] = useState<Map<number, string>>(new Map())
   const [importedCount, setImportedCount] = useState(0)
   const [importProgress, setImportProgress] = useState(0)
+  const [availableLanes, setAvailableLanes] = useState<Lane[]>(lanes)
+  const [bulkLane, setBulkLane] = useState('')
+  const [newLaneName, setNewLaneName] = useState('')
 
-  const laneNames = lanes.map(l => l.name)
+  const laneNames = availableLanes.map(l => l.name)
 
   const yearGroups = useMemo(() => {
     const groups = new Map<number, { idx: number; ev: ParsedCalendarEvent }[]>()
@@ -999,7 +1147,7 @@ function TextTab({ lanes, addEvent, onDone }: TextTabProps) {
     for (let j = 0; j < selected.length; j++) {
       const { ev, i } = selected[j]
       const laneName = laneAssignments.get(i) || 'Other Activities'
-      const lane = lanes.find(l => l.name === laneName)
+      const lane = availableLanes.find(l => l.name === laneName)
       if (!lane) continue
       const result = await addEvent({
         laneId: lane.id,
@@ -1024,7 +1172,29 @@ function TextTab({ lanes, addEvent, onDone }: TextTabProps) {
     setError('')
     setImportedCount(0)
     setImportProgress(0)
+    setBulkLane('')
+    setNewLaneName('')
     setPhase('input')
+  }
+
+  const applyBulkLane = () => {
+    if (!bulkLane || bulkLane === '__new__') return
+    const next = new Map(laneAssignments)
+    for (const idx of selectedIndices) next.set(idx, bulkLane)
+    setLaneAssignments(next)
+  }
+
+  const handleCreateAndApplyLane = async () => {
+    const name = newLaneName.trim()
+    if (!name) return
+    const created = await addLane({ name, color: '#6366f1', visible: true, emoji: '' })
+    if (!created) return
+    setAvailableLanes(prev => [...prev, created])
+    const next = new Map(laneAssignments)
+    for (const idx of selectedIndices) next.set(idx, name)
+    setLaneAssignments(next)
+    setBulkLane(name)
+    setNewLaneName('')
   }
 
   if (!isOpenAIConfigured()) {
@@ -1093,6 +1263,48 @@ function TextTab({ lanes, addEvent, onDone }: TextTabProps) {
           </div>
         </div>
 
+        {/* Bulk lane assignment */}
+        <div className="flex flex-col gap-1.5 rounded-md border border-border/50 bg-muted/30 p-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground shrink-0">Assign all selected to:</span>
+            <select
+              value={bulkLane}
+              onChange={(e) => { setBulkLane(e.target.value); setNewLaneName('') }}
+              className="flex-1 text-xs bg-background border rounded px-1 py-0.5"
+            >
+              <option value="">— keep individual —</option>
+              {availableLanes.map(l => (
+                <option key={l.id} value={l.name}>{l.emoji ? `${l.emoji} ` : ''}{l.name}</option>
+              ))}
+              <option value="__new__">+ Create new lane…</option>
+            </select>
+            {bulkLane && bulkLane !== '__new__' && (
+              <Button size="sm" variant="outline" onClick={applyBulkLane} className="shrink-0 h-6 text-xs px-2">
+                Apply
+              </Button>
+            )}
+          </div>
+          {bulkLane === '__new__' && (
+            <div className="flex items-center gap-2">
+              <input
+                value={newLaneName}
+                onChange={(e) => setNewLaneName(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleCreateAndApplyLane() }}
+                placeholder="New lane name…"
+                className="flex-1 text-xs bg-background border rounded px-2 py-0.5 h-6"
+              />
+              <Button
+                size="sm"
+                onClick={handleCreateAndApplyLane}
+                disabled={!newLaneName.trim()}
+                className="shrink-0 h-6 text-xs px-2"
+              >
+                Create & Apply
+              </Button>
+            </div>
+          )}
+        </div>
+
         <div className="max-h-72 overflow-y-auto rounded-md border">
           <table className="w-full text-xs">
             <thead className="sticky top-0 bg-muted z-10">
@@ -1113,7 +1325,7 @@ function TextTab({ lanes, addEvent, onDone }: TextTabProps) {
                   />
                 </th>
                 <th className="text-left px-2 py-1.5 font-medium">Event</th>
-                <th className="text-left px-2 py-1.5 font-medium w-20">Date</th>
+                <th className="text-left px-2 py-1.5 font-medium">Date</th>
                 <th className="text-left px-2 py-1.5 font-medium w-28">Lane</th>
               </tr>
             </thead>
@@ -1184,12 +1396,13 @@ function TextTab({ lanes, addEvent, onDone }: TextTabProps) {
 interface VoiceTabProps {
   lanes: Lane[]
   addEvent: (event: Omit<TimelineEvent, 'id'>) => Promise<TimelineEvent | null>
+  addLane: (lane: Omit<Lane, 'id' | 'order' | 'isDefault'>) => Promise<Lane | null>
   onDone: () => void
 }
 
 type VoicePhase = 'idle' | 'recording' | 'transcribing' | 'review' | 'parsing' | 'preview' | 'importing' | 'success'
 
-function VoiceTab({ lanes, addEvent, onDone }: VoiceTabProps) {
+function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
   const [phase, setPhase] = useState<VoicePhase>('idle')
   const [error, setError] = useState('')
   const [transcript, setTranscript] = useState('')
@@ -1207,8 +1420,11 @@ function VoiceTab({ lanes, addEvent, onDone }: VoiceTabProps) {
   const [laneAssignments, setLaneAssignments] = useState<Map<number, string>>(new Map())
   const [importedCount, setImportedCount] = useState(0)
   const [importProgress, setImportProgress] = useState(0)
+  const [availableLanes, setAvailableLanes] = useState<Lane[]>(lanes)
+  const [bulkLane, setBulkLane] = useState('')
+  const [newLaneName, setNewLaneName] = useState('')
 
-  const laneNames = lanes.map(l => l.name)
+  const laneNames = availableLanes.map(l => l.name)
 
   const yearGroups = useMemo(() => {
     const groups = new Map<number, { idx: number; ev: ParsedCalendarEvent }[]>()
@@ -1349,7 +1565,7 @@ function VoiceTab({ lanes, addEvent, onDone }: VoiceTabProps) {
     for (let j = 0; j < selected.length; j++) {
       const { ev, i } = selected[j]
       const laneName = laneAssignments.get(i) || 'Other Activities'
-      const lane = lanes.find(l => l.name === laneName)
+      const lane = availableLanes.find(l => l.name === laneName)
       if (!lane) continue
       const result = await addEvent({
         laneId: lane.id,
@@ -1375,7 +1591,29 @@ function VoiceTab({ lanes, addEvent, onDone }: VoiceTabProps) {
     setImportedCount(0)
     setImportProgress(0)
     setElapsed(0)
+    setBulkLane('')
+    setNewLaneName('')
     setPhase('idle')
+  }
+
+  const applyBulkLane = () => {
+    if (!bulkLane || bulkLane === '__new__') return
+    const next = new Map(laneAssignments)
+    for (const idx of selectedIndices) next.set(idx, bulkLane)
+    setLaneAssignments(next)
+  }
+
+  const handleCreateAndApplyLane = async () => {
+    const name = newLaneName.trim()
+    if (!name) return
+    const created = await addLane({ name, color: '#6366f1', visible: true, emoji: '' })
+    if (!created) return
+    setAvailableLanes(prev => [...prev, created])
+    const next = new Map(laneAssignments)
+    for (const idx of selectedIndices) next.set(idx, name)
+    setLaneAssignments(next)
+    setBulkLane(name)
+    setNewLaneName('')
   }
 
   const formatTime = (seconds: number) => {
@@ -1459,6 +1697,48 @@ function VoiceTab({ lanes, addEvent, onDone }: VoiceTabProps) {
           </div>
         </div>
 
+        {/* Bulk lane assignment */}
+        <div className="flex flex-col gap-1.5 rounded-md border border-border/50 bg-muted/30 p-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground shrink-0">Assign all selected to:</span>
+            <select
+              value={bulkLane}
+              onChange={(e) => { setBulkLane(e.target.value); setNewLaneName('') }}
+              className="flex-1 text-xs bg-background border rounded px-1 py-0.5"
+            >
+              <option value="">— keep individual —</option>
+              {availableLanes.map(l => (
+                <option key={l.id} value={l.name}>{l.emoji ? `${l.emoji} ` : ''}{l.name}</option>
+              ))}
+              <option value="__new__">+ Create new lane…</option>
+            </select>
+            {bulkLane && bulkLane !== '__new__' && (
+              <Button size="sm" variant="outline" onClick={applyBulkLane} className="shrink-0 h-6 text-xs px-2">
+                Apply
+              </Button>
+            )}
+          </div>
+          {bulkLane === '__new__' && (
+            <div className="flex items-center gap-2">
+              <input
+                value={newLaneName}
+                onChange={(e) => setNewLaneName(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleCreateAndApplyLane() }}
+                placeholder="New lane name…"
+                className="flex-1 text-xs bg-background border rounded px-2 py-0.5 h-6"
+              />
+              <Button
+                size="sm"
+                onClick={handleCreateAndApplyLane}
+                disabled={!newLaneName.trim()}
+                className="shrink-0 h-6 text-xs px-2"
+              >
+                Create & Apply
+              </Button>
+            </div>
+          )}
+        </div>
+
         <div className="max-h-72 overflow-y-auto rounded-md border">
           <table className="w-full text-xs">
             <thead className="sticky top-0 bg-muted z-10">
@@ -1479,7 +1759,7 @@ function VoiceTab({ lanes, addEvent, onDone }: VoiceTabProps) {
                   />
                 </th>
                 <th className="text-left px-2 py-1.5 font-medium">Event</th>
-                <th className="text-left px-2 py-1.5 font-medium w-20">Date</th>
+                <th className="text-left px-2 py-1.5 font-medium">Date</th>
                 <th className="text-left px-2 py-1.5 font-medium w-28">Lane</th>
               </tr>
             </thead>
@@ -1626,13 +1906,13 @@ export function ImportDialog({ open, onOpenChange, defaultTab = 'calendar-file',
         </div>
 
         {activeTab === 'calendar-file' && (
-          <CalendarFileTab lanes={lanes} addEvent={addEvent} onDone={() => onOpenChange(false)} />
+          <CalendarFileTab lanes={lanes} addEvent={addEvent} addLane={addLane} onDone={() => onOpenChange(false)} />
         )}
         {activeTab === 'google-calendar' && (
           <GoogleCalendarTab lanes={lanes} addEvent={addEvent} addLane={addLane} onDone={() => onOpenChange(false)} />
         )}
-        {activeTab === 'text' && <TextTab lanes={lanes} addEvent={addEvent} onDone={() => onOpenChange(false)} />}
-        {activeTab === 'voice' && <VoiceTab lanes={lanes} addEvent={addEvent} onDone={() => onOpenChange(false)} />}
+        {activeTab === 'text' && <TextTab lanes={lanes} addEvent={addEvent} addLane={addLane} onDone={() => onOpenChange(false)} />}
+        {activeTab === 'voice' && <VoiceTab lanes={lanes} addEvent={addEvent} addLane={addLane} onDone={() => onOpenChange(false)} />}
       </DialogContent>
     </Dialog>
   )
