@@ -540,6 +540,11 @@ function App() {
   }
 
   if (route.type === 'demo') {
+    if (!loading && user) {
+      window.history.replaceState(null, '', '/')
+      window.dispatchEvent(new PopStateEvent('popstate'))
+      return null
+    }
     return <AuthPage />
   }
 

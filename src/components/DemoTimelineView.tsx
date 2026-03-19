@@ -163,6 +163,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [guideOpen, setGuideOpen] = useState(false)
   const [showExampleOverlay, setShowExampleOverlay] = useState(true)
   const guideWasOpenRef = useRef(false)
+  const overlayClickCountRef = useRef(0)
 
   // Auto-open guide after 5 seconds on the landing page
   useEffect(() => {
@@ -527,18 +528,21 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
 
       <div
         className="flex-1 overflow-hidden flex flex-col relative"
-        onClick={() => setShowExampleOverlay(false)}
+        onClick={() => {
+          overlayClickCountRef.current += 1
+          if (overlayClickCountRef.current >= 2) setShowExampleOverlay(false)
+        }}
       >
-        {/* Example overlay text */}
+        {/* Example overlay text — only over own lanes (top ~65% of area) */}
         <div
-          className="pointer-events-none absolute inset-0 flex items-center justify-center z-30 transition-opacity duration-700"
-          style={{ opacity: showExampleOverlay ? 1 : 0 }}
+          className="pointer-events-none absolute top-0 left-0 right-0 flex items-center justify-center z-30 transition-opacity duration-700"
+          style={{ bottom: '35%', opacity: showExampleOverlay ? 1 : 0 }}
         >
           <p
-            className="text-4xl font-black text-foreground/30 select-none whitespace-nowrap"
+            className="text-4xl font-black text-foreground/30 select-none text-center leading-tight"
             style={{ transform: 'rotate(-45deg)', letterSpacing: '0.04em' }}
           >
-            Example life — adjust to be your story
+            Example life<br />adjust to be your story
           </p>
         </div>
         <TimelineContainer
