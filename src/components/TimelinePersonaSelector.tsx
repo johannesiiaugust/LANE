@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ChevronDown, Plus, Pencil, Trash2, Layers, LayoutList, Users, Link2, Link2Off, Star, Copy, UserPlus, X, Globe, Search } from 'lucide-react'
+import { ChevronDown, Plus, Pencil, Trash2, Users, Link2, Link2Off, Star, Copy, UserPlus, X, Globe, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
@@ -84,23 +84,23 @@ export function TimelinePersonaSelector({
   onTogglePersona,
   alignedPersonaIds,
   onTogglePersonaAlignment,
-  personaDisplayModes,
-  onSetPersonaDisplayMode,
+  personaDisplayModes: _personaDisplayModes,
+  onSetPersonaDisplayMode: _onSetPersonaDisplayMode,
   activeOverlayIds,
   onToggleOverlay,
   overlayAlignedIds,
   onToggleOverlayAlignment,
-  overlayDisplayModes,
-  onSetOverlayDisplayMode,
+  overlayDisplayModes: _overlayDisplayModes,
+  onSetOverlayDisplayMode: _onSetOverlayDisplayMode,
   externalStored = [],
   externalActiveIds = new Set(),
   externalAlignedIds = new Set(),
-  externalDisplayModes = new Map(),
+  externalDisplayModes: _externalDisplayModes = new Map(),
   onAddExternal,
   onRemoveExternal,
   onToggleExternalActive,
   onToggleExternalAlignment,
-  onSetExternalDisplayMode,
+  onSetExternalDisplayMode: _onSetExternalDisplayMode,
   mainStartYear,
   sharedWithMe = [],
   requestCreate,
@@ -430,7 +430,6 @@ export function TimelinePersonaSelector({
             {otherTimelines.map(t => {
               const isActive = activeOverlayIds.has(t.id)
               const aligned = overlayAlignedIds.has(t.id)
-              const mode = overlayDisplayModes.get(t.id) ?? 'integrated'
               return (
                 <div key={t.id} className="rounded-md px-2 py-1.5 hover:bg-accent group">
                   <div className="flex items-center justify-between gap-2">
@@ -530,7 +529,6 @@ export function TimelinePersonaSelector({
                 {externalStored.map(info => {
                   const isActive = externalActiveIds.has(info.timelineId)
                   const aligned = externalAlignedIds.has(info.timelineId)
-                  const mode = externalDisplayModes.get(info.timelineId) ?? 'separate'
                   const canAlign = info.startYear != null && mainStartYear != null
                   return (
                     <div key={info.timelineId} className="rounded-md px-1 py-1.5 hover:bg-accent">
@@ -619,7 +617,6 @@ export function TimelinePersonaSelector({
               personas.map(p => {
                 const isActive = activePersonaIds.has(p.id)
                 const aligned = alignedPersonaIds.has(p.id)
-                const mode = personaDisplayModes.get(p.id) ?? 'separate'
                 return (
                   <div key={p.id} className="rounded-md px-2 py-1.5 hover:bg-accent">
                     <div className="flex items-center justify-between gap-2">
