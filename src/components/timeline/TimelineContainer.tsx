@@ -730,59 +730,57 @@ export function TimelineContainer({
   const currentYear = getCurrentYearFraction()
   const hasValueEvents = events.some(e => !!e.valueProjection)
 
-  // Split persona events into integrated (sub-rows in lanes) vs separate (own section below)
-  const integratedPersonaEvents = useMemo(
-    () => personaEvents.filter(e => (personaDisplayModes.get(e.persona_id) ?? 'integrated') === 'integrated'),
-    [personaEvents, personaDisplayModes],
-  )
+  // All personas/overlays always shown as separate sections below (no integrated/blended mode)
+  const integratedPersonaEvents = useMemo(() => [], [])
 
-  const separatePersonas = useMemo(() => {
-    const ids = new Set(
-      personaEvents
-        .filter(e => personaDisplayModes.get(e.persona_id) === 'separate')
-        .map(e => e.persona_id),
-    )
-    return personas.filter(p => ids.has(p.id))
-  }, [personas, personaEvents, personaDisplayModes])
+  const separatePersonas = useMemo(() => personas, [personas])
 
   const separatePersonaEventsMap = useMemo(() => {
     const m = new Map<string, AlignedPersonaEvent[]>()
     for (const e of personaEvents) {
-      if (personaDisplayModes.get(e.persona_id) === 'separate') {
-        const list = m.get(e.persona_id) ?? []
-        list.push(e)
-        m.set(e.persona_id, list)
-      }
+      const list = m.get(e.persona_id) ?? []
+      list.push(e)
+      m.set(e.persona_id, list)
     }
     return m
-  }, [personaEvents, personaDisplayModes])
+  }, [personaEvents])
 
-  // Split overlay events into integrated vs separate
-  const integratedOverlayEvents = useMemo(
-    () => overlayEvents.filter(e => (overlayDisplayModes.get(e.timeline_id) ?? 'integrated') === 'integrated'),
-    [overlayEvents, overlayDisplayModes],
-  )
+  const integratedOverlayEvents = useMemo(() => [], [])
 
-  const separateOverlayTimelines = useMemo(() => {
-    const ids = new Set(
-      overlayEvents
-        .filter(e => overlayDisplayModes.get(e.timeline_id) === 'separate')
-        .map(e => e.timeline_id),
-    )
-    return activeOverlayTimelines.filter(t => ids.has(t.id))
-  }, [overlayEvents, overlayDisplayModes, activeOverlayTimelines])
+  const separateOverlayTimelines = useMemo(() => activeOverlayTimelines, [activeOverlayTimelines])
 
   const separateOverlayEventsMap = useMemo(() => {
     const m = new Map<string, OverlayTimelineEvent[]>()
     for (const e of overlayEvents) {
-      if (overlayDisplayModes.get(e.timeline_id) === 'separate') {
-        const list = m.get(e.timeline_id) ?? []
-        list.push(e)
-        m.set(e.timeline_id, list)
-      }
+      const list = m.get(e.timeline_id) ?? []
+      list.push(e)
+      m.set(e.timeline_id, list)
     }
     return m
-  }, [overlayEvents, overlayDisplayModes])
+  }, [overlayEvents])
+
+  // Derive each persona's/overlay's own unique lane names from their events
+  const personaOwnLaneNames = useMemo(() => {
+    const m = new Map<string, string[]>()
+    for (const [id, evs] of separatePersonaEventsMap) {
+      const seen = new Set<string>()
+      const names: string[] = []
+      for (const e of evs) { if (!seen.has(e.lane_name)) { seen.add(e.lane_name); names.push(e.lane_name) } }
+      m.set(id, names)
+    }
+    return m
+  }, [separatePersonaEventsMap])
+
+  const overlayOwnLaneNames = useMemo(() => {
+    const m = new Map<string, string[]>()
+    for (const [id, evs] of separateOverlayEventsMap) {
+      const seen = new Set<string>()
+      const names: string[] = []
+      for (const e of evs) { if (!seen.has(e.lane_name)) { seen.add(e.lane_name); names.push(e.lane_name) } }
+      m.set(id, names)
+    }
+    return m
+  }, [separateOverlayEventsMap])
 
   // Timeline label helper: emoji or first 2 chars of name
   function getOverlayLabel(t: DbTimeline): string {
@@ -1003,7 +1001,7 @@ export function TimelineContainer({
     for (const persona of separatePersonas) {
       const laneMap = new Map<string, { hasOverlaps: boolean; rowCount: number; eventRowMap: Map<string, number> }>()
       const personaEvs = separatePersonaEventsMap.get(persona.id) ?? []
-      for (const laneName of visibleLaneNames) {
+      for (const laneName of (personaOwnLaneNames.get(persona.id) ?? [])) {
         const laneEvs = personaEvs.filter(e => e.lane_name === laneName)
         const hasOverlaps = hasAnyOverlapsGeneric(laneEvs)
         const isExpanded = hasOverlaps && expandedSeparatePersonaLanes.has(`${persona.id}:${laneName}`)
@@ -1017,7 +1015,7 @@ export function TimelineContainer({
       result.set(persona.id, laneMap)
     }
     return result
-  }, [separatePersonas, separatePersonaEventsMap, visibleLaneNames, expandedSeparatePersonaLanes])
+  }, [separatePersonas, separatePersonaEventsMap, personaOwnLaneNames, expandedSeparatePersonaLanes])
 
   // Per-lane overlap data for separate overlay sections
   const separateOverlayLaneData = useMemo(() => {
@@ -1025,7 +1023,7 @@ export function TimelineContainer({
     for (const timeline of separateOverlayTimelines) {
       const laneMap = new Map<string, { hasOverlaps: boolean; rowCount: number; eventRowMap: Map<string, number> }>()
       const timelineEvs = separateOverlayEventsMap.get(timeline.id) ?? []
-      for (const laneName of visibleLaneNames) {
+      for (const laneName of (overlayOwnLaneNames.get(timeline.id) ?? [])) {
         const laneEvs = timelineEvs.filter(e => e.lane_name === laneName)
         const hasOverlaps = hasAnyOverlapsGeneric(laneEvs)
         const isExpanded = hasOverlaps && expandedSeparateOverlayLanes.has(`${timeline.id}:${laneName}`)
@@ -1039,7 +1037,7 @@ export function TimelineContainer({
       result.set(timeline.id, laneMap)
     }
     return result
-  }, [separateOverlayTimelines, separateOverlayEventsMap, visibleLaneNames, expandedSeparateOverlayLanes])
+  }, [separateOverlayTimelines, separateOverlayEventsMap, overlayOwnLaneNames, expandedSeparateOverlayLanes])
 
   const separatePersonaSections = useMemo<PersonaSidebarSection[]>(() => {
     return separatePersonas.map(p => {
@@ -1052,14 +1050,14 @@ export function TimelineContainer({
         initials,
         birthYear: p.birth_year,
         deathYear: p.death_year,
-        laneRowData: visibleLaneNames.map(name => ({
+        laneRowData: (personaOwnLaneNames.get(p.id) ?? []).map(name => ({
           name,
           hasOverlaps: laneData?.get(name)?.hasOverlaps ?? false,
           rowCount: laneData?.get(name)?.rowCount ?? 1,
         })),
       }
     })
-  }, [separatePersonas, visibleLaneNames, separatePersonaLaneData])
+  }, [separatePersonas, personaOwnLaneNames, separatePersonaLaneData])
 
   // Build sidebar sections for separate overlay timelines
   const separateOverlaySidebarSections = useMemo<OverlaySidebarSection[]>(() => {
@@ -1070,7 +1068,7 @@ export function TimelineContainer({
         name: t.name,
         label: getOverlayLabel(t),
         color: t.color ?? '#6b7280',
-        laneRowData: visibleLaneNames.map(name => ({
+        laneRowData: (overlayOwnLaneNames.get(t.id) ?? []).map(name => ({
           name,
           hasOverlaps: laneData?.get(name)?.hasOverlaps ?? false,
           rowCount: laneData?.get(name)?.rowCount ?? 1,
@@ -1078,7 +1076,7 @@ export function TimelineContainer({
       }
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [separateOverlayTimelines, visibleLaneNames, separateOverlayLaneData])
+  }, [separateOverlayTimelines, overlayOwnLaneNames, separateOverlayLaneData])
 
   // Grand total height includes all section rows for YearGrid coverage
   const personaSectionsTotalHeight = separatePersonaSections.reduce(
@@ -1227,14 +1225,15 @@ export function TimelineContainer({
           {/* Separate persona timeline sections */}
           {separatePersonas.map(persona => {
             const pLaneData = separatePersonaLaneData.get(persona.id)
-            const laneRowCounts = new Map(visibleLaneNames.map(n => [n, pLaneData?.get(n)?.rowCount ?? 1]))
-            const laneEventRowMaps = new Map(visibleLaneNames.map(n => [n, pLaneData?.get(n)?.eventRowMap ?? new Map()]))
+            const ownNames = personaOwnLaneNames.get(persona.id) ?? []
+            const laneRowCounts = new Map(ownNames.map(n => [n, pLaneData?.get(n)?.rowCount ?? 1]))
+            const laneEventRowMaps = new Map(ownNames.map(n => [n, pLaneData?.get(n)?.eventRowMap ?? new Map()]))
             return (
               <PersonaSeparateTimeline
                 key={persona.id}
                 persona={persona}
                 events={separatePersonaEventsMap.get(persona.id) ?? []}
-                laneNames={visibleLaneNames}
+                laneNames={ownNames}
                 yearStart={effectiveYearStart}
                 yearEnd={effectiveYearEnd}
                 pixelsPerYear={pixelsPerYear}
@@ -1248,14 +1247,15 @@ export function TimelineContainer({
           {/* Separate overlay timeline sections */}
           {separateOverlayTimelines.map(t => {
             const oLaneData = separateOverlayLaneData.get(t.id)
-            const laneRowCounts = new Map(visibleLaneNames.map(n => [n, oLaneData?.get(n)?.rowCount ?? 1]))
-            const laneEventRowMaps = new Map(visibleLaneNames.map(n => [n, oLaneData?.get(n)?.eventRowMap ?? new Map()]))
+            const ownNames = overlayOwnLaneNames.get(t.id) ?? []
+            const laneRowCounts = new Map(ownNames.map(n => [n, oLaneData?.get(n)?.rowCount ?? 1]))
+            const laneEventRowMaps = new Map(ownNames.map(n => [n, oLaneData?.get(n)?.eventRowMap ?? new Map()]))
             return (
               <OverlaySeparateTimeline
                 key={t.id}
                 timeline={t}
                 events={separateOverlayEventsMap.get(t.id) ?? []}
-                laneNames={visibleLaneNames}
+                laneNames={ownNames}
                 yearStart={effectiveYearStart}
                 yearEnd={effectiveYearEnd}
                 pixelsPerYear={pixelsPerYear}

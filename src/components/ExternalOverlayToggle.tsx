@@ -184,22 +184,6 @@ export function ExternalOverlayToggle({
                               {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
                             </button>
                           )}
-                          <div className="flex items-center rounded border overflow-hidden">
-                            <button
-                              onClick={() => onSetDisplayMode(info.timelineId, 'integrated')}
-                              title="Blend into my lanes"
-                              className={cn('p-1 transition-colors', mode === 'integrated' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted')}
-                            >
-                              <Layers className="h-3 w-3" />
-                            </button>
-                            <button
-                              onClick={() => onSetDisplayMode(info.timelineId, 'separate')}
-                              title="Show as separate section below"
-                              className={cn('p-1 transition-colors', mode === 'separate' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted')}
-                            >
-                              <LayoutList className="h-3 w-3" />
-                            </button>
-                          </div>
                         </>
                       )}
                       <Switch checked={isActive} onCheckedChange={() => onToggleActive(info.timelineId)} />
