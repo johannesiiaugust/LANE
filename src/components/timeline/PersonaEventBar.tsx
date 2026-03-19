@@ -145,19 +145,19 @@ export function PersonaEventBar({
 
   if (event.type === 'point') {
     const top = verticalOffset + (rowHeight - DOT_SIZE) / 2
-    const adjustedTop = top
     return (
       <>
         <div
-          className="absolute rounded-full border-2 border-dashed border-white/60 cursor-pointer"
+          className="absolute rounded-full border-2 border-dashed border-white/60 cursor-pointer transition-all hover:scale-125 hover:shadow-lg"
           style={{
             left: left - DOT_SIZE / 2,
-            top: adjustedTop,
+            top,
             width: DOT_SIZE,
             height: DOT_SIZE,
             backgroundColor: color,
             opacity: pastOpacity,
             filter: pastFilter,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3)',
           }}
           {...pointerHandlers}
         />
@@ -174,7 +174,7 @@ export function PersonaEventBar({
   return (
     <>
       <div
-        className="absolute rounded-sm border-2 border-dashed border-white/60 overflow-hidden cursor-pointer"
+        className="absolute rounded-lg border-2 border-dashed border-white/60 overflow-hidden cursor-pointer transition-all hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50"
         style={{
           left,
           top,
@@ -183,12 +183,15 @@ export function PersonaEventBar({
           backgroundColor: color,
           opacity: pastOpacity,
           filter: pastFilter,
+          boxShadow: '0 2px 5px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)',
         }}
         {...pointerHandlers}
       >
+        {/* 3D sheen */}
+        <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 55%)' }} />
         {width > EVENT_FONT * 5 && (
           <span
-            className="px-1 text-white/80 font-medium truncate block"
+            className="absolute px-1 text-white/80 font-medium truncate drop-shadow-[0_0_2px_rgba(0,0,0,0.5)]"
             style={{ fontSize: Math.round(EVENT_FONT * 0.9), lineHeight: `${EVENT_LINE_HEIGHT}px` }}
           >
             {event.title}

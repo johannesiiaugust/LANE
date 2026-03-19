@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Globe, Layers, LayoutList, Link2, Link2Off, X, Search } from 'lucide-react'
+import { Globe, Link2, Link2Off, X, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -25,8 +25,8 @@ interface Props {
 }
 
 export function ExternalOverlayToggle({
-  stored, activeIds, alignedIds, displayModes,
-  onAdd, onRemove, onToggleActive, onToggleAlignment, onSetDisplayMode,
+  stored, activeIds, alignedIds, displayModes: _displayModes,
+  onAdd, onRemove, onToggleActive, onToggleAlignment, onSetDisplayMode: _onSetDisplayMode,
   mainStartYear,
   sharedWithMe = [],
 }: Props) {
@@ -163,7 +163,6 @@ export function ExternalOverlayToggle({
             {stored.map(info => {
               const isActive = activeIds.has(info.timelineId)
               const aligned = alignedIds.has(info.timelineId)
-              const mode = displayModes.get(info.timelineId) ?? 'separate'
               const canAlign = info.startYear != null && mainStartYear != null
               return (
                 <div key={info.timelineId} className="rounded-md px-2 py-1.5 hover:bg-accent">

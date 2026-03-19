@@ -1,4 +1,4 @@
-import { Layers, LayoutList, Users, Link2, Link2Off } from 'lucide-react'
+import { Users, Link2, Link2Off } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
@@ -22,8 +22,8 @@ export function PersonaToggle({
   onToggle,
   alignedPersonaIds,
   onToggleAlignment,
-  personaDisplayModes,
-  onSetDisplayMode,
+  personaDisplayModes: _personaDisplayModes,
+  onSetDisplayMode: _onSetDisplayMode,
 }: PersonaToggleProps) {
   const activeCount = activePersonaIds.size
 
@@ -47,7 +47,6 @@ export function PersonaToggle({
         {personas.map(p => {
           const isActive = activePersonaIds.has(p.id)
           const aligned = alignedPersonaIds.has(p.id)
-          const mode = personaDisplayModes.get(p.id) ?? 'separate'
           return (
             <div
               key={p.id}

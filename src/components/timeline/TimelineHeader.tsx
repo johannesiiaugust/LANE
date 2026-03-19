@@ -175,22 +175,25 @@ export function TimelineHeader({ yearStart, yearEnd, pixelsPerYear, currentYear,
             borderTop: '4px solid #ef4444',
           }}
         />
-        <span
-          className="absolute whitespace-nowrap select-none font-medium"
-          style={{
-            top: Math.round(sc.HEADER_HEIGHT * 0.08),
-            left: 0,
-            transform: 'translateX(-50%)',
-            fontSize: sc.TICK_FONT + 2,
-            padding: '1px 4px',
-            borderRadius: 3,
-            background: 'rgba(239,68,68,0.85)',
-            color: '#fff',
-            zIndex: 15,
-          }}
+        <div
+          className="absolute flex flex-col items-center"
+          style={{ top: Math.round(sc.HEADER_HEIGHT * 0.08), left: 0, transform: 'translateX(-50%)', zIndex: 15 }}
         >
-          {(() => { const d = new Date(fracYearToMs(currentYear)); return `${d.getUTCDate()} ${MONTH_ABBR[d.getUTCMonth()]} ${d.getUTCFullYear()}` })()}
-        </span>
+          <span
+            className="whitespace-nowrap select-none font-medium"
+            style={{
+              fontSize: sc.TICK_FONT - 1,
+              padding: '1px 4px',
+              borderRadius: 3,
+              background: 'rgba(239,68,68,0.85)',
+              color: '#fff',
+            }}
+          >
+            {(() => { const d = new Date(fracYearToMs(currentYear)); return `${d.getUTCDate()} ${MONTH_ABBR[d.getUTCMonth()]} ${d.getUTCFullYear()}` })()}
+          </span>
+          {/* Bottom upward-pointing triangle */}
+          <div style={{ width: 0, height: 0, borderLeft: '4px solid transparent', borderRight: '4px solid transparent', borderBottom: '4px solid rgba(239,68,68,0.85)' }} />
+        </div>
       </div>
       {/* Cursor position marker — positioned in viewport space (left updated via ref) */}
       {cursorRef && (
