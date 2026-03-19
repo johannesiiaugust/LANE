@@ -228,12 +228,6 @@ export function LaneSidebar({
                         : <ChevronRight size={ICON_SIZE} />}
                     </button>
                   )}
-                  <span
-                    className="font-semibold bg-muted rounded shrink-0"
-                    style={{ fontSize: Math.round(SIDEBAR_FONT * 0.85), padding: '0 4px' }}
-                  >
-                    {pl.initials}
-                  </span>
                   <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>
                     {pl.name}
                   </span>
@@ -269,12 +263,6 @@ export function LaneSidebar({
                         : <ChevronRight size={ICON_SIZE} />}
                     </button>
                   )}
-                  <span
-                    className="font-semibold bg-primary/15 text-primary rounded shrink-0"
-                    style={{ fontSize: Math.round(SIDEBAR_FONT * 0.85), padding: '0 4px' }}
-                  >
-                    {ol.label}
-                  </span>
                   <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>
                     {ol.name}
                   </span>
@@ -316,12 +304,6 @@ export function LaneSidebar({
               gap: Math.round(ICON_SIZE / 6),
             }}
           >
-            <span
-              className="font-bold bg-muted-foreground/20 rounded shrink-0"
-              style={{ fontSize: Math.round(SIDEBAR_FONT * 0.85), padding: '1px 4px' }}
-            >
-              {section.initials}
-            </span>
             <span className="font-semibold text-muted-foreground truncate" style={{ fontSize: SIDEBAR_FONT }}>
               {section.name}
             </span>
@@ -339,7 +321,7 @@ export function LaneSidebar({
             return (
               <div
                 key={row.name}
-                className="border-b border-border/30 flex items-start text-muted-foreground"
+                className="border-b border-border/30 flex items-start text-muted-foreground bg-muted/20"
                 style={{
                   height: row.rowCount * BASE_LANE_HEIGHT,
                   paddingLeft: row.hasOverlaps ? Math.round(W * 0.04) : Math.round(W * 0.08),
@@ -377,12 +359,6 @@ export function LaneSidebar({
               gap: Math.round(ICON_SIZE / 6),
             }}
           >
-            <span
-              className="font-bold bg-primary/15 text-primary rounded shrink-0"
-              style={{ fontSize: Math.round(SIDEBAR_FONT * 0.85), padding: '1px 4px' }}
-            >
-              {section.label}
-            </span>
             <span className="font-semibold text-muted-foreground truncate" style={{ fontSize: SIDEBAR_FONT }}>
               {section.name}
             </span>
@@ -393,7 +369,7 @@ export function LaneSidebar({
             return (
               <div
                 key={row.name}
-                className="border-b border-border/30 flex items-start text-muted-foreground"
+                className="border-b border-border/30 flex items-start text-muted-foreground bg-muted/20"
                 style={{
                   height: row.rowCount * BASE_LANE_HEIGHT,
                   paddingLeft: row.hasOverlaps ? Math.round(W * 0.04) : Math.round(W * 0.08),

@@ -159,14 +159,14 @@ export function TimelineContainer({
   onEventDrop,
   personaEvents,
   personas,
-  personaDisplayModes,
+  personaDisplayModes: _personaDisplayModes,
   dataYearMin,
   dataYearMax,
   scrollToTodayRef,
   scrollToEventRef,
   lifeSpan,
   overlayEvents = [],
-  overlayDisplayModes = new Map(),
+  overlayDisplayModes: _overlayDisplayModes = new Map(),
   activeOverlayTimelines = [],
   onTodayVisibilityChange,
 }: TimelineContainerProps) {
@@ -731,9 +731,10 @@ export function TimelineContainer({
   const hasValueEvents = events.some(e => !!e.valueProjection)
 
   // All personas/overlays always shown as separate sections below (no integrated/blended mode)
-  const integratedPersonaEvents = useMemo(() => [], [])
+  const integratedPersonaEvents = useMemo((): AlignedPersonaEvent[] => [], [])
 
-  const separatePersonas = useMemo(() => personas, [personas])
+  const activePersonaIdSet = useMemo(() => new Set(personaEvents.map(e => e.persona_id)), [personaEvents])
+  const separatePersonas = useMemo(() => personas.filter(p => activePersonaIdSet.has(p.id)), [personas, activePersonaIdSet])
 
   const separatePersonaEventsMap = useMemo(() => {
     const m = new Map<string, AlignedPersonaEvent[]>()
@@ -745,7 +746,7 @@ export function TimelineContainer({
     return m
   }, [personaEvents])
 
-  const integratedOverlayEvents = useMemo(() => [], [])
+  const integratedOverlayEvents = useMemo((): OverlayTimelineEvent[] => [], [])
 
   const separateOverlayTimelines = useMemo(() => activeOverlayTimelines, [activeOverlayTimelines])
 
@@ -991,8 +992,6 @@ export function TimelineContainer({
     return m
   }, [visibleLanes, laneData])
 
-  // Lane names in visible order — used for separate sections
-  const visibleLaneNames = useMemo(() => visibleLanes.map(l => l.name), [visibleLanes])
 
   // Build sidebar sections for separate personas
   // Per-lane overlap data for separate persona sections
@@ -1177,7 +1176,7 @@ export function TimelineContainer({
         <div className="relative" style={{ width: effectiveTotalWidth, minHeight: grandTotalHeight + 24 }}>
           <TimelineHeader yearStart={effectiveYearStart} yearEnd={effectiveYearEnd} pixelsPerYear={pixelsPerYear} currentYear={currentYear} scrollLeft={scrollLeft} viewportWidth={viewportWidth} cursorRef={cursorHeaderRef} lifeSpan={lifeSpan} />
           <div className="relative">
-            <YearGrid yearStart={effectiveYearStart} yearEnd={effectiveYearEnd} pixelsPerYear={pixelsPerYear} totalHeight={grandTotalHeight} currentYear={currentYear} scrollLeft={scrollLeft} viewportWidth={viewportWidth} lifeSpan={lifeSpan} />
+            <YearGrid yearStart={effectiveYearStart} yearEnd={effectiveYearEnd} pixelsPerYear={pixelsPerYear} totalHeight={totalHeight} currentYear={currentYear} scrollLeft={scrollLeft} viewportWidth={viewportWidth} lifeSpan={lifeSpan} />
             {/* Cursor line — positioned in content space, updated via ref */}
             <div
               ref={cursorLaneRef}

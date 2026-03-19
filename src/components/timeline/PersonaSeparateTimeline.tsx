@@ -34,7 +34,7 @@ export function PersonaSeparateTimeline({
   return (
     <div style={{ width }}>
       {/* Persona header row — height spacer only; label is rendered in LaneSidebar */}
-      <div className="border-t-2 border-border/60 bg-muted/10" style={{ height: PERSONA_SUB_ROW_HEIGHT }} />
+      <div className="border-t-2 border-border/60 bg-muted/30" style={{ height: PERSONA_SUB_ROW_HEIGHT }} />
 
       {/* Lane rows — event bars only, no in-flow or sticky labels inside */}
       {laneNames.map(laneName => {
@@ -45,7 +45,7 @@ export function PersonaSeparateTimeline({
         return (
           <div
             key={laneName}
-            className="relative border-b border-border/30"
+            className="relative border-b border-border/30 bg-muted/20"
             style={{ height: rowCount * BASE_LANE_HEIGHT, width }}
           >
             {laneEvents.map(e => (

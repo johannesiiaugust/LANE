@@ -34,7 +34,7 @@ export function OverlaySeparateTimeline({
   return (
     <div style={{ width }}>
       {/* Timeline header row — height spacer; label is in LaneSidebar */}
-      <div className="border-t-2 border-border/60 bg-muted/10" style={{ height: PERSONA_SUB_ROW_HEIGHT }} />
+      <div className="border-t-2 border-border/60 bg-muted/30" style={{ height: PERSONA_SUB_ROW_HEIGHT }} />
 
       {/* Lane rows */}
       {laneNames.map(laneName => {
@@ -45,7 +45,7 @@ export function OverlaySeparateTimeline({
         return (
           <div
             key={laneName}
-            className="relative border-b border-border/30"
+            className="relative border-b border-border/30 bg-muted/20"
             style={{ height: rowCount * BASE_LANE_HEIGHT, width }}
           >
             {laneEvents.map(e => (
