@@ -178,7 +178,7 @@ const SkinContext = createContext<SkinContextValue>({
 
 export function SkinProvider({ children }: { children: ReactNode }) {
   const [skinId, setSkinIdRaw] = useState<SkinId>(
-    () => (localStorage.getItem('skin-id') as SkinId | null) ?? 'sepia'
+    () => (localStorage.getItem('skin-id') as SkinId | null) ?? 'dark'
   )
   const [customInput, setCustomInputRaw] = useState<CustomSkinInput>(() => {
     try {
