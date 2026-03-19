@@ -1144,7 +1144,7 @@ export function TimelineContainer({
       {/* Lane sidebar overlay — floats above timeline content, scrolls vertically via sidebarInnerRef */}
       <div
         className="absolute top-0 left-0 overflow-hidden pointer-events-none"
-        style={{ width: sc.SIDEBAR_WIDTH, height: '100%', zIndex: 5 }}
+        style={{ width: sc.SIDEBAR_WIDTH, height: '100%', zIndex: 30 }}
       >
         <div ref={sidebarInnerRef} className="pointer-events-auto">
           <LaneSidebar
