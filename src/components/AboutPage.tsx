@@ -177,7 +177,7 @@ export function AboutPage() {
         <div className="flex items-center gap-4">
           <button onClick={() => navigate('/terms')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Terms</button>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/demo')}
             className="text-sm px-4 py-1.5 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity font-medium"
           >
             Open App →
@@ -192,12 +192,6 @@ export function AboutPage() {
           <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-primary/10 blur-3xl" />
         </div>
         <div className="relative max-w-3xl mx-auto space-y-6">
-          <div
-            className="inline-block text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full border border-primary/40 text-primary/80 bg-primary/5"
-            style={{ animation: 'fadeDown 0.6s ease both' }}
-          >
-            Early Access · Be First
-          </div>
           <button
             onClick={() => navigate('/demo')}
             className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-tight hover:opacity-80 transition-opacity"
@@ -253,7 +247,7 @@ export function AboutPage() {
       <section className="py-20 px-6">
         <FadeIn>
           <div className="max-w-2xl mx-auto grid grid-cols-3 gap-8 text-center">
-            <StatPill value="7" label="life dimensions tracked" />
+            <StatPill value="7" label="default life dimensions" />
             <StatPill value="∞" label="years of perspective" />
             <StatPill value="1" label="place to see it all" />
           </div>

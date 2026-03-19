@@ -30,7 +30,7 @@ const STEPS: Step[] = [
   {
     target: 'compare',
     title: 'Manage timelines',
-    text: 'Create and modify timelines for family, friends and others. Import from CVs, social networks, calendars and other sources — or simply copy-paste any text with our AI.',
+    text: 'Create and modify timelines for family, friends and others. Import from CVs, social networks, calendars and other sources — simply copy-paste any text with our AI, or by voice.',
     side: 'bottom',
     align: 'start',
   },
