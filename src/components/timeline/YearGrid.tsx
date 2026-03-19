@@ -14,13 +14,14 @@ interface YearGridProps {
   yearEnd: number
   pixelsPerYear: number
   totalHeight: number
+  comparedHeight?: number   // extra height below totalHeight occupied by comparison sections
   currentYear: number
   scrollLeft: number
   viewportWidth: number
   lifeSpan?: LifeSpan
 }
 
-export function YearGrid({ yearStart, yearEnd, pixelsPerYear, totalHeight, currentYear, scrollLeft, viewportWidth, lifeSpan }: YearGridProps) {
+export function YearGrid({ yearStart, yearEnd, pixelsPerYear, totalHeight, comparedHeight = 0, currentYear, scrollLeft, viewportWidth, lifeSpan }: YearGridProps) {
   const mode = getZoomMode(pixelsPerYear)
   const bufferPx = viewportWidth * 1.5
   const visStart = yearStart + Math.max(0, scrollLeft - bufferPx) / pixelsPerYear
@@ -121,7 +122,7 @@ export function YearGrid({ yearStart, yearEnd, pixelsPerYear, totalHeight, curre
           style={{ left: (y - yearStart) * pixelsPerYear, height: totalHeight }}
         />
       ))}
-      {/* Present-day line */}
+      {/* Present-day line — solid over main, dimmer dotted over comparison */}
       <div
         className="absolute top-0"
         style={{
@@ -131,6 +132,19 @@ export function YearGrid({ yearStart, yearEnd, pixelsPerYear, totalHeight, curre
           backgroundColor: '#ef4444',
         }}
       />
+      {comparedHeight > 0 && (
+        <div
+          className="absolute"
+          style={{
+            left: (currentYear - yearStart) * pixelsPerYear,
+            top: totalHeight,
+            width: 2,
+            height: comparedHeight,
+            background: 'repeating-linear-gradient(to bottom, #ef4444 0px, #ef4444 4px, transparent 4px, transparent 8px)',
+            opacity: 0.4,
+          }}
+        />
+      )}
     </div>
   )
 }
