@@ -175,7 +175,7 @@ export function TimelineEventBar({
       <>
         <div
           className={`absolute rounded-full cursor-pointer transition-all select-none hover:scale-125 hover:shadow-lg ${grabRing}`}
-          style={{ left: left - DOT_SIZE / 2, top, width: DOT_SIZE, height: DOT_SIZE, backgroundColor: color, boxShadow: '0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.35)', ...pastStyle, ...draggingStyle }}
+          style={{ left: left - DOT_SIZE / 2, top, width: DOT_SIZE, height: DOT_SIZE, backgroundColor: color, opacity: 0.88, boxShadow: '0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.35)', ...pastStyle, ...draggingStyle }}
           {...interactionProps}
           onMouseEnter={e => {
             if (hasPointValue) setTooltip({ clientX: e.clientX, clientY: e.clientY, value: event.pointValue! })
@@ -233,7 +233,7 @@ export function TimelineEventBar({
     <>
       <div
         className={`absolute rounded-lg cursor-pointer transition-all overflow-hidden select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50 ${grabRing}`}
-        style={{ left, top, width: Math.max(width, 4), height: BAR_HEIGHT, backgroundColor: color, zIndex: stackZ, boxShadow: '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)', ...pastStyle, ...draggingStyle }}
+        style={{ left, top, width: Math.max(width, 4), height: BAR_HEIGHT, backgroundColor: color, opacity: 0.88, zIndex: stackZ, boxShadow: '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)', ...pastStyle, ...draggingStyle }}
         title={event.title}
         {...interactionProps}
         onMouseMove={e => {
