@@ -1,4 +1,5 @@
 import { useMemo, useCallback, useState } from 'react'
+import { useGoogleTranslate, TranslateMenuContent } from '@/components/TranslateMenu'
 import { Plus, ZoomIn, ZoomOut, MoreHorizontal, CalendarSearch, Globe, FileText, Mic, Search, LogOut, UserPen } from 'lucide-react' // Globe kept for import menu item
 import { Button } from '@/components/ui/button'
 import { TimelinePersonaSelector } from '@/components/TimelinePersonaSelector'
@@ -130,6 +131,7 @@ export function Toolbar({
   showUserMenu = true,
   extraActions,
 }: ToolbarProps) {
+  useGoogleTranslate()
   const { size, setSize } = useSizeConfig()
   const { skinId, setSkinId, customInput } = useSkin()
   const { user, signOut } = useAuth()
@@ -363,6 +365,9 @@ export function Toolbar({
                   <Mic className="h-4 w-4 mr-2" />
                   Import from Voice
                 </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+                <TranslateMenuContent />
 
                 {/* User section */}
                 {showUserMenu && user && (
