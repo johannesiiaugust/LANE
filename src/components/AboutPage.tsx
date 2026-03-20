@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Footer } from '@/components/Footer'
 import { useTitle } from '@/hooks/useTitle'
+import { TranslateDropdown } from '@/components/TranslateMenu'
 
 function navigate(path: string) {
   window.history.pushState(null, '', path)
@@ -177,6 +178,7 @@ export function AboutPage() {
           LifeLANE
         </button>
         <div className="flex items-center gap-4">
+          <TranslateDropdown />
           <button onClick={() => navigate('/terms')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Terms</button>
           <button
             onClick={() => navigate('/demo')}

@@ -15,6 +15,7 @@ import { SkinDialog } from '@/components/SkinDialog'
 import { ImportDialog, type ImportTab } from '@/components/ImportDialog'
 import { SearchDialog } from '@/components/SearchDialog'
 import { GuideOverlay } from '@/components/GuideOverlay'
+import { useGoogleTranslate, TranslateMenuContent } from '@/components/TranslateMenu'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
@@ -161,6 +162,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [importTab, setImportTab] = useState<ImportTab>('calendar-file')
   const [searchOpen, setSearchOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
+  useGoogleTranslate()
   const [showExampleOverlay, setShowExampleOverlay] = useState(true)
   const guideWasOpenRef = useRef(false)
   const guideClosedRef = useRef(false)
@@ -520,6 +522,8 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
               <DropdownMenuItem onClick={onSignUpWithTimeline}>
                 Sign up with this timeline →
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <TranslateMenuContent />
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
