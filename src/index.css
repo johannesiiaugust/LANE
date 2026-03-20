@@ -32,6 +32,17 @@ body {
   @apply border-border;
 }
 
+/* ── emoji-mart theme overrides ───────────────────────────────────────────── */
+em-emoji-picker {
+  --border-radius: 0.5rem;
+  --font-family: system-ui, -apple-system, sans-serif;
+  --font-size: 14px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.12);
+  --color-border: #e4e4e7;
+  --rgb-accent: 24, 24, 27;
+  height: 380px;
+}
+
 @keyframes blink-fast {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ChevronDown, ChevronRight, Plus, Pencil, Trash2, X, Copy, UserPlus } from 'lucide-react'
+import { ChevronDown, Plus, Pencil, Trash2, X, Copy, UserPlus } from 'lucide-react'
 import { useTimelineContext } from '@/contexts/TimelineContext'
 import { fracYearToMs, msToFracYear } from '@/lib/constants'
 import { fetchLanes, getTimelineShares, addTimelineShare, removeTimelineShare, lookupUserByUsername } from '@/lib/api'
@@ -23,17 +23,10 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { EmojiField } from '@/components/ui/EmojiPickerPopover'
+import { ColorPicker } from '@/components/ui/ColorPicker'
 
 const DEFAULT_COLOR = '#3b82f6'
-
-const EMOJI_OPTIONS = [
-  '🌍','🌎','🌏','🗺️','📍','📌','🏠','🏡','🏢','🏗️',
-  '🎓','📚','✏️','🔬','🧪','💼','💡','🚀','⭐','🏆',
-  '❤️','💛','💚','💙','💜','🖤','🤍','🎯','🎨','🎵',
-  '🚗','✈️','🚂','⛵','🏔️','🌊','🌲','🌸','🍀','☀️',
-  '👶','👦','👧','🧑','👨','👩','🧓','👴','👵','👪',
-  '💰','📈','🏅','🎉','🎂','🕯️','📅','⏳','🔑','💎',
-]
 const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
@@ -98,7 +91,6 @@ export function TimelineSelector() {
   const [endDate, setEndDate] = useState('')
   const [endTime, setEndTime] = useState('00:00')
   const [isPublic, setIsPublic] = useState(false)
-  const [emojiExpanded, setEmojiExpanded] = useState(false)
 
   // Sharing state (edit mode only)
   const [shares, setShares] = useState<DbTimelineShare[]>([])
@@ -172,7 +164,6 @@ export function TimelineSelector() {
       setEndTime('00:00')
     }
     setIsPublic(t.visibility === 'public')
-    setEmojiExpanded(false)
     setTargetId(id)
     setShares([])
     setShareInput('')
@@ -353,46 +344,10 @@ export function TimelineSelector() {
               />
             </div>
 
-            {/* Emoji picker (collapsible) */}
+            {/* Emoji picker */}
             <div className="grid gap-1.5">
-              <button
-                type="button"
-                onClick={() => setEmojiExpanded(v => !v)}
-                className="flex items-center gap-1.5 text-sm font-medium text-left"
-              >
-                {emojiExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
-                Emoji
-                {emojiValue && <span className="ml-1 text-base leading-none">{emojiValue}</span>}
-                <span className="text-muted-foreground font-normal">(optional)</span>
-              </button>
-              {emojiExpanded && (
-                <div className="rounded-md border border-input p-2">
-                  <div className="flex flex-wrap gap-1">
-                    {EMOJI_OPTIONS.map(em => (
-                      <button
-                        key={em}
-                        type="button"
-                        onClick={() => setEmojiValue(emojiValue === em ? '' : em)}
-                        className={`rounded px-1 py-0.5 text-lg leading-none transition-colors hover:bg-accent ${emojiValue === em ? 'bg-accent ring-2 ring-ring' : ''}`}
-                      >
-                        {em}
-                      </button>
-                    ))}
-                  </div>
-                  {emojiValue && (
-                    <div className="mt-2 flex items-center gap-2 border-t pt-2">
-                      <span className="text-sm text-muted-foreground">Selected: <span className="text-lg">{emojiValue}</span></span>
-                      <button
-                        type="button"
-                        onClick={() => setEmojiValue('')}
-                        className="ml-auto flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                      >
-                        <X className="h-3 w-3" /> Clear
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+              <Label>Emoji <span className="text-muted-foreground font-normal">(optional)</span></Label>
+              <EmojiField value={emojiValue} onChange={setEmojiValue} />
             </div>
 
             {/* ── Duplicate from existing timeline (create mode only) ── */}
@@ -496,17 +451,8 @@ export function TimelineSelector() {
               <>
                 {/* Color */}
                 <div className="grid gap-1.5">
-                  <Label htmlFor="tlColor">Color</Label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      id="tlColor"
-                      type="color"
-                      value={colorValue}
-                      onChange={e => setColorValue(e.target.value)}
-                      className="h-8 w-12 cursor-pointer rounded border border-input bg-transparent p-0.5"
-                    />
-                    <span className="text-sm text-muted-foreground font-mono">{colorValue}</span>
-                  </div>
+                  <Label>Color</Label>
+                  <ColorPicker value={colorValue} onChange={setColorValue} />
                 </div>
 
                 {/* Start date/time */}
