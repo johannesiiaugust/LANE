@@ -55,12 +55,13 @@ export function TimelineEventBar({
   const modeRef = useRef<'idle' | 'pending' | 'grabbed'>('idle')
   const downPosRef = useRef({ x: 0, y: 0 })
 
-  // Build sparkline series
+  // Build sparkline series — use fade extents when present
   const sparklineSeries = useMemo(() => {
     if (!hasValue || event.type !== 'range' || !event.valueProjection) return []
-    const endY = event.endYear ?? currentYear
-    return generateSparklineSeries(event.startYear, endY, event.valueProjection, currentYear)
-  }, [hasValue, event.startYear, event.endYear, event.valueProjection, event.type, currentYear])
+    const seriesStart = event.fadeInYear ?? event.startYear
+    const seriesEnd = event.fadeOutYear ?? event.endYear ?? currentYear
+    return generateSparklineSeries(seriesStart, seriesEnd, event.valueProjection, currentYear)
+  }, [hasValue, event.startYear, event.endYear, event.fadeInYear, event.fadeOutYear, event.valueProjection, event.type, currentYear])
 
   function clearHold() {
     if (holdTimerRef.current) { clearTimeout(holdTimerRef.current); holdTimerRef.current = null }
@@ -107,7 +108,9 @@ export function TimelineEventBar({
     if (!hasValue || !event.valueProjection) return
     const rect = e.currentTarget.getBoundingClientRect()
     const relX = e.clientX - rect.left
-    const hoverYear = event.startYear + relX / pixelsPerYear
+    // Bar may start from fadeInYear; use the bar's actual left year as origin
+    const barOriginYear = event.fadeInYear != null && event.fadeInYear < event.startYear ? event.fadeInYear : event.startYear
+    const hoverYear = barOriginYear + relX / pixelsPerYear
     const val = computeValueAtYear(hoverYear, event.startYear, event.valueProjection)
     setTooltip({ clientX: e.clientX, clientY: e.clientY, value: val })
   }
@@ -194,9 +197,34 @@ export function TimelineEventBar({
     )
   }
 
+  // Fade extents: if set, the bar extends further left/right with a gradient
+  const hasFadeIn = event.fadeInYear != null && event.fadeInYear < event.startYear
+  const hasFadeOut = event.fadeOutYear != null && event.fadeOutYear > (event.endYear ?? event.startYear)
+  const barStartYear = hasFadeIn ? event.fadeInYear! : event.startYear
+  const barEndYear = hasFadeOut ? event.fadeOutYear! : (event.endYear ?? event.startYear + 1)
+  const barLeft = (barStartYear - yearStart) * pixelsPerYear
+  const barWidth = (barEndYear - barStartYear) * pixelsPerYear
+
+  // Build CSS gradient for fade zones
+  let barBackground: string
+  if (hasFadeIn || hasFadeOut) {
+    const totalYears = barEndYear - barStartYear
+    const fadeInPct  = hasFadeIn  ? ((event.startYear - barStartYear) / totalYears) * 100 : 0
+    const fadeOutPct = hasFadeOut ? (((event.endYear ?? event.startYear) - barStartYear) / totalYears) * 100 : 100
+    const stops: string[] = [`transparent 0%`]
+    if (hasFadeIn)  stops.push(`${color} ${fadeInPct.toFixed(1)}%`)
+    if (hasFadeOut) stops.push(`${color} ${fadeOutPct.toFixed(1)}%`)
+    stops.push(`transparent 100%`)
+    barBackground = `linear-gradient(to right, ${stops.join(', ')})`
+  } else {
+    barBackground = color
+  }
+
   const width = ((event.endYear ?? event.startYear + 1) - event.startYear) * pixelsPerYear
   const top = (BASE_LANE_HEIGHT - BAR_HEIGHT) / 2 + topOffset + stackOff
-  const textLeft = Math.max(4, scrollLeft - left + sc.SIDEBAR_WIDTH + 4)
+  // Clamp text so it stays inside the solid-color region of the bar
+  const solidStart = hasFadeIn ? (event.startYear - yearStart) * pixelsPerYear : barLeft
+  const textLeft = Math.max(4, scrollLeft - solidStart + sc.SIDEBAR_WIDTH + 4)
 
   // Sparkline geometry
   let sparklinePath: string | null = null
@@ -211,7 +239,7 @@ export function TimelineEventBar({
     const chartH = BAR_HEIGHT - pad * 2
     const bottomY = (BAR_HEIGHT - pad).toFixed(1)
     const toXY = (p: { year: number; value: number }) => {
-      const x = (p.year - event.startYear) * pixelsPerYear
+      const x = (p.year - barStartYear) * pixelsPerYear
       const y = pad + chartH - chartH * (p.value - minV) / range
       return `${x.toFixed(1)},${y.toFixed(1)}`
     }
@@ -222,8 +250,8 @@ export function TimelineEventBar({
     if (projPts.length >= 2) projectionPath = projPts.map(toXY).join(' ')
     // Filled area under the full line for 3D depth
     const allPts = sparklineSeries.map(toXY)
-    const firstX = ((sparklineSeries[0].year - event.startYear) * pixelsPerYear).toFixed(1)
-    const lastX  = ((sparklineSeries[sparklineSeries.length - 1].year - event.startYear) * pixelsPerYear).toFixed(1)
+    const firstX = ((sparklineSeries[0].year - barStartYear) * pixelsPerYear).toFixed(1)
+    const lastX  = ((sparklineSeries[sparklineSeries.length - 1].year - barStartYear) * pixelsPerYear).toFixed(1)
     sparklineFill = `${firstX},${bottomY} ${allPts.join(' ')} ${lastX},${bottomY}`
   }
 
@@ -233,7 +261,7 @@ export function TimelineEventBar({
     <>
       <div
         className={`absolute rounded-lg cursor-pointer transition-all overflow-hidden select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50 ${grabRing}`}
-        style={{ left, top, width: Math.max(width, 4), height: BAR_HEIGHT, backgroundColor: color, opacity: 0.88, zIndex: stackZ, boxShadow: '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)', ...pastStyle, ...draggingStyle }}
+        style={{ left: barLeft, top, width: Math.max(hasFadeIn || hasFadeOut ? barWidth : width, 4), height: BAR_HEIGHT, background: barBackground, opacity: 0.88, zIndex: stackZ, boxShadow: hasFadeIn || hasFadeOut ? 'none' : '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)', ...pastStyle, ...draggingStyle }}
         title={event.title}
         {...interactionProps}
         onMouseMove={e => {

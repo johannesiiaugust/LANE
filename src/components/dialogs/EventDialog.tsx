@@ -96,6 +96,13 @@ export function EventDialog({
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
 
+  // Fade in/out
+  const [fadeInDate, setFadeInDate] = useState('')
+  const [fadeInTime, setFadeInTime] = useState('')
+  const [fadeOutDate, setFadeOutDate] = useState('')
+  const [fadeOutTime, setFadeOutTime] = useState('')
+  const [showTimeOptions, setShowTimeOptions] = useState(false)
+
   // Validation
   const [submitAttempted, setSubmitAttempted] = useState(false)
 
@@ -157,6 +164,18 @@ export function EventDialog({
       setStartTime(st === '00:00' ? '' : st)
       const et = editingEvent.endYear != null ? fracYearToTimeStr(editingEvent.endYear) : ''
       setEndTime(et === '00:00' ? '' : et)
+      // Fade in/out
+      if (editingEvent.fadeInYear != null) {
+        setFadeInDate(fracYearToDMY(editingEvent.fadeInYear))
+        const fit = fracYearToTimeStr(editingEvent.fadeInYear)
+        setFadeInTime(fit === '00:00' ? '' : fit)
+      } else { setFadeInDate(''); setFadeInTime('') }
+      if (editingEvent.fadeOutYear != null) {
+        setFadeOutDate(fracYearToDMY(editingEvent.fadeOutYear))
+        const fot = fracYearToTimeStr(editingEvent.fadeOutYear)
+        setFadeOutTime(fot === '00:00' ? '' : fot)
+      } else { setFadeOutDate(''); setFadeOutTime('') }
+      setShowTimeOptions(!!(editingEvent.fadeInYear != null || editingEvent.fadeOutYear != null))
 
       const proj = editingEvent.valueProjection
       setValueEnabled(!!proj)
@@ -248,6 +267,9 @@ export function EventDialog({
       setLinkDurationStr('')
       setLinkOnDelete('freeze')
       setLinkFixedDate(''); setLinkFixedTime('')
+      setFadeInDate(''); setFadeInTime('')
+      setFadeOutDate(''); setFadeOutTime('')
+      setShowTimeOptions(false)
       setUrl('')
       setLocation('')
       setRating(0)
@@ -421,6 +443,10 @@ export function EventDialog({
         }
       : undefined
 
+    // Resolve fade years
+    const fadeInResolved = fadeInDate.length === 10 ? dmyTimeToFracYear(fadeInDate, fadeInTime) : undefined
+    const fadeOutResolved = fadeOutDate.length === 10 ? dmyTimeToFracYear(fadeOutDate, fadeOutTime) : undefined
+
     const data: Omit<TimelineEvent, 'id'> = {
       laneId,
       title: title.trim(),
@@ -428,6 +454,8 @@ export function EventDialog({
       type: resolvedEnd !== undefined ? 'range' : 'point',
       startYear: resolvedStart,
       ...(resolvedEnd !== undefined ? { endYear: resolvedEnd } : {}),
+      ...(fadeInResolved !== undefined && !isNaN(fadeInResolved) ? { fadeInYear: fadeInResolved } : {}),
+      ...(fadeOutResolved !== undefined && !isNaN(fadeOutResolved) ? { fadeOutYear: fadeOutResolved } : {}),
       ...(color ? { color } : {}),
       ...(emoji ? { emoji } : {}),
       ...(valueProjectionOut ? { valueProjection: valueProjectionOut } : {}),
@@ -573,6 +601,59 @@ export function EventDialog({
               <div className="grid gap-1.5">
                 <Label htmlFor="pointval" className="text-xs text-muted-foreground">Value (optional)</Label>
                 <Input id="pointval" type="number" value={startValue} placeholder="e.g. 50000" onChange={e => setStartValue(e.target.value)} className="h-8 text-xs" />
+              </div>
+            )}
+          </div>
+
+          {/* ── More time options (collapsible) ── */}
+          <div className="rounded-md border">
+            <button
+              type="button"
+              onClick={() => setShowTimeOptions(v => !v)}
+              className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium hover:bg-muted/40 transition-colors rounded-md"
+            >
+              <span className="flex items-center gap-2">
+                More time options
+                {(fadeInDate || fadeOutDate) && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" title="Has fade" />
+                )}
+              </span>
+              {showTimeOptions ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+            </button>
+            {showTimeOptions && (
+              <div className="px-3 pb-3 space-y-3 border-t pt-3">
+                <p className="text-[11px] text-muted-foreground leading-snug">
+                  Set a <strong>fade-in</strong> date before the real start, or a <strong>fade-out</strong> date after the real end.
+                  The bar will render as a color gradient — transparent → full color at the real start/end.
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-1.5">
+                    <Label className="text-xs text-muted-foreground">Fade-in start date</Label>
+                    <Input
+                      type="text" value={fadeInDate} placeholder="DD/MM/YYYY"
+                      onChange={e => setFadeInDate(formatDMYInput(e.target.value))}
+                      className="h-8 text-xs"
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label className="text-xs text-muted-foreground">Fade-in start time</Label>
+                    <Input type="time" value={fadeInTime} onChange={e => setFadeInTime(e.target.value)} className="h-8 text-xs" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-1.5">
+                    <Label className="text-xs text-muted-foreground">Fade-out end date</Label>
+                    <Input
+                      type="text" value={fadeOutDate} placeholder="DD/MM/YYYY"
+                      onChange={e => setFadeOutDate(formatDMYInput(e.target.value))}
+                      className="h-8 text-xs"
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label className="text-xs text-muted-foreground">Fade-out end time</Label>
+                    <Input type="time" value={fadeOutTime} onChange={e => setFadeOutTime(e.target.value)} className="h-8 text-xs" />
+                  </div>
+                </div>
               </div>
             )}
           </div>
