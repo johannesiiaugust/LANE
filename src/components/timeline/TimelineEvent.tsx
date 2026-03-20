@@ -262,8 +262,10 @@ export function TimelineEventBar({
   const OVERLAP = 2   // px: solid bar extends this many px into each tail to kill sub-pixel gaps
   const fiW = Math.max(fadeInTailWidth, 1)
   const foW = Math.max(fadeOutTailWidth, 1)
-  // Control points pulled to 65% width so the shape stays wide longer before tapering
-  const fadeInPath  = `M${fiW},0 C${fiW*0.65},0 0,${h*0.25} 0,${h/2} C0,${h*0.75} ${fiW*0.65},${h} ${fiW},${h} Z`
+  // Base inset 1px top/bottom so the tail is visually slightly narrower than the bar height.
+  // Control points at 65% so the shape stays wide longer before tapering.
+  const T = 1  // top/bottom inset px
+  const fadeInPath  = `M${fiW},${T} C${fiW*0.65},${T} 0,${h*0.25} 0,${h/2} C0,${h*0.75} ${fiW*0.65},${h-T} ${fiW},${h-T} Z`
 
   // Positions relative to the wrapper (wrapper starts at barLeft)
   const fadeInRelLeft  = 0
@@ -298,24 +300,20 @@ export function TimelineEventBar({
             style={{ left: fadeInRelLeft, top: 0, width: fiW, height: h, overflow: 'visible' }}
           >
             <defs>
-              {/* Horizontal colour fade: full at base (right), transparent at tip (left) */}
               <linearGradient id={`fi-${event.id}`} x1="1" x2="0" y1="0" y2="0">
                 <stop offset="0%"   stopColor={color} stopOpacity={1} />
                 <stop offset="100%" stopColor={color} stopOpacity={0} />
               </linearGradient>
-              {/* Vertical sheen matching the solid bar's top highlight */}
               <linearGradient id={`fi-sh-${event.id}`} x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%"   stopColor="white" stopOpacity={0.22} />
-                <stop offset="55%"  stopColor="white" stopOpacity={0} />
+                <stop offset="0%"  stopColor="white" stopOpacity={0.22} />
+                <stop offset="55%" stopColor="white" stopOpacity={0} />
               </linearGradient>
-              {/* Slight edge blur filter */}
-              <filter id={`fi-bl-${event.id}`} x="-5%" y="-10%" width="110%" height="120%">
-                <feGaussianBlur stdDeviation="1.2" />
+              {/* Drop shadow matching the solid bar: 0 2px 5px rgba(0,0,0,0.25) */}
+              <filter id={`fi-f-${event.id}`} x="-5%" y="-20%" width="115%" height="160%">
+                <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="black" floodOpacity="0.25" />
               </filter>
             </defs>
-            {/* Colour fill (blurred for soft edges) */}
-            <path d={fadeInPath} fill={`url(#fi-${event.id})`} filter={`url(#fi-bl-${event.id})`} />
-            {/* Sheen overlay (no blur — stays crisp to match the bar) */}
+            <path d={fadeInPath} fill={`url(#fi-${event.id})`} filter={`url(#fi-f-${event.id})`} />
             <path d={fadeInPath} fill={`url(#fi-sh-${event.id})`} />
           </svg>
         )}
@@ -350,25 +348,21 @@ export function TimelineEventBar({
             style={{ left: fadeOutRelLeft, top: 0, width: foW + OVERLAP, height: h, overflow: 'visible' }}
           >
             <defs>
-              {/* Horizontal colour fade: full at base (left, offset by OVERLAP), transparent at tip (right) */}
               <linearGradient id={`fo-${event.id}`} x1="0" x2="1" y1="0" y2="0">
                 <stop offset={`${(OVERLAP / (foW + OVERLAP) * 100).toFixed(1)}%`} stopColor={color} stopOpacity={1} />
                 <stop offset="100%" stopColor={color} stopOpacity={0} />
               </linearGradient>
-              {/* Vertical sheen */}
               <linearGradient id={`fo-sh-${event.id}`} x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%"   stopColor="white" stopOpacity={0.22} />
-                <stop offset="55%"  stopColor="white" stopOpacity={0} />
+                <stop offset="0%"  stopColor="white" stopOpacity={0.22} />
+                <stop offset="55%" stopColor="white" stopOpacity={0} />
               </linearGradient>
-              {/* Edge blur */}
-              <filter id={`fo-bl-${event.id}`} x="-5%" y="-10%" width="110%" height="120%">
-                <feGaussianBlur stdDeviation="1.2" />
+              <filter id={`fo-f-${event.id}`} x="-5%" y="-20%" width="115%" height="160%">
+                <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="black" floodOpacity="0.25" />
               </filter>
             </defs>
-            {/* Colour fill shifted right by OVERLAP so the full-colour base aligns with bar edge */}
-            <path d={`M${OVERLAP},0 C${OVERLAP + foW*0.35},0 ${OVERLAP+foW},${h*0.25} ${OVERLAP+foW},${h/2} C${OVERLAP+foW},${h*0.75} ${OVERLAP+foW*0.35},${h} ${OVERLAP},${h} Z`}
-              fill={`url(#fo-${event.id})`} filter={`url(#fo-bl-${event.id})`} />
-            <path d={`M${OVERLAP},0 C${OVERLAP + foW*0.35},0 ${OVERLAP+foW},${h*0.25} ${OVERLAP+foW},${h/2} C${OVERLAP+foW},${h*0.75} ${OVERLAP+foW*0.35},${h} ${OVERLAP},${h} Z`}
+            <path d={`M${OVERLAP},${T} C${OVERLAP+foW*0.35},${T} ${OVERLAP+foW},${h*0.25} ${OVERLAP+foW},${h/2} C${OVERLAP+foW},${h*0.75} ${OVERLAP+foW*0.35},${h-T} ${OVERLAP},${h-T} Z`}
+              fill={`url(#fo-${event.id})`} filter={`url(#fo-f-${event.id})`} />
+            <path d={`M${OVERLAP},${T} C${OVERLAP+foW*0.35},${T} ${OVERLAP+foW},${h*0.25} ${OVERLAP+foW},${h/2} C${OVERLAP+foW},${h*0.75} ${OVERLAP+foW*0.35},${h-T} ${OVERLAP},${h-T} Z`}
               fill={`url(#fo-sh-${event.id})`} />
           </svg>
         )}
