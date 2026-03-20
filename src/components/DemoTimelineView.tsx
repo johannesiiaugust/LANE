@@ -534,7 +534,8 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
           bottom: '45%',
           zIndex: 100,
           opacity: showExampleOverlay ? 1 : 0,
-          transition: 'opacity 2800ms ease',
+          transform: showExampleOverlay ? 'translateY(0)' : 'translateY(80vh)',
+          transition: 'opacity 4000ms ease-in, transform 4000ms ease-in',
         }}
       >
         <p
