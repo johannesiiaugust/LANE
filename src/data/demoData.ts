@@ -23,7 +23,7 @@ export const DEMO_EVENTS: TimelineEvent[] = [
 
   // Work (Work + Education merged)
   { id: 'demo-evt-highschool', laneId: 'work',       emoji: '🎓', title: 'School & University',  description: 'Gymnasium Berlin-Mitte, then TU Berlin Computer Science', type: 'range', startYear: 1994, endYear: 2004, color: '#8b5cf6' },
-  { id: 'demo-evt-work',       laneId: 'work',       emoji: '💻', title: 'Software Engineer',    description: 'Full-stack developer at Berlin tech startup', type: 'range', startYear: 2005, endYear: 2022,   color: '#10b981' },
+  { id: 'demo-evt-work',       laneId: 'work',       emoji: '💻', title: 'Software Engineer',    description: 'Full-stack developer at Berlin tech startup', type: 'range', startYear: 2005, endYear: 2020.997, color: '#10b981' },
   { id: 'demo-evt-leadeng',    laneId: 'work',       emoji: '🚀', title: 'Lead Engineer',        description: 'Returned with new perspective — promoted to Lead Engineer at Munich startup', type: 'range', startYear: 2023, endYear: 2040.5, color: '#059669' },
   { id: 'demo-evt-biz',        laneId: 'work',       emoji: '🏢', title: '?Own Business?',       description: 'Future venture',                             type: 'range', startYear: 2040.5, endYear: 2060.5, color: '#0d9488',
     valueProjection: {
@@ -43,7 +43,7 @@ export const DEMO_EVENTS: TimelineEvent[] = [
   // Relations (Relationships + Family merged)
   { id: 'demo-evt-girlfriend', laneId: 'relations',  emoji: '💕', title: 'First Girlfriend',     description: 'High school relationship',                   type: 'range', startYear: 1996, endYear: 1999, color: '#ec4899' },
   { id: 'demo-evt-married',    laneId: 'relations',  emoji: '💍', title: 'Married',              description: 'Married',                                    type: 'range', startYear: 2007, endYear: 2065, color: '#ec4899' },
-  { id: 'demo-evt-kid',        laneId: 'relations',  emoji: '👶', title: 'Child',                description: 'First child born (2015)',                     type: 'range', startYear: 2015, endYear: 2100, color: '#f97316' },
+  { id: 'demo-evt-kid',        laneId: 'relations',  emoji: '👶', title: 'Child',                description: 'First child born (Feb 2024)',                type: 'range', startYear: 2024.085, endYear: 2100, color: '#f97316' },
 
   // Activities (Activities + Achievements merged)
   { id: 'demo-evt-chess',      laneId: 'activities', emoji: '♟️', title: 'Chess Club',           description: 'University chess club',                      type: 'range', startYear: 2001, endYear: 2021, color: '#f59e0b' },
@@ -61,7 +61,7 @@ export const DEMO_EVENTS: TimelineEvent[] = [
   },
 
   // Items (Vehicles + Items merged)
-  { id: 'demo-evt-volvo',      laneId: 'items',      emoji: '🚗', title: 'Volvo',                description: 'Current car',                                type: 'range', startYear: 2021, endYear: 2037, color: '#64748b' },
+  { id: 'demo-evt-volvo',      laneId: 'items',      emoji: '🚗', title: 'Volvo',                description: 'Current car',                                type: 'range', startYear: 2023, endYear: 2042, color: '#64748b' },
   { id: 'demo-evt-boat',       laneId: 'items',      emoji: '⛵', title: 'Boat',                 description: 'Future boat',                                type: 'range', startYear: 2053, endYear: 2082, color: '#0ea5e9',
     valueProjection: {
       startValue: 0,
