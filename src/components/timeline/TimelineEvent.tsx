@@ -205,16 +205,31 @@ export function TimelineEventBar({
   const barLeft = (barStartYear - yearStart) * pixelsPerYear
   const barWidth = (barEndYear - barStartYear) * pixelsPerYear
 
-  // Build CSS gradient for fade zones
+  // Build CSS gradient for fade zones.
+  // Use color-with-alpha-0 instead of 'transparent' to avoid the browser's
+  // black-haze interpolation bug in sRGB gradient space.
+  function colorAlpha0(hex: string): string {
+    const m = /^#([0-9a-f]{6})$/i.exec(hex)
+    if (!m) return 'rgba(0,0,0,0)'
+    const r = parseInt(m[1].slice(0, 2), 16)
+    const g = parseInt(m[1].slice(2, 4), 16)
+    const b = parseInt(m[1].slice(4, 6), 16)
+    return `rgba(${r},${g},${b},0)`
+  }
+
   let barBackground: string
   if (hasFadeIn || hasFadeOut) {
     const totalYears = barEndYear - barStartYear
     const fadeInPct  = hasFadeIn  ? ((event.startYear - barStartYear) / totalYears) * 100 : 0
     const fadeOutPct = hasFadeOut ? (((event.endYear ?? event.startYear) - barStartYear) / totalYears) * 100 : 100
-    const stops: string[] = [`transparent 0%`]
+    const c0 = colorAlpha0(color)
+    const stops: string[] = []
+    // Left edge: transparent only if fading in, otherwise solid from 0
+    stops.push(hasFadeIn ? `${c0} 0%` : `${color} 0%`)
     if (hasFadeIn)  stops.push(`${color} ${fadeInPct.toFixed(1)}%`)
     if (hasFadeOut) stops.push(`${color} ${fadeOutPct.toFixed(1)}%`)
-    stops.push(`transparent 100%`)
+    // Right edge: transparent only if fading out, otherwise solid to 100
+    stops.push(hasFadeOut ? `${c0} 100%` : `${color} 100%`)
     barBackground = `linear-gradient(to right, ${stops.join(', ')})`
   } else {
     barBackground = color
@@ -260,7 +275,7 @@ export function TimelineEventBar({
   return (
     <>
       <div
-        className={`absolute rounded-lg cursor-pointer transition-all overflow-hidden select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50 ${grabRing}`}
+        className={`absolute cursor-pointer transition-all overflow-hidden select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50 ${hasFadeIn || hasFadeOut ? '' : 'rounded-lg'} ${grabRing}`}
         style={{ left: barLeft, top, width: Math.max(hasFadeIn || hasFadeOut ? barWidth : width, 4), height: BAR_HEIGHT, background: barBackground, opacity: 0.88, zIndex: stackZ, boxShadow: hasFadeIn || hasFadeOut ? 'none' : '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)', ...pastStyle, ...draggingStyle }}
         title={event.title}
         {...interactionProps}
@@ -270,8 +285,10 @@ export function TimelineEventBar({
         }}
         onMouseLeave={() => { handleMouseLeave(); setTooltip(null); setImageHover(null) }}
       >
-        {/* 3D sheen */}
-        <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)' }} />
+        {/* 3D sheen — only over the solid region so it doesn't reveal fade-zone edges */}
+        {!(hasFadeIn || hasFadeOut) && (
+          <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)' }} />
+        )}
         {sparklineSeries.length >= 2 && (
           <svg className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%', overflow: 'hidden' }} preserveAspectRatio="none">
             {sparklineFill && <polygon points={sparklineFill} fill="rgba(255,255,255,0.13)" />}
