@@ -536,13 +536,13 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
         {/* Example overlay text — only over own lanes (top ~65% of area) */}
         <div
           className="pointer-events-none absolute top-0 left-0 right-0 flex items-center justify-center z-30 transition-opacity duration-700"
-          style={{ bottom: '35%', opacity: showExampleOverlay ? 1 : 0 }}
+          style={{ bottom: '50%', opacity: showExampleOverlay ? 1 : 0 }}
         >
           <p
-            className="text-4xl font-black text-foreground/30 select-none text-center leading-tight"
+            className="text-4xl font-black text-foreground/45 select-none text-center leading-tight"
             style={{ transform: 'rotate(-45deg)', letterSpacing: '0.04em' }}
           >
-            Example life<br />adjust to be your story
+            Example life<br />adjust to your story!!
           </p>
         </div>
         <TimelineContainer
