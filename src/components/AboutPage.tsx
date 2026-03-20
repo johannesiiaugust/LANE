@@ -219,7 +219,7 @@ export function AboutPage() {
               Start mapping your life →
             </button>
             <a
-              href="mailto:hello@timelane.space"
+              href="mailto:hello@lifelane.space"
               className="px-7 py-3 rounded-full border border-border/60 text-sm font-medium hover:bg-muted/50 transition-colors"
             >
               Get in touch
@@ -367,7 +367,7 @@ export function AboutPage() {
         <span>© {new Date().getFullYear()} LifeLANE</span>
         <div className="flex gap-5">
           <button onClick={() => navigate('/terms')} className="hover:text-foreground transition-colors">Terms & Conditions</button>
-          <a href="mailto:hello@timelane.space" className="hover:text-foreground transition-colors">Contact</a>
+          <a href="mailto:hello@lifelane.space" className="hover:text-foreground transition-colors">Contact</a>
         </div>
       </div>
 
