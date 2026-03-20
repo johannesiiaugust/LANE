@@ -162,7 +162,6 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [searchOpen, setSearchOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
   const [showExampleOverlay, setShowExampleOverlay] = useState(true)
-  const guideWasOpenRef = useRef(false)
   const overlayClickCountRef = useRef(0)
 
   // Auto-open guide after 5 seconds on the landing page
@@ -170,12 +169,6 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
     const t = setTimeout(() => setGuideOpen(true), 5000)
     return () => clearTimeout(t)
   }, [])
-
-  // Fade overlay when guide closes
-  useEffect(() => {
-    if (guideOpen) { guideWasOpenRef.current = true }
-    else if (guideWasOpenRef.current) { setShowExampleOverlay(false) }
-  }, [guideOpen])
 
   const stepZoom = useCallback((factor: number) => {
     const next = Math.max(MIN_PIXELS_PER_YEAR, Math.min(MAX_PIXELS_PER_YEAR, pixelsPerYear * factor))
@@ -526,25 +519,31 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
         </div>
       </div>
 
+      {/* Example overlay text — fixed over full width incl. sidebar, own-lanes height only */}
       <div
-        className="flex-1 overflow-hidden flex flex-col relative"
+        className="pointer-events-none fixed left-0 right-0 flex items-center justify-center z-30"
+        style={{
+          top: '48px',
+          bottom: '45%',
+          opacity: showExampleOverlay ? 1 : 0,
+          transition: 'opacity 2800ms ease',
+        }}
+      >
+        <p
+          className="text-4xl font-black text-foreground/45 select-none text-center leading-tight"
+          style={{ transform: 'rotate(-45deg)', letterSpacing: '0.04em' }}
+        >
+          Example life<br />adjust to your story!!
+        </p>
+      </div>
+
+      <div
+        className="flex-1 overflow-hidden flex flex-col"
         onClick={() => {
           overlayClickCountRef.current += 1
           if (overlayClickCountRef.current >= 2) setShowExampleOverlay(false)
         }}
       >
-        {/* Example overlay text — only over own lanes (top ~65% of area) */}
-        <div
-          className="pointer-events-none absolute top-0 left-0 right-0 flex items-center justify-center z-30 transition-opacity duration-700"
-          style={{ bottom: '50%', opacity: showExampleOverlay ? 1 : 0 }}
-        >
-          <p
-            className="text-4xl font-black text-foreground/45 select-none text-center leading-tight"
-            style={{ transform: 'rotate(-45deg)', letterSpacing: '0.04em' }}
-          >
-            Example life<br />adjust to your story!!
-          </p>
-        </div>
         <TimelineContainer
           lanes={lanes}
           events={displayedEvents}
