@@ -162,6 +162,40 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [searchOpen, setSearchOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
   const [langSearch, setLangSearch] = useState('')
+
+  // Inject Google Translate widget once on mount
+  useEffect(() => {
+    if (!document.getElementById('gt-element')) {
+      const el = document.createElement('div')
+      el.id = 'gt-element'
+      el.style.display = 'none'
+      document.body.appendChild(el)
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any)['googleTranslateElementInit'] = () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      new (window as any).google.translate.TranslateElement(
+        { pageLanguage: 'en', autoDisplay: false },
+        'gt-element',
+      )
+    }
+    if (!document.getElementById('gt-script')) {
+      const s = document.createElement('script')
+      s.id = 'gt-script'
+      s.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
+      document.body.appendChild(s)
+    }
+    if (!document.getElementById('gt-style')) {
+      const style = document.createElement('style')
+      style.id = 'gt-style'
+      style.textContent = [
+        '.goog-te-banner-frame { display:none !important; }',
+        '.goog-te-menu-frame { display:none !important; }',
+        'body { top:0 !important; }',
+      ].join(' ')
+      document.head.appendChild(style)
+    }
+  }, [])
   const [showExampleOverlay, setShowExampleOverlay] = useState(true)
   const guideWasOpenRef = useRef(false)
   const guideClosedRef = useRef(false)
@@ -309,7 +343,16 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
     ? ALL_LANGS.filter(l => l.name.toLowerCase().includes(langSearch.toLowerCase()))
     : []
   function translateTo(code: string) {
-    window.open(`https://translate.google.com/translate?sl=auto&tl=${code}&u=${encodeURIComponent(window.location.href)}`, '_blank')
+    const attempt = (retries: number) => {
+      const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null
+      if (select) {
+        select.value = code
+        select.dispatchEvent(new Event('change'))
+      } else if (retries > 0) {
+        setTimeout(() => attempt(retries - 1), 300)
+      }
+    }
+    attempt(10)
   }
 
   return (
