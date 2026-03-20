@@ -68,6 +68,8 @@ export interface TimelineEvent {
   type: 'range' | 'point'
   startYear: number
   endYear?: number
+  fadeInYear?: number   // bar extends left to here; transparent→color gradient before startYear
+  fadeOutYear?: number  // bar extends right to here; color→transparent gradient after endYear
   color?: string
   emoji?: string
   pointValue?: number
