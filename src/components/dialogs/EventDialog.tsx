@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { Plus, X, Smile, Link2, ChevronDown, ChevronUp, Star, Upload, ImageIcon } from 'lucide-react'
+import { Plus, X, Link2, ChevronDown, ChevronUp, Star, Upload, ImageIcon } from 'lucide-react'
 import { uploadEventImage } from '@/lib/imageUpload'
 import type {
   Lane,
@@ -19,7 +19,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+import { EmojiPickerPopover } from '@/components/ui/EmojiPickerPopover'
+import { ColorPicker } from '@/components/ui/ColorPicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -33,15 +34,6 @@ import {
 } from '@/components/ui/select'
 import { fracYearToDMY, dmyToFracYear, formatDMYInput, fracYearToTimeStr, dmyTimeToFracYear, dateToFracYear } from '@/lib/constants'
 
-const EMOJIS = [
-  '👶','🎓','💼','🏠','❤️','💍','🤝','🏆','🎯','🌍',
-  '✈️','🏖️','⛰️','🚗','🚂','🚢','🏡','🌆','🌄','🌊',
-  '📚','✏️','🔬','💡','🖥️','📊','📱','🎵','🎮','🎨',
-  '🏋️','🚴','⚽','🏊','🎉','🎁','🎂','🎭','🎬','🏅',
-  '💰','💳','🏦','📈','📉','💎','🔑','📌','🌟','⭐',
-  '☀️','🌙','❄️','🔥','🌈','⚡','🌱','🌳','🐶','🐱',
-  '😊','🙏','👋','💪','🦁','🐸','🐦','🌺','🍕','🎪',
-]
 
 interface EventDialogProps {
   open: boolean
@@ -92,7 +84,6 @@ export function EventDialog({
   const [endDate, setEndDate] = useState('')
   const [color, setColor] = useState('')
   const [emoji, setEmoji] = useState('')
-  const [emojiOpen, setEmojiOpen] = useState(false)
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
 
@@ -516,48 +507,20 @@ export function EventDialog({
             <Label htmlFor="desc">Description</Label>
             <Input id="desc" value={description} onChange={e => setDescription(e.target.value)} placeholder="Optional description" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="grid gap-1.5">
-              <Label>Color</Label>
-              <Input type="color" value={color || '#3b82f6'} onChange={e => setColor(e.target.value)} className="h-9 p-1" />
-            </div>
-            <div className="grid gap-1.5">
-              <Label>Emoji</Label>
-              <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="h-9 w-full border rounded-md flex items-center justify-center text-lg hover:bg-muted/50 transition-colors"
-                    title="Pick emoji"
-                  >
-                    {emoji || <Smile className="h-4 w-4 text-muted-foreground" />}
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-60 p-2" align="start">
-                  <div className="grid grid-cols-10 gap-0.5">
-                    {emoji && (
-                      <button
-                        type="button"
-                        className="h-6 w-6 text-xs text-muted-foreground hover:bg-muted rounded flex items-center justify-center"
-                        title="Clear emoji"
-                        onClick={() => { setEmoji(''); setEmojiOpen(false) }}
-                      >
-                        ×
-                      </button>
-                    )}
-                    {EMOJIS.map(em => (
-                      <button
-                        key={em}
-                        type="button"
-                        className="h-6 w-6 text-base hover:bg-muted rounded flex items-center justify-center leading-none"
-                        onClick={() => { setEmoji(em); setEmojiOpen(false) }}
-                      >
-                        {em}
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+          <div className="grid gap-1.5">
+            <Label>Color</Label>
+            <ColorPicker value={color || '#3b82f6'} onChange={setColor} allowNone noneLabel="Lane default" />
+          </div>
+          <div className="grid gap-1.5">
+            <Label>Emoji</Label>
+            <div className="flex items-center gap-2">
+              <EmojiPickerPopover value={emoji} onChange={em => { setEmoji(em) }} />
+              {emoji && (
+                <button type="button" className="text-muted-foreground hover:text-foreground" onClick={() => setEmoji('')} title="Clear">
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+              <span className="text-sm text-muted-foreground">{emoji || 'No emoji'}</span>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
