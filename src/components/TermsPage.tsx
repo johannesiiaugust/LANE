@@ -1,4 +1,5 @@
 import { Footer } from '@/components/Footer'
+import { useTitle } from '@/hooks/useTitle'
 
 function navigate(path: string) {
   window.history.pushState(null, '', path)
@@ -6,6 +7,7 @@ function navigate(path: string) {
 }
 
 export function TermsPage() {
+  useTitle('LifeLANE — Terms & Conditions')
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <div className="border-b bg-background px-6 py-3 flex items-center justify-between">

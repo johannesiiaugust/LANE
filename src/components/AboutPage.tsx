@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Footer } from '@/components/Footer'
+import { useTitle } from '@/hooks/useTitle'
 
 function navigate(path: string) {
   window.history.pushState(null, '', path)
@@ -166,6 +167,7 @@ function ComparePreview() {
 }
 
 export function AboutPage() {
+  useTitle('LifeLANE — Your entire life, in one view')
   return (
     <div className="flex flex-col min-h-screen bg-background overflow-x-hidden">
 

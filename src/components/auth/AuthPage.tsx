@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTitle } from '@/hooks/useTitle'
 import { SignInForm } from './SignInForm'
 import { SignUpForm } from './SignUpForm'
 import { ForgotPasswordForm } from './ForgotPasswordForm'
@@ -13,6 +14,7 @@ import { Footer } from '@/components/Footer'
 type AuthMode = 'sign-in' | 'sign-up' | 'forgot-password' | 'check-email'
 
 export function AuthPage() {
+  useTitle('LifeLANE — Try the demo')
   const [mode, setMode] = useState<AuthMode>('sign-in')
   const [authOpen, setAuthOpen] = useState(false)
   const [fromDemo, setFromDemo] = useState(false)

@@ -1,4 +1,5 @@
 import { useState, useCallback, useSyncExternalStore, useRef, useMemo, useEffect } from 'react'
+import { useTitle } from '@/hooks/useTitle'
 import type { Lane, TimelineEvent } from '@/types/timeline'
 import { useTimelineContext, TimelineProvider } from '@/contexts/TimelineContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -130,6 +131,8 @@ function TimelineView() {
   } = useTimelineContext()
 
   const selectedTimeline = timelines.find(t => t.id === selectedTimelineId)
+
+  useTitle(selectedTimeline ? `LifeLANE — ${selectedTimeline.name}` : 'LifeLANE')
 
   const { user } = useAuth()
   const { profile } = useProfile()
