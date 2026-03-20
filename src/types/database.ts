@@ -57,6 +57,9 @@ export interface DbEvent {
   location: string | null
   rating: number | null
   metadata: unknown | null  // { image_url?, tags?, external_id?, source_data? }
+  // Fade in/out (migration 027)
+  fade_in_time: string | null
+  fade_out_time: string | null
 }
 
 export interface PublicProfileData {
