@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { Plus, X, Smile, Link2, ChevronDown, ChevronUp, Star, Upload, ImageIcon } from 'lucide-react'
+import { Plus, X, Link2, ChevronDown, ChevronUp, Star, Upload, ImageIcon } from 'lucide-react'
 import { uploadEventImage } from '@/lib/imageUpload'
 import type {
   Lane,
@@ -19,7 +19,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+import { EmojiPickerPopover } from '@/components/ui/EmojiPickerPopover'
+import { ColorPicker } from '@/components/ui/ColorPicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -33,15 +34,6 @@ import {
 } from '@/components/ui/select'
 import { fracYearToDMY, dmyToFracYear, formatDMYInput, fracYearToTimeStr, dmyTimeToFracYear, dateToFracYear } from '@/lib/constants'
 
-const EMOJIS = [
-  '👶','🎓','💼','🏠','❤️','💍','🤝','🏆','🎯','🌍',
-  '✈️','🏖️','⛰️','🚗','🚂','🚢','🏡','🌆','🌄','🌊',
-  '📚','✏️','🔬','💡','🖥️','📊','📱','🎵','🎮','🎨',
-  '🏋️','🚴','⚽','🏊','🎉','🎁','🎂','🎭','🎬','🏅',
-  '💰','💳','🏦','📈','📉','💎','🔑','📌','🌟','⭐',
-  '☀️','🌙','❄️','🔥','🌈','⚡','🌱','🌳','🐶','🐱',
-  '😊','🙏','👋','💪','🦁','🐸','🐦','🌺','🍕','🎪',
-]
 
 interface EventDialogProps {
   open: boolean
@@ -92,7 +84,6 @@ export function EventDialog({
   const [endDate, setEndDate] = useState('')
   const [color, setColor] = useState('')
   const [emoji, setEmoji] = useState('')
-  const [emojiOpen, setEmojiOpen] = useState(false)
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
 
@@ -512,52 +503,22 @@ export function EventDialog({
               className={submitAttempted && !title.trim() ? 'border-destructive focus-visible:ring-destructive text-destructive placeholder:text-destructive/50' : ''}
             />
           </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="desc">Description</Label>
-            <Input id="desc" value={description} onChange={e => setDescription(e.target.value)} placeholder="Optional description" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="grid gap-1.5">
+          {/* Color + Emoji in one row */}
+          <div className="flex items-end gap-3">
+            <div className="flex-1 grid gap-1.5">
               <Label>Color</Label>
-              <Input type="color" value={color || '#3b82f6'} onChange={e => setColor(e.target.value)} className="h-9 p-1" />
+              <ColorPicker value={color || '#3b82f6'} onChange={setColor} allowNone noneLabel="Lane default" />
             </div>
             <div className="grid gap-1.5">
               <Label>Emoji</Label>
-              <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="h-9 w-full border rounded-md flex items-center justify-center text-lg hover:bg-muted/50 transition-colors"
-                    title="Pick emoji"
-                  >
-                    {emoji || <Smile className="h-4 w-4 text-muted-foreground" />}
+              <div className="flex items-center gap-1.5">
+                <EmojiPickerPopover value={emoji} onChange={em => setEmoji(em)} />
+                {emoji && (
+                  <button type="button" className="text-muted-foreground hover:text-foreground" onClick={() => setEmoji('')} title="Clear">
+                    <X className="h-4 w-4" />
                   </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-60 p-2" align="start">
-                  <div className="grid grid-cols-10 gap-0.5">
-                    {emoji && (
-                      <button
-                        type="button"
-                        className="h-6 w-6 text-xs text-muted-foreground hover:bg-muted rounded flex items-center justify-center"
-                        title="Clear emoji"
-                        onClick={() => { setEmoji(''); setEmojiOpen(false) }}
-                      >
-                        ×
-                      </button>
-                    )}
-                    {EMOJIS.map(em => (
-                      <button
-                        key={em}
-                        type="button"
-                        className="h-6 w-6 text-base hover:bg-muted rounded flex items-center justify-center leading-none"
-                        onClick={() => { setEmoji(em); setEmojiOpen(false) }}
-                      >
-                        {em}
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+                )}
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -587,24 +548,6 @@ export function EventDialog({
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="grid gap-1.5">
-              <Label htmlFor="starttime" className="text-xs text-muted-foreground">Start Time (optional)</Label>
-              <Input id="starttime" type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="h-8 text-xs" />
-            </div>
-            {endDate.trim() ? (
-              <div className="grid gap-1.5">
-                <Label htmlFor="endtime" className="text-xs text-muted-foreground">End Time (optional)</Label>
-                <Input id="endtime" type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="h-8 text-xs" />
-              </div>
-            ) : (
-              <div className="grid gap-1.5">
-                <Label htmlFor="pointval" className="text-xs text-muted-foreground">Value (optional)</Label>
-                <Input id="pointval" type="number" value={startValue} placeholder="e.g. 50000" onChange={e => setStartValue(e.target.value)} className="h-8 text-xs" />
-              </div>
-            )}
-          </div>
-
           {/* ── More time options (collapsible) ── */}
           <div className="rounded-md border">
             <button
@@ -614,17 +557,37 @@ export function EventDialog({
             >
               <span className="flex items-center gap-2">
                 More time options
-                {(fadeInDate || fadeOutDate) && (
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary" title="Has fade" />
+                {(fadeInDate || fadeOutDate || linkEnabled) && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" title="Has values" />
                 )}
               </span>
               {showTimeOptions ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
             </button>
             {showTimeOptions && (
               <div className="px-3 pb-3 space-y-3 border-t pt-3">
+
+                {/* Start / end times */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-1.5">
+                    <Label className="text-xs text-muted-foreground">Start Time</Label>
+                    <Input id="starttime" type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="h-8 text-xs" />
+                  </div>
+                  {endDate.trim() ? (
+                    <div className="grid gap-1.5">
+                      <Label className="text-xs text-muted-foreground">End Time</Label>
+                      <Input id="endtime" type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="h-8 text-xs" />
+                    </div>
+                  ) : (
+                    <div className="grid gap-1.5">
+                      <Label className="text-xs text-muted-foreground">Value (point)</Label>
+                      <Input id="pointval" type="number" value={startValue} placeholder="e.g. 50000" onChange={e => setStartValue(e.target.value)} className="h-8 text-xs" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Fade in/out */}
                 <p className="text-[11px] text-muted-foreground leading-snug">
                   Set a <strong>fade-in</strong> date before the real start, or a <strong>fade-out</strong> date after the real end.
-                  The bar will render as a color gradient — transparent → full color at the real start/end.
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="grid gap-1.5">
@@ -654,6 +617,146 @@ export function EventDialog({
                     <Input type="time" value={fadeOutTime} onChange={e => setFadeOutTime(e.target.value)} className="h-8 text-xs" />
                   </div>
                 </div>
+
+                {/* Dependency */}
+                <div className="space-y-3 pt-2 border-t">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Link2 className="h-4 w-4 text-muted-foreground" />
+                      <Label className="text-sm font-medium">Dependency</Label>
+                    </div>
+                    <Switch checked={linkEnabled} onCheckedChange={setLinkEnabled} />
+                  </div>
+
+                  {linkEnabled && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Label className="text-xs text-muted-foreground shrink-0 w-20">Anchor to</Label>
+                        <select
+                          value={linkAnchorType}
+                          onChange={e => setLinkAnchorType(e.target.value as 'today' | 'event' | 'start_to_today' | 'today_to_end')}
+                          className="h-7 text-xs border rounded-md px-1 bg-background flex-1"
+                        >
+                          <option value="today">Today's date</option>
+                          <option value="event">Another event</option>
+                          <option value="start_to_today">Fixed start → today (ongoing)</option>
+                          <option value="today_to_end">Today → fixed end date</option>
+                        </select>
+                      </div>
+
+                      {(linkAnchorType === 'start_to_today' || linkAnchorType === 'today_to_end') && (
+                        <div className="flex items-center gap-2">
+                          <Label className="text-xs text-muted-foreground shrink-0 w-20">
+                            {linkAnchorType === 'start_to_today' ? 'Start date' : 'End date'}
+                          </Label>
+                          <Input
+                            type="text" value={linkFixedDate} placeholder="DD/MM/YYYY"
+                            onChange={e => setLinkFixedDate(formatDMYInput(e.target.value))}
+                            className="w-32 h-7 text-xs"
+                          />
+                          <input
+                            type="time" value={linkFixedTime}
+                            onChange={e => setLinkFixedTime(e.target.value)}
+                            className="h-7 text-xs border rounded-md px-1 bg-background"
+                          />
+                        </div>
+                      )}
+
+                      {linkAnchorType === 'event' && (
+                        <>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">Event</Label>
+                            <select
+                              value={linkEventId}
+                              onChange={e => setLinkEventId(e.target.value)}
+                              className="h-7 text-xs border rounded-md px-1 bg-background flex-1 min-w-0"
+                            >
+                              <option value="">— select event —</option>
+                              {events
+                                .filter(e => e.id !== editingEvent?.id)
+                                .map(e => {
+                                  const lane = lanes.find(l => l.id === e.laneId)
+                                  return (
+                                    <option key={e.id} value={e.id}>
+                                      {lane ? `[${lane.name}] ` : ''}{e.emoji ? `${e.emoji} ` : ''}{e.title}
+                                    </option>
+                                  )
+                                })}
+                            </select>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">Anchor at</Label>
+                            <select
+                              value={linkEventAnchor}
+                              onChange={e => setLinkEventAnchor(e.target.value as 'start' | 'end')}
+                              className="h-7 text-xs border rounded-md px-1 bg-background"
+                            >
+                              <option value="start">Start of event</option>
+                              <option value="end">End of event</option>
+                            </select>
+                          </div>
+                        </>
+                      )}
+
+                      {linkAnchorType !== 'start_to_today' && linkAnchorType !== 'today_to_end' && (
+                        <>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">Start offset</Label>
+                            <Input
+                              type="number" step="0.01" value={linkStartOffsetStr}
+                              onChange={e => setLinkStartOffsetStr(e.target.value)}
+                              className="w-24 h-7 text-xs" placeholder="0"
+                            />
+                            <span className="text-xs text-muted-foreground">years (− before, + after)</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">Duration</Label>
+                            <Input
+                              type="number" step="0.01" min="0" value={linkDurationStr}
+                              onChange={e => setLinkDurationStr(e.target.value)}
+                              className="w-24 h-7 text-xs" placeholder="optional"
+                            />
+                            <span className="text-xs text-muted-foreground">years (sets end date)</span>
+                          </div>
+                        </>
+                      )}
+
+                      {computedLink ? (
+                        <div className="rounded bg-muted/50 px-2 py-1.5 text-xs text-muted-foreground space-y-0.5">
+                          <div>Start → <span className="text-foreground font-medium">{fracYearToDMY(computedLink.startYear)}</span></div>
+                          {computedLink.endYear != null && (
+                            <div>End → <span className="text-foreground font-medium">{fracYearToDMY(computedLink.endYear)}</span></div>
+                          )}
+                        </div>
+                      ) : linkAnchorType === 'event' && !linkEventId ? (
+                        <p className="text-xs text-muted-foreground italic">Select an event to preview computed dates.</p>
+                      ) : null}
+
+                      {linkAnchorType === 'event' && (
+                        <div className="space-y-1 pt-1 border-t">
+                          <Label className="text-xs text-muted-foreground">If linked event is deleted</Label>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setLinkOnDelete('freeze')}
+                              className={`flex-1 h-7 rounded-md border text-xs transition-colors ${linkOnDelete === 'freeze' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-muted/50'}`}
+                            >
+                              Freeze dates
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setLinkOnDelete('delete')}
+                              className={`flex-1 h-7 rounded-md border text-xs transition-colors ${linkOnDelete === 'delete' ? 'bg-destructive text-destructive-foreground border-destructive' : 'bg-background hover:bg-muted/50'}`}
+                            >
+                              Delete this event too
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
               </div>
             )}
           </div>
@@ -675,6 +778,11 @@ export function EventDialog({
             </button>
             {showDetails && (
               <div className="px-3 pb-3 space-y-3 border-t pt-3">
+                {/* Description */}
+                <div className="grid gap-1.5">
+                  <Label htmlFor="desc" className="text-xs">Description</Label>
+                  <Input id="desc" value={description} onChange={e => setDescription(e.target.value)} placeholder="Optional description" className="h-8 text-xs" />
+                </div>
                 {/* URL */}
                 <div className="grid gap-1.5">
                   <Label htmlFor="ev-url" className="text-xs">URL <span className="text-muted-foreground font-normal">(link to article, post, activity…)</span></Label>
