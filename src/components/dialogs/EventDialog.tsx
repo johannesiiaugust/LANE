@@ -503,39 +503,21 @@ export function EventDialog({
               className={submitAttempted && !title.trim() ? 'border-destructive focus-visible:ring-destructive text-destructive placeholder:text-destructive/50' : ''}
             />
           </div>
-          {/* Color · Emoji · Image — compact row */}
-          <div className="flex items-start gap-3">
-            {/* Color grid — 4 columns */}
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Color</Label>
-              <ColorPicker value={color || '#3b82f6'} onChange={setColor} allowNone noneLabel="Lane default" columns={4} />
+          {/* Color + Emoji in one row */}
+          <div className="flex items-end gap-3">
+            <div className="flex-1 grid gap-1.5">
+              <Label>Color</Label>
+              <ColorPicker value={color || '#3b82f6'} onChange={setColor} allowNone noneLabel="Lane default" />
             </div>
-
-            {/* Emoji + Image stacked */}
-            <div className="flex flex-col gap-2 pt-0.5">
-              <div className="grid gap-1">
-                <Label className="text-xs">Emoji</Label>
-                <div className="flex items-center gap-1">
-                  <EmojiPickerPopover value={emoji} onChange={em => setEmoji(em)} />
-                  {emoji && (
-                    <button type="button" className="text-muted-foreground hover:text-foreground" onClick={() => setEmoji('')} title="Clear">
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-                </div>
-              </div>
-              <div className="grid gap-1">
-                <Label className="text-xs">Image</Label>
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="h-9 w-9 rounded-md border border-input bg-background hover:bg-accent transition-colors overflow-hidden flex items-center justify-center"
-                  title={imageUrl ? 'Change image' : 'Add image'}
-                >
-                  {imageUrl
-                    ? <img src={imageUrl} alt="" className="w-full h-full object-cover" onError={e => (e.currentTarget.style.display = 'none')} />
-                    : <ImageIcon className="h-4 w-4 text-muted-foreground" />}
-                </button>
+            <div className="grid gap-1.5">
+              <Label>Emoji</Label>
+              <div className="flex items-center gap-1.5">
+                <EmojiPickerPopover value={emoji} onChange={em => setEmoji(em)} />
+                {emoji && (
+                  <button type="button" className="text-muted-foreground hover:text-foreground" onClick={() => setEmoji('')} title="Clear">
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             </div>
           </div>
