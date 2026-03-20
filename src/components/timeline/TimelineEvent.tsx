@@ -255,21 +255,23 @@ export function TimelineEventBar({
 
   const label = event.emoji ? `${event.emoji} ${event.title}` : event.title
 
-  // SVG bezier path for fade tails.
-  // Shape: full-height rectangle on the base side, tapering to a center point at the tip.
-  // The horizontal linear-gradient fill handles color→transparent; the tapered shape
-  // naturally makes top/bottom transparent at the tip while the center stays most opaque.
+  // SVG bezier paths for fade tails.
+  // Full-height base on the bar side, tapering to a center point at the tip.
+  // The linear-gradient fill handles color→transparent; the tapered shape naturally
+  // keeps the center most opaque and lets top/bottom edges fade away first.
+  const OVERLAP = 2   // px: solid bar extends this many px into each tail to kill sub-pixel gaps
   const fiW = Math.max(fadeInTailWidth, 1)
   const foW = Math.max(fadeOutTailWidth, 1)
-  // Fade-in tail: tip at left (0, h/2), base at right (fiW, 0..h)
-  const fadeInPath  = `M${fiW},0 C${fiW*0.5},0 0,${h*0.3} 0,${h/2} C0,${h*0.7} ${fiW*0.5},${h} ${fiW},${h} Z`
-  // Fade-out tail: base at left (0, 0..h), tip at right (foW, h/2)
-  const fadeOutPath = `M0,0 C${foW*0.5},0 ${foW},${h*0.3} ${foW},${h/2} C${foW},${h*0.7} ${foW*0.5},${h} 0,${h} Z`
+  // Control points pulled to 65% width so the shape stays wide longer before tapering
+  const fadeInPath  = `M${fiW},0 C${fiW*0.65},0 0,${h*0.25} 0,${h/2} C0,${h*0.75} ${fiW*0.65},${h} ${fiW},${h} Z`
 
-  // Positions of tails relative to the wrapper (wrapper starts at barLeft)
-  const fadeInRelLeft  = 0                          // starts at wrapper left
+  // Positions relative to the wrapper (wrapper starts at barLeft)
+  const fadeInRelLeft  = 0
   const mainRelLeft    = hasFadeIn ? fadeInTailWidth : 0
-  const fadeOutRelLeft = mainRelLeft + mainBarWidth
+  // Solid bar overlaps 1px into each tail to eliminate sub-pixel seam on hover
+  const solidLeft  = mainRelLeft  - (hasFadeIn  ? OVERLAP : 0)
+  const solidWidth = mainBarWidth + (hasFadeIn  ? OVERLAP : 0) + (hasFadeOut ? OVERLAP : 0)
+  const fadeOutRelLeft = mainRelLeft + mainBarWidth - OVERLAP  // tail starts OVERLAP px inside the bar
 
   return (
     <>
@@ -296,19 +298,32 @@ export function TimelineEventBar({
             style={{ left: fadeInRelLeft, top: 0, width: fiW, height: h, overflow: 'visible' }}
           >
             <defs>
+              {/* Horizontal colour fade: full at base (right), transparent at tip (left) */}
               <linearGradient id={`fi-${event.id}`} x1="1" x2="0" y1="0" y2="0">
                 <stop offset="0%"   stopColor={color} stopOpacity={1} />
                 <stop offset="100%" stopColor={color} stopOpacity={0} />
               </linearGradient>
+              {/* Vertical sheen matching the solid bar's top highlight */}
+              <linearGradient id={`fi-sh-${event.id}`} x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%"   stopColor="white" stopOpacity={0.22} />
+                <stop offset="55%"  stopColor="white" stopOpacity={0} />
+              </linearGradient>
+              {/* Slight edge blur filter */}
+              <filter id={`fi-bl-${event.id}`} x="-5%" y="-10%" width="110%" height="120%">
+                <feGaussianBlur stdDeviation="1.2" />
+              </filter>
             </defs>
-            <path d={fadeInPath} fill={`url(#fi-${event.id})`} />
+            {/* Colour fill (blurred for soft edges) */}
+            <path d={fadeInPath} fill={`url(#fi-${event.id})`} filter={`url(#fi-bl-${event.id})`} />
+            {/* Sheen overlay (no blur — stays crisp to match the bar) */}
+            <path d={fadeInPath} fill={`url(#fi-sh-${event.id})`} />
           </svg>
         )}
 
-        {/* ── Solid main bar ── */}
+        {/* ── Solid main bar (drawn after tails so it renders on top, hiding the OVERLAP seam) ── */}
         <div
           className={`absolute overflow-hidden ${roundedClass}`}
-          style={{ left: mainRelLeft, top: 0, width: Math.max(mainBarWidth, 4), height: h, backgroundColor: color, boxShadow: '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)' }}
+          style={{ left: solidLeft, top: 0, width: Math.max(solidWidth, 4), height: h, backgroundColor: color, boxShadow: '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)' }}
         >
           {/* 3D sheen */}
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)' }} />
@@ -320,9 +335,9 @@ export function TimelineEventBar({
               {projectionPath && <polyline points={projectionPath} fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth={1.5} strokeDasharray="3 2" strokeLinejoin="round" />}
             </svg>
           )}
-          {/* Label */}
+          {/* Label — offset by OVERLAP so it stays in the visible solid region */}
           {mainBarWidth > EVENT_FONT * 2 && (
-            <span className="absolute text-white font-medium whitespace-nowrap drop-shadow-[0_0_2px_rgba(0,0,0,0.6)]" style={{ left: textLeft, fontSize: EVENT_FONT, lineHeight: `${EVENT_LINE_HEIGHT}px` }}>
+            <span className="absolute text-white font-medium whitespace-nowrap drop-shadow-[0_0_2px_rgba(0,0,0,0.6)]" style={{ left: textLeft + (hasFadeIn ? OVERLAP : 0), fontSize: EVENT_FONT, lineHeight: `${EVENT_LINE_HEIGHT}px` }}>
               {label}
             </span>
           )}
@@ -332,15 +347,29 @@ export function TimelineEventBar({
         {hasFadeOut && (
           <svg
             className="absolute pointer-events-none"
-            style={{ left: fadeOutRelLeft, top: 0, width: foW, height: h, overflow: 'visible' }}
+            style={{ left: fadeOutRelLeft, top: 0, width: foW + OVERLAP, height: h, overflow: 'visible' }}
           >
             <defs>
+              {/* Horizontal colour fade: full at base (left, offset by OVERLAP), transparent at tip (right) */}
               <linearGradient id={`fo-${event.id}`} x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0%"   stopColor={color} stopOpacity={1} />
+                <stop offset={`${(OVERLAP / (foW + OVERLAP) * 100).toFixed(1)}%`} stopColor={color} stopOpacity={1} />
                 <stop offset="100%" stopColor={color} stopOpacity={0} />
               </linearGradient>
+              {/* Vertical sheen */}
+              <linearGradient id={`fo-sh-${event.id}`} x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%"   stopColor="white" stopOpacity={0.22} />
+                <stop offset="55%"  stopColor="white" stopOpacity={0} />
+              </linearGradient>
+              {/* Edge blur */}
+              <filter id={`fo-bl-${event.id}`} x="-5%" y="-10%" width="110%" height="120%">
+                <feGaussianBlur stdDeviation="1.2" />
+              </filter>
             </defs>
-            <path d={fadeOutPath} fill={`url(#fo-${event.id})`} />
+            {/* Colour fill shifted right by OVERLAP so the full-colour base aligns with bar edge */}
+            <path d={`M${OVERLAP},0 C${OVERLAP + foW*0.35},0 ${OVERLAP+foW},${h*0.25} ${OVERLAP+foW},${h/2} C${OVERLAP+foW},${h*0.75} ${OVERLAP+foW*0.35},${h} ${OVERLAP},${h} Z`}
+              fill={`url(#fo-${event.id})`} filter={`url(#fo-bl-${event.id})`} />
+            <path d={`M${OVERLAP},0 C${OVERLAP + foW*0.35},0 ${OVERLAP+foW},${h*0.25} ${OVERLAP+foW},${h/2} C${OVERLAP+foW},${h*0.75} ${OVERLAP+foW*0.35},${h} ${OVERLAP},${h} Z`}
+              fill={`url(#fo-sh-${event.id})`} />
           </svg>
         )}
 
