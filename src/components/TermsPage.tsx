@@ -22,7 +22,7 @@ export function TermsPage() {
       <div className="flex-1 max-w-3xl mx-auto w-full px-6 py-10 space-y-8">
         <div>
           <h1 className="text-3xl font-bold mb-1">Terms & Conditions</h1>
-          <p className="text-xs text-muted-foreground italic">Draft — last updated March 2026</p>
+          <p className="text-xs text-muted-foreground italic">Last updated March 2026</p>
         </div>
 
         <div className="space-y-6 text-sm text-muted-foreground leading-relaxed">
@@ -47,14 +47,14 @@ export function TermsPage() {
             <h3 className="font-semibold text-foreground mb-1">10. Historical Personas</h3>
             <p>
               The historical personas available in LifeLANE are provided for illustrative and inspirational purposes only. While we aim for reasonable accuracy, the information may contain errors or omissions. LifeLANE makes no warranty as to the completeness or accuracy of any persona data. If you are the subject of a persona, a representative, or otherwise have a legitimate concern, you may request its removal by contacting us at{' '}
-              <a href="mailto:hello@timelane.space" className="underline text-foreground hover:opacity-70">hello@timelane.space</a> and we will action the request promptly.
+              <a href="mailto:hello@lifelane.space" className="underline text-foreground hover:opacity-70">hello@lifelane.space</a> and we will action the request promptly.
             </p>
           </div>
         </div>
 
         <div className="pt-4 border-t">
           <p className="text-sm text-muted-foreground">
-            Questions? <a href="mailto:hello@timelane.space" className="underline text-foreground hover:opacity-70">hello@timelane.space</a>
+            Questions? <a href="mailto:hello@lifelane.space" className="underline text-foreground hover:opacity-70">hello@lifelane.space</a>
           </p>
         </div>
       </div>
