@@ -59,13 +59,16 @@ export function LaneDialog({ open, onOpenChange, editingLane, onSave }: LaneDial
             <Label htmlFor="lane-name">Name</Label>
             <Input id="lane-name" value={name} onChange={e => setName(e.target.value)} placeholder="Lane name" />
           </div>
-          <div className="grid gap-1.5">
-            <Label>Emoji (optional)</Label>
-            <EmojiField value={emoji} onChange={setEmoji} />
-          </div>
-          <div className="grid gap-1.5">
-            <Label>Color</Label>
-            <ColorPicker value={color} onChange={setColor} />
+          {/* Color + Emoji on the same row */}
+          <div className="flex items-end gap-4">
+            <div className="flex-1 grid gap-1.5">
+              <Label>Color</Label>
+              <ColorPicker value={color} onChange={setColor} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label>Emoji</Label>
+              <EmojiField value={emoji} onChange={setEmoji} />
+            </div>
           </div>
           <DialogFooter className="mt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
