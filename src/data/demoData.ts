@@ -25,7 +25,7 @@ export const DEMO_EVENTS: TimelineEvent[] = [
   { id: 'demo-evt-highschool', laneId: 'work',       emoji: '🎓', title: 'School & University',  description: 'Gymnasium Berlin-Mitte, then TU Berlin Computer Science', type: 'range', startYear: 1994, endYear: 2004, color: '#8b5cf6' },
   { id: 'demo-evt-work',       laneId: 'work',       emoji: '💻', title: 'Software Engineer',    description: 'Full-stack developer at Berlin tech startup', type: 'range', startYear: 2005, endYear: 2020.997, color: '#10b981' },
   { id: 'demo-evt-leadeng',    laneId: 'work',       emoji: '🚀', title: 'Lead Engineer',        description: 'Returned with new perspective — promoted to Lead Engineer at Munich startup', type: 'range', startYear: 2023, endYear: 2040.5, color: '#059669' },
-  { id: 'demo-evt-biz',        laneId: 'work',       emoji: '🏢', title: '?Own Business?',       description: 'Future venture',                             type: 'range', startYear: 2040.5, endYear: 2060.5, color: '#0d9488',
+  { id: 'demo-evt-biz',        laneId: 'work',       emoji: '🏢', title: '?Own Business?',       description: 'Future venture',                             type: 'range', startYear: 2040.5, endYear: 2060.5, fadeOutYear: 2070.5, color: '#0d9488',
     valueProjection: {
       startValue: 0,
       spotChanges: [],
