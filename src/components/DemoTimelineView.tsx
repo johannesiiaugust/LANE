@@ -162,13 +162,20 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [searchOpen, setSearchOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
   const [showExampleOverlay, setShowExampleOverlay] = useState(true)
-  const overlayClickCountRef = useRef(0)
+  const guideWasOpenRef = useRef(false)
+  const guideClosedRef = useRef(false)
 
   // Auto-open guide after 5 seconds on the landing page
   useEffect(() => {
     const t = setTimeout(() => setGuideOpen(true), 5000)
     return () => clearTimeout(t)
   }, [])
+
+  // Track when guide has been shown and then closed
+  useEffect(() => {
+    if (guideOpen) { guideWasOpenRef.current = true }
+    else if (guideWasOpenRef.current) { guideClosedRef.current = true }
+  }, [guideOpen])
 
   const stepZoom = useCallback((factor: number) => {
     const next = Math.max(MIN_PIXELS_PER_YEAR, Math.min(MAX_PIXELS_PER_YEAR, pixelsPerYear * factor))
@@ -521,10 +528,11 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
 
       {/* Example overlay text — fixed over full width incl. sidebar, own-lanes height only */}
       <div
-        className="pointer-events-none fixed left-0 right-0 flex items-center justify-center z-30"
+        className="pointer-events-none fixed left-0 right-0 flex items-center justify-center"
         style={{
           top: '48px',
           bottom: '45%',
+          zIndex: 100,
           opacity: showExampleOverlay ? 1 : 0,
           transition: 'opacity 2800ms ease',
         }}
@@ -540,8 +548,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
       <div
         className="flex-1 overflow-hidden flex flex-col"
         onClick={() => {
-          overlayClickCountRef.current += 1
-          if (overlayClickCountRef.current >= 2) setShowExampleOverlay(false)
+          if (guideClosedRef.current) setShowExampleOverlay(false)
         }}
       >
         <TimelineContainer
