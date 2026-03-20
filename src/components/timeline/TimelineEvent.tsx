@@ -201,36 +201,31 @@ export function TimelineEventBar({
   const hasFadeIn  = event.fadeInYear  != null && event.fadeInYear  < event.startYear
   const hasFadeOut = event.fadeOutYear != null && event.fadeOutYear > (event.endYear ?? event.startYear)
 
-  // Geometry for the solid core
+  // Geometry
   const mainBarLeft  = (event.startYear - yearStart) * pixelsPerYear
   const mainBarWidth = ((event.endYear ?? event.startYear + 1) - event.startYear) * pixelsPerYear
-  const width = mainBarWidth   // used for label-width check below
-
-  // Geometry for fade tails
-  const fadeInTailLeft  = hasFadeIn  ? (event.fadeInYear!  - yearStart) * pixelsPerYear : 0
-  const fadeInTailWidth = hasFadeIn  ? (event.startYear    - event.fadeInYear!)  * pixelsPerYear : 0
-  const fadeOutTailLeft  = hasFadeOut ? ((event.endYear ?? event.startYear) - yearStart) * pixelsPerYear : 0
+  const fadeInTailWidth  = hasFadeIn  ? (event.startYear - event.fadeInYear!)  * pixelsPerYear : 0
   const fadeOutTailWidth = hasFadeOut ? (event.fadeOutYear! - (event.endYear ?? event.startYear)) * pixelsPerYear : 0
-
-  // For sparkline gradient percentages
   const barStartYear = hasFadeIn  ? event.fadeInYear!  : event.startYear
   const barEndYear   = hasFadeOut ? event.fadeOutYear! : (event.endYear ?? event.startYear + 1)
-  const barLeft      = (barStartYear - yearStart) * pixelsPerYear
-  const barWidth     = (barEndYear - barStartYear) * pixelsPerYear
+  const barLeft  = (barStartYear - yearStart) * pixelsPerYear
+  const barWidth = (barEndYear - barStartYear) * pixelsPerYear
+
+  // Sparkline gradient percentages (relative to full bar span)
   const totalFadeYears = barEndYear - barStartYear
   const fadeInPct  = hasFadeIn  ? ((event.startYear - barStartYear) / totalFadeYears) * 100 : 0
   const fadeOutPct = hasFadeOut ? (((event.endYear ?? event.startYear) - barStartYear) / totalFadeYears) * 100 : 100
 
   const top = (BASE_LANE_HEIGHT - BAR_HEIGHT) / 2 + topOffset + stackOff
+  const h   = BAR_HEIGHT
 
-  // Rounded corners: only remove rounding where a tail is attached
+  // Rounded corners only on the non-tail side
   const roundedClass = hasFadeIn && hasFadeOut ? '' : hasFadeIn ? 'rounded-r-lg' : hasFadeOut ? 'rounded-l-lg' : 'rounded-lg'
 
-  // Sticky label: keep it inside the solid region
-  const solidLeft = (event.startYear - yearStart) * pixelsPerYear
-  const textLeft = Math.max(4, scrollLeft - solidLeft + sc.SIDEBAR_WIDTH + 4)
+  // Sticky label stays inside the solid core
+  const textLeft = Math.max(4, scrollLeft - mainBarLeft + sc.SIDEBAR_WIDTH + 4)
 
-  // Sparkline geometry — coordinates relative to barStartYear (full span incl. tails)
+  // Sparkline — coordinates relative to barStartYear (full span incl. tails)
   let sparklinePath: string | null = null
   let projectionPath: string | null = null
   let sparklineFill: string | null = null
@@ -240,8 +235,8 @@ export function TimelineEventBar({
     const maxV = Math.max(...values)
     const range = maxV - minV || 1
     const pad = 2
-    const chartH = BAR_HEIGHT - pad * 2
-    const bottomY = (BAR_HEIGHT - pad).toFixed(1)
+    const chartH = h - pad * 2
+    const bottomY = (h - pad).toFixed(1)
     const toXY = (p: { year: number; value: number }) => {
       const x = (p.year - barStartYear) * pixelsPerYear
       const y = pad + chartH - chartH * (p.value - minV) / range
@@ -260,42 +255,31 @@ export function TimelineEventBar({
 
   const label = event.emoji ? `${event.emoji} ${event.title}` : event.title
 
-  // Mask for fade tails: elliptical radial gradient so the bar tapers
-  // vertically at the tip, giving a 3D feathered appearance.
-  const maskFadeIn  = 'radial-gradient(ellipse 100% 75% at 0% 50%, transparent 0%, black 90%)'
-  const maskFadeOut = 'radial-gradient(ellipse 100% 75% at 100% 50%, transparent 0%, black 90%)'
+  // SVG bezier path for fade tails.
+  // Shape: full-height rectangle on the base side, tapering to a center point at the tip.
+  // The horizontal linear-gradient fill handles color→transparent; the tapered shape
+  // naturally makes top/bottom transparent at the tip while the center stays most opaque.
+  const fiW = Math.max(fadeInTailWidth, 1)
+  const foW = Math.max(fadeOutTailWidth, 1)
+  // Fade-in tail: tip at left (0, h/2), base at right (fiW, 0..h)
+  const fadeInPath  = `M${fiW},0 C${fiW*0.5},0 0,${h*0.3} 0,${h/2} C0,${h*0.7} ${fiW*0.5},${h} ${fiW},${h} Z`
+  // Fade-out tail: base at left (0, 0..h), tip at right (foW, h/2)
+  const fadeOutPath = `M0,0 C${foW*0.5},0 ${foW},${h*0.3} ${foW},${h/2} C${foW},${h*0.7} ${foW*0.5},${h} 0,${h} Z`
 
-  const tailStyle: React.CSSProperties = {
-    position: 'absolute',
-    top,
-    height: BAR_HEIGHT,
-    backgroundColor: color,
-    opacity: 0.88,
-    zIndex: stackZ,
-    pointerEvents: 'none',
-    ...(pastStyle ?? {}),
-    ...(draggingStyle ?? {}),
-  }
+  // Positions of tails relative to the wrapper (wrapper starts at barLeft)
+  const fadeInRelLeft  = 0                          // starts at wrapper left
+  const mainRelLeft    = hasFadeIn ? fadeInTailWidth : 0
+  const fadeOutRelLeft = mainRelLeft + mainBarWidth
 
   return (
     <>
-      {/* Fade-in tail — tapers to a point on the left */}
-      {hasFadeIn && (
-        <div
-          style={{
-            ...tailStyle,
-            left: fadeInTailLeft,
-            width: Math.max(fadeInTailWidth, 1),
-            WebkitMaskImage: maskFadeIn,
-            maskImage: maskFadeIn,
-          }}
-        />
-      )}
-
-      {/* Main solid bar */}
+      {/*
+        Outer wrapper spans the full bar + tails.
+        All hover / grab transforms are applied here so tails move with the bar.
+      */}
       <div
-        className={`absolute cursor-pointer transition-all overflow-hidden select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50 ${roundedClass} ${grabRing}`}
-        style={{ left: mainBarLeft, top, width: Math.max(width, 4), height: BAR_HEIGHT, backgroundColor: color, opacity: 0.88, zIndex: stackZ, boxShadow: '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)', ...pastStyle, ...draggingStyle }}
+        className={`absolute cursor-pointer transition-all select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50 ${grabRing}`}
+        style={{ left: barLeft, top, width: Math.max(barWidth, 4), height: h, opacity: 0.88, zIndex: stackZ, ...pastStyle, ...draggingStyle }}
         title={event.title}
         {...interactionProps}
         onMouseMove={e => {
@@ -304,63 +288,90 @@ export function TimelineEventBar({
         }}
         onMouseLeave={() => { handleMouseLeave(); setTooltip(null); setImageHover(null) }}
       >
-        {/* 3D sheen */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)' }} />
-        {/* Sparkline — only in no-fade case (fade case rendered below as full-span SVG) */}
-        {!(hasFadeIn || hasFadeOut) && sparklineSeries.length >= 2 && (
-          <svg className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%', overflow: 'hidden' }} preserveAspectRatio="none">
-            {sparklineFill && <polygon points={sparklineFill} fill="rgba(255,255,255,0.13)" />}
-            {sparklinePath && <polyline points={sparklinePath} fill="none" stroke="rgba(255,255,255,0.95)" strokeWidth={2} strokeLinejoin="round" />}
-            {projectionPath && <polyline points={projectionPath} fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth={1.5} strokeDasharray="3 2" strokeLinejoin="round" />}
+
+        {/* ── Fade-in tail (SVG bezier, points left) ── */}
+        {hasFadeIn && (
+          <svg
+            className="absolute pointer-events-none"
+            style={{ left: fadeInRelLeft, top: 0, width: fiW, height: h, overflow: 'visible' }}
+          >
+            <defs>
+              <linearGradient id={`fi-${event.id}`} x1="1" x2="0" y1="0" y2="0">
+                <stop offset="0%"   stopColor={color} stopOpacity={1} />
+                <stop offset="100%" stopColor={color} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <path d={fadeInPath} fill={`url(#fi-${event.id})`} />
           </svg>
         )}
-        {width > EVENT_FONT * 2 && (
-          <span className="absolute text-white font-medium whitespace-nowrap drop-shadow-[0_0_2px_rgba(0,0,0,0.6)]" style={{ left: textLeft, fontSize: EVENT_FONT, lineHeight: `${EVENT_LINE_HEIGHT}px` }}>
-            {label}
-          </span>
-        )}
-      </div>
 
-      {/* Fade-out tail — tapers to a point on the right */}
-      {hasFadeOut && (
+        {/* ── Solid main bar ── */}
         <div
-          style={{
-            ...tailStyle,
-            left: fadeOutTailLeft,
-            width: Math.max(fadeOutTailWidth, 1),
-            WebkitMaskImage: maskFadeOut,
-            maskImage: maskFadeOut,
-          }}
-        />
-      )}
-
-      {/* Full-span sparkline SVG when fade is active — uses a gradient stroke */}
-      {(hasFadeIn || hasFadeOut) && sparklineSeries.length >= 2 && (
-        <svg
-          className="absolute pointer-events-none"
-          style={{ left: barLeft, top, width: barWidth, height: BAR_HEIGHT, zIndex: (stackZ ?? 1) + 1, overflow: 'visible' }}
-          preserveAspectRatio="none"
+          className={`absolute overflow-hidden ${roundedClass}`}
+          style={{ left: mainRelLeft, top: 0, width: Math.max(mainBarWidth, 4), height: h, backgroundColor: color, boxShadow: '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)' }}
         >
-          <defs>
-            <linearGradient id={`sf-${event.id}`} x1="0" x2="1" y1="0" y2="0">
-              <stop offset="0%"   stopColor="rgba(255,255,255,0.95)" stopOpacity={hasFadeIn  ? 0 : 1} />
-              {hasFadeIn  && <stop offset={`${fadeInPct.toFixed(1)}%`}  stopColor="rgba(255,255,255,0.95)" stopOpacity={1} />}
-              {hasFadeOut && <stop offset={`${fadeOutPct.toFixed(1)}%`} stopColor="rgba(255,255,255,0.95)" stopOpacity={1} />}
-              <stop offset="100%" stopColor="rgba(255,255,255,0.95)" stopOpacity={hasFadeOut ? 0 : 1} />
-            </linearGradient>
-            <linearGradient id={`sf-proj-${event.id}`} x1="0" x2="1" y1="0" y2="0">
-              <stop offset="0%"   stopColor="rgba(255,255,255,0.6)" stopOpacity={hasFadeIn  ? 0 : 1} />
-              {hasFadeIn  && <stop offset={`${fadeInPct.toFixed(1)}%`}  stopColor="rgba(255,255,255,0.6)" stopOpacity={1} />}
-              {hasFadeOut && <stop offset={`${fadeOutPct.toFixed(1)}%`} stopColor="rgba(255,255,255,0.6)" stopOpacity={1} />}
-              <stop offset="100%" stopColor="rgba(255,255,255,0.6)" stopOpacity={hasFadeOut ? 0 : 1} />
-            </linearGradient>
-          </defs>
-          {sparklineFill && <polygon points={sparklineFill} fill="rgba(255,255,255,0.08)" />}
-          {sparklinePath    && <polyline points={sparklinePath}    fill="none" stroke={`url(#sf-${event.id})`}      strokeWidth={2}   strokeLinejoin="round" />}
-          {projectionPath   && <polyline points={projectionPath}   fill="none" stroke={`url(#sf-proj-${event.id})`} strokeWidth={1.5} strokeDasharray="3 2" strokeLinejoin="round" />}
-        </svg>
-      )}
+          {/* 3D sheen */}
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)' }} />
+          {/* Sparkline — inline when no fades */}
+          {!(hasFadeIn || hasFadeOut) && sparklineSeries.length >= 2 && (
+            <svg className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%', overflow: 'hidden' }} preserveAspectRatio="none">
+              {sparklineFill && <polygon points={sparklineFill} fill="rgba(255,255,255,0.13)" />}
+              {sparklinePath && <polyline points={sparklinePath} fill="none" stroke="rgba(255,255,255,0.95)" strokeWidth={2} strokeLinejoin="round" />}
+              {projectionPath && <polyline points={projectionPath} fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth={1.5} strokeDasharray="3 2" strokeLinejoin="round" />}
+            </svg>
+          )}
+          {/* Label */}
+          {mainBarWidth > EVENT_FONT * 2 && (
+            <span className="absolute text-white font-medium whitespace-nowrap drop-shadow-[0_0_2px_rgba(0,0,0,0.6)]" style={{ left: textLeft, fontSize: EVENT_FONT, lineHeight: `${EVENT_LINE_HEIGHT}px` }}>
+              {label}
+            </span>
+          )}
+        </div>
 
+        {/* ── Fade-out tail (SVG bezier, points right) ── */}
+        {hasFadeOut && (
+          <svg
+            className="absolute pointer-events-none"
+            style={{ left: fadeOutRelLeft, top: 0, width: foW, height: h, overflow: 'visible' }}
+          >
+            <defs>
+              <linearGradient id={`fo-${event.id}`} x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%"   stopColor={color} stopOpacity={1} />
+                <stop offset="100%" stopColor={color} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <path d={fadeOutPath} fill={`url(#fo-${event.id})`} />
+          </svg>
+        )}
+
+        {/* ── Full-span sparkline when fades are active ── */}
+        {(hasFadeIn || hasFadeOut) && sparklineSeries.length >= 2 && (
+          <svg
+            className="absolute pointer-events-none"
+            style={{ left: 0, top: 0, width: barWidth, height: h, overflow: 'visible', zIndex: 1 }}
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <linearGradient id={`sf-${event.id}`} x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%"   stopColor="rgba(255,255,255,0.95)" stopOpacity={hasFadeIn  ? 0 : 1} />
+                {hasFadeIn  && <stop offset={`${fadeInPct.toFixed(1)}%`}  stopColor="rgba(255,255,255,0.95)" stopOpacity={1} />}
+                {hasFadeOut && <stop offset={`${fadeOutPct.toFixed(1)}%`} stopColor="rgba(255,255,255,0.95)" stopOpacity={1} />}
+                <stop offset="100%" stopColor="rgba(255,255,255,0.95)" stopOpacity={hasFadeOut ? 0 : 1} />
+              </linearGradient>
+              <linearGradient id={`sfp-${event.id}`} x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%"   stopColor="rgba(255,255,255,0.6)" stopOpacity={hasFadeIn  ? 0 : 1} />
+                {hasFadeIn  && <stop offset={`${fadeInPct.toFixed(1)}%`}  stopColor="rgba(255,255,255,0.6)" stopOpacity={1} />}
+                {hasFadeOut && <stop offset={`${fadeOutPct.toFixed(1)}%`} stopColor="rgba(255,255,255,0.6)" stopOpacity={1} />}
+                <stop offset="100%" stopColor="rgba(255,255,255,0.6)" stopOpacity={hasFadeOut ? 0 : 1} />
+              </linearGradient>
+            </defs>
+            {sparklineFill    && <polygon  points={sparklineFill}    fill="rgba(255,255,255,0.08)" />}
+            {sparklinePath    && <polyline points={sparklinePath}    fill="none" stroke={`url(#sf-${event.id})`}  strokeWidth={2}   strokeLinejoin="round" />}
+            {projectionPath   && <polyline points={projectionPath}   fill="none" stroke={`url(#sfp-${event.id})`} strokeWidth={1.5} strokeDasharray="3 2" strokeLinejoin="round" />}
+          </svg>
+        )}
+
+      </div>
       {tooltip && <ValueTooltip title={event.title} tooltip={tooltip} />}
       {imageHover && event.metadata?.image_url && <ImageHoverThumbnail imageUrl={event.metadata.image_url} pos={imageHover} />}
       {contextMenu}
