@@ -17,14 +17,12 @@ export const DEMO_LANES: Lane[] = [
 
 export const DEMO_EVENTS: TimelineEvent[] = [
   // Place (Locations + Travel merged)
-  { id: 'demo-evt-berlin',     laneId: 'place',      emoji: '🏙️', title: 'Berlin',              description: 'Grew up and worked in Berlin',              type: 'range', startYear: 2000, endYear: 2022,   color: '#3b82f6' },
-  { id: 'demo-evt-seasia',     laneId: 'place',      emoji: '🌴', title: 'Southeast Asia',       description: 'Vietnam, Thailand, Bali — sabbatical year', type: 'range', startYear: 2022, endYear: 2023,   color: '#0ea5e9' },
+  { id: 'demo-evt-berlin',     laneId: 'place',      emoji: '🏙️', title: 'Berlin',              description: 'Grew up and worked in Berlin',              type: 'range', startYear: 2000, endYear: 2021,   color: '#3b82f6' },
+  { id: 'demo-evt-sabbatical', laneId: 'place',      emoji: '🌏', title: 'Sabbatical — SE Asia', description: 'A year to explore — Vietnam, Thailand, Bali', type: 'range', startYear: 2021, endYear: 2023, color: '#0ea5e9' },
   { id: 'demo-evt-munich',     laneId: 'place',      emoji: '🏔️', title: 'Munich',               description: 'Moved to Munich after returning',           type: 'range', startYear: 2023, endYear: 2035,   color: '#3b82f6' },
-  { id: 'demo-evt-sabbatical', laneId: 'place',      emoji: '🌏', title: 'Sabbatical — SE Asia', description: 'A year to explore — Vietnam, Thailand, Bali', type: 'range', startYear: 2022, endYear: 2023, color: '#0ea5e9' },
 
   // Work (Work + Education merged)
-  { id: 'demo-evt-highschool', laneId: 'work',       emoji: '🏫', title: 'High School',          description: 'Gymnasium Berlin-Mitte',                     type: 'range', startYear: 1994, endYear: 1999, color: '#8b5cf6' },
-  { id: 'demo-evt-university', laneId: 'work',       emoji: '🎓', title: 'University (CS)',       description: 'TU Berlin, Computer Science',                type: 'range', startYear: 1999, endYear: 2004, color: '#8b5cf6' },
+  { id: 'demo-evt-highschool', laneId: 'work',       emoji: '🎓', title: 'School & University',  description: 'Gymnasium Berlin-Mitte, then TU Berlin Computer Science', type: 'range', startYear: 1994, endYear: 2004, color: '#8b5cf6' },
   { id: 'demo-evt-work',       laneId: 'work',       emoji: '💻', title: 'Software Engineer',    description: 'Full-stack developer at Berlin tech startup', type: 'range', startYear: 2005, endYear: 2022,   color: '#10b981' },
   { id: 'demo-evt-leadeng',    laneId: 'work',       emoji: '🚀', title: 'Lead Engineer',        description: 'Returned with new perspective — promoted to Lead Engineer at Munich startup', type: 'range', startYear: 2023, endYear: 2040.5, color: '#059669' },
   { id: 'demo-evt-biz',        laneId: 'work',       emoji: '🏢', title: '?Own Business?',       description: 'Future venture',                             type: 'range', startYear: 2040.5, endYear: 2060.5, color: '#0d9488',
@@ -48,7 +46,7 @@ export const DEMO_EVENTS: TimelineEvent[] = [
   { id: 'demo-evt-kid',        laneId: 'relations',  emoji: '👶', title: 'Child',                description: 'First child born (2015)',                     type: 'range', startYear: 2015, endYear: 2100, color: '#f97316' },
 
   // Activities (Activities + Achievements merged)
-  { id: 'demo-evt-chess',      laneId: 'activities', emoji: '♟️', title: 'Chess Club',           description: 'University chess club',                      type: 'range', startYear: 2001, endYear: 2003, color: '#f59e0b' },
+  { id: 'demo-evt-chess',      laneId: 'activities', emoji: '♟️', title: 'Chess Club',           description: 'University chess club',                      type: 'range', startYear: 2001, endYear: 2021, color: '#f59e0b' },
   { id: 'demo-evt-diving',     laneId: 'activities', emoji: '🤿', title: 'PADI Open Water Diver', description: 'Got certified diving in Koh Tao, Thailand', type: 'point', startYear: 2022.6, color: '#0ea5e9' },
   { id: 'demo-evt-nobel',      laneId: 'activities', title: '🏆 Nobel Prize',      description: 'Nobel Prize in Physics, 2050',               type: 'point', startYear: 2050, color: '#eab308' },
 
@@ -63,14 +61,13 @@ export const DEMO_EVENTS: TimelineEvent[] = [
   },
 
   // Items (Vehicles + Items merged)
-  { id: 'demo-evt-volvo',      laneId: 'items',      emoji: '🚗', title: 'Volvo',                description: 'Current car',                                type: 'range', startYear: 2021, endYear: 2031, color: '#64748b' },
-  { id: 'demo-evt-vw',         laneId: 'items',      emoji: '🚗', title: '?VW?',                 description: 'Next car',                                   type: 'range', startYear: 2032, endYear: 2037, color: '#64748b' },
-  { id: 'demo-evt-boat',       laneId: 'items',      emoji: '⛵', title: 'Boat',                 description: 'Future boat',                                type: 'range', startYear: 2062, endYear: 2082, color: '#0ea5e9',
+  { id: 'demo-evt-volvo',      laneId: 'items',      emoji: '🚗', title: 'Volvo',                description: 'Current car',                                type: 'range', startYear: 2021, endYear: 2037, color: '#64748b' },
+  { id: 'demo-evt-boat',       laneId: 'items',      emoji: '⛵', title: 'Boat',                 description: 'Future boat',                                type: 'range', startYear: 2053, endYear: 2082, color: '#0ea5e9',
     valueProjection: {
       startValue: 0,
-      spotChanges: [{ id: 'demo-vs-boat', year: 2062, amount: -100, label: 'Purchase' }],
+      spotChanges: [{ id: 'demo-vs-boat', year: 2053, amount: -100, label: 'Purchase' }],
       growthPeriods: [],
-      deposits: [{ id: 'demo-dep-boat', label: 'Monthly running cost', amount: -10, frequency: 'monthly', startYear: 2062, endYear: 2082 }],
+      deposits: [{ id: 'demo-dep-boat', label: 'Monthly running cost', amount: -10, frequency: 'monthly', startYear: 2053, endYear: 2082 }],
     },
   },
 ]
