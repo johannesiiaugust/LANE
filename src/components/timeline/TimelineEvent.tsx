@@ -308,9 +308,8 @@ export function TimelineEventBar({
                 <stop offset="0%"  stopColor="white" stopOpacity={0.22} />
                 <stop offset="55%" stopColor="white" stopOpacity={0} />
               </linearGradient>
-              {/* Drop shadow matching the solid bar: 0 2px 5px rgba(0,0,0,0.25) */}
-              <filter id={`fi-f-${event.id}`} x="-5%" y="-20%" width="115%" height="160%">
-                <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="black" floodOpacity="0.25" />
+              <filter id={`fi-f-${event.id}`} x="-5%" y="-10%" width="110%" height="120%">
+                <feGaussianBlur stdDeviation="1.2" />
               </filter>
             </defs>
             <path d={fadeInPath} fill={`url(#fi-${event.id})`} filter={`url(#fi-f-${event.id})`} />
@@ -356,8 +355,8 @@ export function TimelineEventBar({
                 <stop offset="0%"  stopColor="white" stopOpacity={0.22} />
                 <stop offset="55%" stopColor="white" stopOpacity={0} />
               </linearGradient>
-              <filter id={`fo-f-${event.id}`} x="-5%" y="-20%" width="115%" height="160%">
-                <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="black" floodOpacity="0.25" />
+              <filter id={`fo-f-${event.id}`} x="-5%" y="-10%" width="110%" height="120%">
+                <feGaussianBlur stdDeviation="1.2" />
               </filter>
             </defs>
             <path d={`M${OVERLAP},${T} C${OVERLAP+foW*0.35},${T} ${OVERLAP+foW},${h*0.25} ${OVERLAP+foW},${h/2} C${OVERLAP+foW},${h*0.75} ${OVERLAP+foW*0.35},${h-T} ${OVERLAP},${h-T} Z`}
