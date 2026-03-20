@@ -21,22 +21,15 @@ interface ColorPickerProps {
   /** Show a "no color / inherit" option as first swatch */
   allowNone?: boolean
   noneLabel?: string
-  /** Number of swatches per row (default: all in one row) */
-  columns?: number
 }
 
-export function ColorPicker({ value, onChange, allowNone, noneLabel = 'Default', columns }: ColorPickerProps) {
+export function ColorPicker({ value, onChange, allowNone, noneLabel = 'Default' }: ColorPickerProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const normalised = value?.toLowerCase()
   const isCustom = !!value && !PALETTE.map(c => c.toLowerCase()).includes(normalised)
 
-  const wrapClass = columns
-    ? `grid gap-1.5`
-    : `flex flex-wrap gap-1.5 items-center`
-  const gridStyle = columns ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` } : undefined
-
   return (
-    <div className={wrapClass} style={gridStyle}>
+    <div className="flex flex-wrap gap-1.5 items-center">
       {allowNone && (
         <button
           type="button"
