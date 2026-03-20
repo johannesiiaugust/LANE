@@ -15,6 +15,7 @@ import { SkinDialog } from '@/components/SkinDialog'
 import { ImportDialog, type ImportTab } from '@/components/ImportDialog'
 import { SearchDialog } from '@/components/SearchDialog'
 import { GuideOverlay } from '@/components/GuideOverlay'
+import { useGoogleTranslate, TranslateMenuContent } from '@/components/TranslateMenu'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
@@ -161,41 +162,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [importTab, setImportTab] = useState<ImportTab>('calendar-file')
   const [searchOpen, setSearchOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
-  const [langSearch, setLangSearch] = useState('')
-
-  // Inject Google Translate widget once on mount
-  useEffect(() => {
-    if (!document.getElementById('gt-element')) {
-      const el = document.createElement('div')
-      el.id = 'gt-element'
-      el.style.display = 'none'
-      document.body.appendChild(el)
-    }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(window as any)['googleTranslateElementInit'] = () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      new (window as any).google.translate.TranslateElement(
-        { pageLanguage: 'en', autoDisplay: false },
-        'gt-element',
-      )
-    }
-    if (!document.getElementById('gt-script')) {
-      const s = document.createElement('script')
-      s.id = 'gt-script'
-      s.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
-      document.body.appendChild(s)
-    }
-    if (!document.getElementById('gt-style')) {
-      const style = document.createElement('style')
-      style.id = 'gt-style'
-      style.textContent = [
-        '.goog-te-banner-frame { display:none !important; }',
-        '.goog-te-menu-frame { display:none !important; }',
-        'body { top:0 !important; }',
-      ].join(' ')
-      document.head.appendChild(style)
-    }
-  }, [])
+  useGoogleTranslate()
   const [showExampleOverlay, setShowExampleOverlay] = useState(true)
   const guideWasOpenRef = useRef(false)
   const guideClosedRef = useRef(false)
@@ -318,42 +285,6 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const handleSaveLane = useCallback((data: { name: string; color: string; visible: boolean; emoji?: string }) => {
     if (editingLane) updateLane(editingLane.id, data); else addLane(data)
   }, [editingLane, updateLane, addLane])
-
-  const QUICK_LANGS = [
-    { flag: '🇬🇧', code: 'en', name: 'English' },
-    { flag: '🇩🇪', code: 'de', name: 'German' },
-    { flag: '🇫🇷', code: 'fr', name: 'French' },
-    { flag: '🇪🇸', code: 'es', name: 'Spanish' },
-  ]
-  const ALL_LANGS = [
-    { code: 'zh', name: 'Chinese' }, { code: 'ar', name: 'Arabic' },
-    { code: 'pt', name: 'Portuguese' }, { code: 'ru', name: 'Russian' },
-    { code: 'ja', name: 'Japanese' }, { code: 'ko', name: 'Korean' },
-    { code: 'it', name: 'Italian' }, { code: 'nl', name: 'Dutch' },
-    { code: 'pl', name: 'Polish' }, { code: 'sv', name: 'Swedish' },
-    { code: 'no', name: 'Norwegian' }, { code: 'da', name: 'Danish' },
-    { code: 'fi', name: 'Finnish' }, { code: 'tr', name: 'Turkish' },
-    { code: 'hi', name: 'Hindi' }, { code: 'id', name: 'Indonesian' },
-    { code: 'uk', name: 'Ukrainian' }, { code: 'cs', name: 'Czech' },
-    { code: 'ro', name: 'Romanian' }, { code: 'hu', name: 'Hungarian' },
-    { code: 'el', name: 'Greek' }, { code: 'he', name: 'Hebrew' },
-    { code: 'vi', name: 'Vietnamese' }, { code: 'th', name: 'Thai' },
-  ]
-  const filteredLangs = langSearch.trim()
-    ? ALL_LANGS.filter(l => l.name.toLowerCase().includes(langSearch.toLowerCase()))
-    : []
-  function translateTo(code: string) {
-    const attempt = (retries: number) => {
-      const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null
-      if (select) {
-        select.value = code
-        select.dispatchEvent(new Event('change'))
-      } else if (retries > 0) {
-        setTimeout(() => attempt(retries - 1), 300)
-      }
-    }
-    attempt(10)
-  }
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
@@ -592,45 +523,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
                 Sign up with this timeline →
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              {/* Translate */}
-              <div className="px-2 py-1.5" onClick={e => e.stopPropagation()}>
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
-                  Translate with Google
-                </p>
-                <div className="flex gap-1 mb-2">
-                  {QUICK_LANGS.map(({ flag, code, name }) => (
-                    <button
-                      key={code}
-                      onClick={() => translateTo(code)}
-                      title={name}
-                      className="flex-1 flex flex-col items-center gap-0.5 py-1.5 rounded hover:bg-accent transition-colors"
-                    >
-                      <span className="text-xl leading-none">{flag}</span>
-                    </button>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search language…"
-                  value={langSearch}
-                  onChange={e => setLangSearch(e.target.value)}
-                  onKeyDown={e => e.stopPropagation()}
-                  className="w-full text-xs px-2 py-1.5 rounded border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground/60"
-                />
-                {filteredLangs.length > 0 && (
-                  <div className="mt-1 max-h-28 overflow-y-auto rounded border border-border bg-background">
-                    {filteredLangs.map(l => (
-                      <button
-                        key={l.code}
-                        onClick={() => { translateTo(l.code); setLangSearch('') }}
-                        className="w-full text-left px-2 py-1 text-xs hover:bg-accent transition-colors"
-                      >
-                        {l.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <TranslateMenuContent />
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
