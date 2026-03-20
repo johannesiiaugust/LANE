@@ -197,51 +197,40 @@ export function TimelineEventBar({
     )
   }
 
-  // Fade extents: if set, the bar extends further left/right with a gradient
-  const hasFadeIn = event.fadeInYear != null && event.fadeInYear < event.startYear
+  // Fade extents
+  const hasFadeIn  = event.fadeInYear  != null && event.fadeInYear  < event.startYear
   const hasFadeOut = event.fadeOutYear != null && event.fadeOutYear > (event.endYear ?? event.startYear)
-  const barStartYear = hasFadeIn ? event.fadeInYear! : event.startYear
-  const barEndYear = hasFadeOut ? event.fadeOutYear! : (event.endYear ?? event.startYear + 1)
-  const barLeft = (barStartYear - yearStart) * pixelsPerYear
-  const barWidth = (barEndYear - barStartYear) * pixelsPerYear
 
-  // Build CSS gradient for fade zones.
-  // Use color-with-alpha-0 instead of 'transparent' to avoid the browser's
-  // black-haze interpolation bug in sRGB gradient space.
-  function colorAlpha0(hex: string): string {
-    const m = /^#([0-9a-f]{6})$/i.exec(hex)
-    if (!m) return 'rgba(0,0,0,0)'
-    const r = parseInt(m[1].slice(0, 2), 16)
-    const g = parseInt(m[1].slice(2, 4), 16)
-    const b = parseInt(m[1].slice(4, 6), 16)
-    return `rgba(${r},${g},${b},0)`
-  }
+  // Geometry for the solid core
+  const mainBarLeft  = (event.startYear - yearStart) * pixelsPerYear
+  const mainBarWidth = ((event.endYear ?? event.startYear + 1) - event.startYear) * pixelsPerYear
+  const width = mainBarWidth   // used for label-width check below
 
-  let barBackground: string
-  if (hasFadeIn || hasFadeOut) {
-    const totalYears = barEndYear - barStartYear
-    const fadeInPct  = hasFadeIn  ? ((event.startYear - barStartYear) / totalYears) * 100 : 0
-    const fadeOutPct = hasFadeOut ? (((event.endYear ?? event.startYear) - barStartYear) / totalYears) * 100 : 100
-    const c0 = colorAlpha0(color)
-    const stops: string[] = []
-    // Left edge: transparent only if fading in, otherwise solid from 0
-    stops.push(hasFadeIn ? `${c0} 0%` : `${color} 0%`)
-    if (hasFadeIn)  stops.push(`${color} ${fadeInPct.toFixed(1)}%`)
-    if (hasFadeOut) stops.push(`${color} ${fadeOutPct.toFixed(1)}%`)
-    // Right edge: transparent only if fading out, otherwise solid to 100
-    stops.push(hasFadeOut ? `${c0} 100%` : `${color} 100%`)
-    barBackground = `linear-gradient(to right, ${stops.join(', ')})`
-  } else {
-    barBackground = color
-  }
+  // Geometry for fade tails
+  const fadeInTailLeft  = hasFadeIn  ? (event.fadeInYear!  - yearStart) * pixelsPerYear : 0
+  const fadeInTailWidth = hasFadeIn  ? (event.startYear    - event.fadeInYear!)  * pixelsPerYear : 0
+  const fadeOutTailLeft  = hasFadeOut ? ((event.endYear ?? event.startYear) - yearStart) * pixelsPerYear : 0
+  const fadeOutTailWidth = hasFadeOut ? (event.fadeOutYear! - (event.endYear ?? event.startYear)) * pixelsPerYear : 0
 
-  const width = ((event.endYear ?? event.startYear + 1) - event.startYear) * pixelsPerYear
+  // For sparkline gradient percentages
+  const barStartYear = hasFadeIn  ? event.fadeInYear!  : event.startYear
+  const barEndYear   = hasFadeOut ? event.fadeOutYear! : (event.endYear ?? event.startYear + 1)
+  const barLeft      = (barStartYear - yearStart) * pixelsPerYear
+  const barWidth     = (barEndYear - barStartYear) * pixelsPerYear
+  const totalFadeYears = barEndYear - barStartYear
+  const fadeInPct  = hasFadeIn  ? ((event.startYear - barStartYear) / totalFadeYears) * 100 : 0
+  const fadeOutPct = hasFadeOut ? (((event.endYear ?? event.startYear) - barStartYear) / totalFadeYears) * 100 : 100
+
   const top = (BASE_LANE_HEIGHT - BAR_HEIGHT) / 2 + topOffset + stackOff
-  // Clamp text so it stays inside the solid-color region of the bar
-  const solidStart = hasFadeIn ? (event.startYear - yearStart) * pixelsPerYear : barLeft
-  const textLeft = Math.max(4, scrollLeft - solidStart + sc.SIDEBAR_WIDTH + 4)
 
-  // Sparkline geometry
+  // Rounded corners: only remove rounding where a tail is attached
+  const roundedClass = hasFadeIn && hasFadeOut ? '' : hasFadeIn ? 'rounded-r-lg' : hasFadeOut ? 'rounded-l-lg' : 'rounded-lg'
+
+  // Sticky label: keep it inside the solid region
+  const solidLeft = (event.startYear - yearStart) * pixelsPerYear
+  const textLeft = Math.max(4, scrollLeft - solidLeft + sc.SIDEBAR_WIDTH + 4)
+
+  // Sparkline geometry — coordinates relative to barStartYear (full span incl. tails)
   let sparklinePath: string | null = null
   let projectionPath: string | null = null
   let sparklineFill: string | null = null
@@ -263,7 +252,6 @@ export function TimelineEventBar({
     const projPts = splitIdx >= 0 ? sparklineSeries.slice(splitIdx) : []
     if (histPts.length >= 2) sparklinePath = histPts.map(toXY).join(' ')
     if (projPts.length >= 2) projectionPath = projPts.map(toXY).join(' ')
-    // Filled area under the full line for 3D depth
     const allPts = sparklineSeries.map(toXY)
     const firstX = ((sparklineSeries[0].year - barStartYear) * pixelsPerYear).toFixed(1)
     const lastX  = ((sparklineSeries[sparklineSeries.length - 1].year - barStartYear) * pixelsPerYear).toFixed(1)
@@ -272,11 +260,42 @@ export function TimelineEventBar({
 
   const label = event.emoji ? `${event.emoji} ${event.title}` : event.title
 
+  // Mask for fade tails: elliptical radial gradient so the bar tapers
+  // vertically at the tip, giving a 3D feathered appearance.
+  const maskFadeIn  = 'radial-gradient(ellipse 100% 75% at 0% 50%, transparent 0%, black 90%)'
+  const maskFadeOut = 'radial-gradient(ellipse 100% 75% at 100% 50%, transparent 0%, black 90%)'
+
+  const tailStyle: React.CSSProperties = {
+    position: 'absolute',
+    top,
+    height: BAR_HEIGHT,
+    backgroundColor: color,
+    opacity: 0.88,
+    zIndex: stackZ,
+    pointerEvents: 'none',
+    ...(pastStyle ?? {}),
+    ...(draggingStyle ?? {}),
+  }
+
   return (
     <>
+      {/* Fade-in tail — tapers to a point on the left */}
+      {hasFadeIn && (
+        <div
+          style={{
+            ...tailStyle,
+            left: fadeInTailLeft,
+            width: Math.max(fadeInTailWidth, 1),
+            WebkitMaskImage: maskFadeIn,
+            maskImage: maskFadeIn,
+          }}
+        />
+      )}
+
+      {/* Main solid bar */}
       <div
-        className={`absolute cursor-pointer transition-all overflow-hidden select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50 ${hasFadeIn || hasFadeOut ? '' : 'rounded-lg'} ${grabRing}`}
-        style={{ left: barLeft, top, width: Math.max(hasFadeIn || hasFadeOut ? barWidth : width, 4), height: BAR_HEIGHT, background: barBackground, opacity: 0.88, zIndex: stackZ, boxShadow: hasFadeIn || hasFadeOut ? 'none' : '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)', ...pastStyle, ...draggingStyle }}
+        className={`absolute cursor-pointer transition-all overflow-hidden select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50 ${roundedClass} ${grabRing}`}
+        style={{ left: mainBarLeft, top, width: Math.max(width, 4), height: BAR_HEIGHT, backgroundColor: color, opacity: 0.88, zIndex: stackZ, boxShadow: '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)', ...pastStyle, ...draggingStyle }}
         title={event.title}
         {...interactionProps}
         onMouseMove={e => {
@@ -285,11 +304,10 @@ export function TimelineEventBar({
         }}
         onMouseLeave={() => { handleMouseLeave(); setTooltip(null); setImageHover(null) }}
       >
-        {/* 3D sheen — only over the solid region so it doesn't reveal fade-zone edges */}
-        {!(hasFadeIn || hasFadeOut) && (
-          <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)' }} />
-        )}
-        {sparklineSeries.length >= 2 && (
+        {/* 3D sheen */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)' }} />
+        {/* Sparkline — only in no-fade case (fade case rendered below as full-span SVG) */}
+        {!(hasFadeIn || hasFadeOut) && sparklineSeries.length >= 2 && (
           <svg className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%', overflow: 'hidden' }} preserveAspectRatio="none">
             {sparklineFill && <polygon points={sparklineFill} fill="rgba(255,255,255,0.13)" />}
             {sparklinePath && <polyline points={sparklinePath} fill="none" stroke="rgba(255,255,255,0.95)" strokeWidth={2} strokeLinejoin="round" />}
@@ -302,6 +320,47 @@ export function TimelineEventBar({
           </span>
         )}
       </div>
+
+      {/* Fade-out tail — tapers to a point on the right */}
+      {hasFadeOut && (
+        <div
+          style={{
+            ...tailStyle,
+            left: fadeOutTailLeft,
+            width: Math.max(fadeOutTailWidth, 1),
+            WebkitMaskImage: maskFadeOut,
+            maskImage: maskFadeOut,
+          }}
+        />
+      )}
+
+      {/* Full-span sparkline SVG when fade is active — uses a gradient stroke */}
+      {(hasFadeIn || hasFadeOut) && sparklineSeries.length >= 2 && (
+        <svg
+          className="absolute pointer-events-none"
+          style={{ left: barLeft, top, width: barWidth, height: BAR_HEIGHT, zIndex: (stackZ ?? 1) + 1, overflow: 'visible' }}
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <linearGradient id={`sf-${event.id}`} x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0%"   stopColor="rgba(255,255,255,0.95)" stopOpacity={hasFadeIn  ? 0 : 1} />
+              {hasFadeIn  && <stop offset={`${fadeInPct.toFixed(1)}%`}  stopColor="rgba(255,255,255,0.95)" stopOpacity={1} />}
+              {hasFadeOut && <stop offset={`${fadeOutPct.toFixed(1)}%`} stopColor="rgba(255,255,255,0.95)" stopOpacity={1} />}
+              <stop offset="100%" stopColor="rgba(255,255,255,0.95)" stopOpacity={hasFadeOut ? 0 : 1} />
+            </linearGradient>
+            <linearGradient id={`sf-proj-${event.id}`} x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0%"   stopColor="rgba(255,255,255,0.6)" stopOpacity={hasFadeIn  ? 0 : 1} />
+              {hasFadeIn  && <stop offset={`${fadeInPct.toFixed(1)}%`}  stopColor="rgba(255,255,255,0.6)" stopOpacity={1} />}
+              {hasFadeOut && <stop offset={`${fadeOutPct.toFixed(1)}%`} stopColor="rgba(255,255,255,0.6)" stopOpacity={1} />}
+              <stop offset="100%" stopColor="rgba(255,255,255,0.6)" stopOpacity={hasFadeOut ? 0 : 1} />
+            </linearGradient>
+          </defs>
+          {sparklineFill && <polygon points={sparklineFill} fill="rgba(255,255,255,0.08)" />}
+          {sparklinePath    && <polyline points={sparklinePath}    fill="none" stroke={`url(#sf-${event.id})`}      strokeWidth={2}   strokeLinejoin="round" />}
+          {projectionPath   && <polyline points={projectionPath}   fill="none" stroke={`url(#sf-proj-${event.id})`} strokeWidth={1.5} strokeDasharray="3 2" strokeLinejoin="round" />}
+        </svg>
+      )}
+
       {tooltip && <ValueTooltip title={event.title} tooltip={tooltip} />}
       {imageHover && event.metadata?.image_url && <ImageHoverThumbnail imageUrl={event.metadata.image_url} pos={imageHover} />}
       {contextMenu}
