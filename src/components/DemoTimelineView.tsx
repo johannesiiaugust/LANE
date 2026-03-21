@@ -169,10 +169,10 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const guideWasOpenRef = useRef(false)
   const guideClosedRef = useRef(false)
 
-  // Auto-open guide after 5 seconds — skip if user already completed onboarding
+  // Auto-open guide after 3.5 seconds — skip if user already completed onboarding
   useEffect(() => {
     if (localStorage.getItem('timeline_guide_completed')) return
-    const t = setTimeout(() => setGuideOpen(true), 5000)
+    const t = setTimeout(() => setGuideOpen(true), 3500)
     return () => clearTimeout(t)
   }, [])
 
@@ -181,7 +181,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
     if (guideOpen) { guideWasOpenRef.current = true }
     else if (guideWasOpenRef.current) {
       guideClosedRef.current = true
-      const t = setTimeout(() => setShowExampleOverlay(false), 10000)
+      const t = setTimeout(() => setShowExampleOverlay(false), 8000)
       return () => clearTimeout(t)
     }
   }, [guideOpen])
