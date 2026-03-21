@@ -105,6 +105,7 @@ export interface DbPersona {
   bio: string
   birth_year: number
   death_year: number | null
+  view_count?: number
 }
 
 export interface DbTimelineShare {

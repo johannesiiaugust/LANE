@@ -568,6 +568,10 @@ export async function fetchPersonas(): Promise<DbPersona[]> {
   return data ?? []
 }
 
+export async function incrementPersonaView(personaId: string): Promise<void> {
+  await supabase.rpc('increment_persona_view', { p_id: personaId })
+}
+
 export async function fetchPersonaEvents(personaIds: string[]): Promise<DbPersonaEvent[]> {
   if (personaIds.length === 0) return []
   const { data, error } = await supabase
