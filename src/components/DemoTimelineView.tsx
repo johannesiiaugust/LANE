@@ -176,10 +176,14 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
     return () => clearTimeout(t)
   }, [])
 
-  // Track when guide has been shown and then closed
+  // Track when guide has been shown and then closed; auto-hide overlay 10s after close
   useEffect(() => {
     if (guideOpen) { guideWasOpenRef.current = true }
-    else if (guideWasOpenRef.current) { guideClosedRef.current = true }
+    else if (guideWasOpenRef.current) {
+      guideClosedRef.current = true
+      const t = setTimeout(() => setShowExampleOverlay(false), 10000)
+      return () => clearTimeout(t)
+    }
   }, [guideOpen])
 
   const stepZoom = useCallback((factor: number) => {
