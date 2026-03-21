@@ -22,7 +22,7 @@ const STEPS: Step[] = [
   {
     target: 'compare',
     title: 'Compare your life with anyone',
-    text: 'Famous people, friends and others. See as-if you started the same time.',
+    text: 'Famous people, friends and others. See as if you started at the same time.',
     side: 'bottom',
     align: 'start',
   },
