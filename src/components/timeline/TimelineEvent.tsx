@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import type { TimelineEvent as TEvent } from '@/types/timeline'
 import { computeValueAtYear, generateSparklineSeries, formatValue } from '@/lib/valueCompute'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
@@ -116,6 +116,23 @@ export function TimelineEventBar({
   }
 
   const grabRing = isGrabbing ? 'ring-2 ring-primary scale-105' : ''
+
+  // Rare shimmer — random interval 4–8 s, random initial offset so bars never sync
+  const [shimmer, setShimmer] = useState(false)
+  const shimmerInitialDelay = useMemo(() => Math.random() * 4000, [event.id])
+  useEffect(() => {
+    if (event.type !== 'range') return
+    let sweepTimer: ReturnType<typeof setTimeout>
+    let schedTimer: ReturnType<typeof setTimeout>
+    function schedule() {
+      schedTimer = setTimeout(() => {
+        setShimmer(true)
+        sweepTimer = setTimeout(() => { setShimmer(false); schedule() }, 1400)
+      }, 4000 + Math.random() * 4000)
+    }
+    const initTimer = setTimeout(schedule, shimmerInitialDelay)
+    return () => { clearTimeout(initTimer); clearTimeout(schedTimer); clearTimeout(sweepTimer) }
+  }, [event.id, event.type, shimmerInitialDelay])
 
   // shared interaction props for every event element
   const interactionProps = onMoveStart ? {
@@ -350,6 +367,12 @@ export function TimelineEventBar({
         >
           {/* 3D sheen */}
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)' }} />
+          {/* Shimmer — rare light catch */}
+          {shimmer && (
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div className="absolute inset-0 animate-shimmer-sweep" style={{ background: 'linear-gradient(105deg, transparent 25%, rgba(255,255,255,0.12) 50%, transparent 75%)' }} />
+            </div>
+          )}
           {/* Sparkline — inline when no fades */}
           {!(hasFadeIn || hasFadeOut) && sparklineSeries.length >= 2 && (
             <svg className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%', overflow: 'hidden' }} preserveAspectRatio="none">
