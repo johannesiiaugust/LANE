@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
+import { DateInput } from '@/components/ui/DateInput'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import type { DbPersona, DbLane, DbTimelineShare, SharedWithMeItem } from '@/types/database'
@@ -701,14 +702,14 @@ export function TimelinePersonaSelector({
             <div className="grid gap-1.5">
               <Label>Start <span className="text-muted-foreground text-xs">(optional)</span></Label>
               <div className="flex gap-2">
-                <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="flex-1" />
+                <DateInput value={startDate} onChange={setStartDate} className="flex-1" />
                 <Input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="w-28" disabled={!startDate} />
               </div>
             </div>
             <div className="grid gap-1.5">
               <Label>End <span className="text-muted-foreground text-xs">(optional)</span></Label>
               <div className="flex gap-2">
-                <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="flex-1" />
+                <DateInput value={endDate} onChange={setEndDate} className="flex-1" />
                 <Input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="w-28" disabled={!endDate} />
               </div>
             </div>

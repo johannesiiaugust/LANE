@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { X, ChevronRight, ChevronLeft, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DateInput } from '@/components/ui/DateInput'
 import { DEMO_LANES } from '@/data/demoData'
 import { dateStrToFracYear } from '@/lib/constants'
 import type { TimelineEvent } from '@/types/timeline'
@@ -21,14 +22,14 @@ const STEPS: Step[] = [
   {
     target: 'compare',
     title: 'Compare your life with anyone',
-    text: 'Compare yourself with famous people, friends and others.',
+    text: 'Famous people, friends and others. See as if you started at the same time.',
     side: 'bottom',
     align: 'start',
   },
   {
     target: 'zoom',
     title: 'Navigate time',
-    text: 'Zoom in and out in time — slide to your future and past.',
+    text: 'Zoom in and out in time — slide to your future and past. See your wealth develop with alternative timeline paths.',
     side: 'bottom',
     align: 'end',
   },
@@ -42,7 +43,7 @@ const STEPS: Step[] = [
   {
     target: 'add-events',
     title: 'Add life events & plan with AI',
-    text: 'Add events across all LANEs of life — work, where you lived, health, and more. Then describe a future you want and our AI gives you concrete ways to reach it.',
+    text: 'Add events across all LANEs of life — work, where you lived, health, and more. Describe a future you want and our AI gives you concrete ways to reach it.',
     side: 'bottom',
     align: 'end',
   },
@@ -242,7 +243,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
           <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b">
             <div>
               <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">{step + 1} / {total}</div>
-              <h2 className="text-xl font-semibold">Start with your own story</h2>
+              <h2 className="text-xl font-semibold">Start your own story</h2>
               <p className="text-sm text-muted-foreground mt-1">Add a few events and we'll build your personal timeline.</p>
             </div>
             <button onClick={onClose} className="text-muted-foreground hover:text-foreground ml-4 mt-0.5"><X className="h-5 w-5" /></button>
@@ -253,13 +254,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
             {/* Birth date */}
             <div className="flex items-center gap-3">
               <label className="text-sm font-medium shrink-0 w-24">Birth date</label>
-              <Input
-                type="date"
-                value={birthDate}
-                onChange={e => setBirthDate(e.target.value)}
-                className="w-44 h-9"
-                min="1900-01-01" max="2020-12-31"
-              />
+              <DateInput value={birthDate} onChange={setBirthDate} minIso="1900-01-01" maxIso="2020-12-31" className="w-56" />
             </div>
 
             {/* Event rows */}
@@ -287,20 +282,10 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
                   />
 
                   {/* From / To */}
-                  <div className="flex items-center gap-1.5">
-                    <Input
-                      value={row.fromYear}
-                      onChange={e => updateRow(row.id, { fromYear: e.target.value })}
-                      className="h-8 text-sm w-36"
-                      type="date" min="1900-01-01" max="2100-12-31"
-                    />
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <DateInput value={row.fromYear} onChange={v => updateRow(row.id, { fromYear: v })} minIso="1900-01-01" maxIso="2100-12-31" />
                     <span className="text-muted-foreground text-xs">→</span>
-                    <Input
-                      value={row.toYear}
-                      onChange={e => updateRow(row.id, { toYear: e.target.value })}
-                      className="h-8 text-sm w-36"
-                      type="date" min="1900-01-01" max="2100-12-31"
-                    />
+                    <DateInput value={row.toYear} onChange={v => updateRow(row.id, { toYear: v })} minIso="1900-01-01" maxIso="2100-12-31" />
                   </div>
 
                   {/* Remove (only if more than 1 row) */}
