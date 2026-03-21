@@ -21,6 +21,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { DateInput } from '@/components/ui/DateInput'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { EmojiField } from '@/components/ui/EmojiPickerPopover'
@@ -459,12 +460,7 @@ export function TimelineSelector() {
                 <div className="grid gap-1.5">
                   <Label>Start <span className="text-muted-foreground">(optional)</span></Label>
                   <div className="flex gap-2">
-                    <Input
-                      type="date"
-                      value={startDate}
-                      onChange={e => setStartDate(e.target.value)}
-                      className="flex-1"
-                    />
+                    <DateInput value={startDate} onChange={setStartDate} className="flex-1" />
                     <Input
                       type="time"
                       value={startTime}
@@ -479,12 +475,7 @@ export function TimelineSelector() {
                 <div className="grid gap-1.5">
                   <Label>End <span className="text-muted-foreground">(optional)</span></Label>
                   <div className="flex gap-2">
-                    <Input
-                      type="date"
-                      value={endDate}
-                      onChange={e => setEndDate(e.target.value)}
-                      className="flex-1"
-                    />
+                    <DateInput value={endDate} onChange={setEndDate} className="flex-1" />
                     <Input
                       type="time"
                       value={endTime}
