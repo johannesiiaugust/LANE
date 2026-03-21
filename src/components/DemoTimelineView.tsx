@@ -163,7 +163,9 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [searchOpen, setSearchOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
   useGoogleTranslate()
-  const [showExampleOverlay, setShowExampleOverlay] = useState(true)
+  const [showExampleOverlay, setShowExampleOverlay] = useState(
+    () => !localStorage.getItem('timeline_guide_completed')
+  )
   const guideWasOpenRef = useRef(false)
   const guideClosedRef = useRef(false)
 
@@ -553,9 +555,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
 
       <div
         className="flex-1 overflow-hidden flex flex-col"
-        onClick={() => {
-          if (guideClosedRef.current) setShowExampleOverlay(false)
-        }}
+        onClick={() => setShowExampleOverlay(false)}
       >
         <TimelineContainer
           lanes={lanes}
