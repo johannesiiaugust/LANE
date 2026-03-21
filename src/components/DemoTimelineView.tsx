@@ -169,17 +169,21 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const guideWasOpenRef = useRef(false)
   const guideClosedRef = useRef(false)
 
-  // Auto-open guide after 5 seconds — skip if user already completed onboarding
+  // Auto-open guide after 3.5 seconds — skip if user already completed onboarding
   useEffect(() => {
     if (localStorage.getItem('timeline_guide_completed')) return
-    const t = setTimeout(() => setGuideOpen(true), 5000)
+    const t = setTimeout(() => setGuideOpen(true), 3500)
     return () => clearTimeout(t)
   }, [])
 
-  // Track when guide has been shown and then closed
+  // Track when guide has been shown and then closed; auto-hide overlay 10s after close
   useEffect(() => {
     if (guideOpen) { guideWasOpenRef.current = true }
-    else if (guideWasOpenRef.current) { guideClosedRef.current = true }
+    else if (guideWasOpenRef.current) {
+      guideClosedRef.current = true
+      const t = setTimeout(() => setShowExampleOverlay(false), 8000)
+      return () => clearTimeout(t)
+    }
   }, [guideOpen])
 
   const stepZoom = useCallback((factor: number) => {
