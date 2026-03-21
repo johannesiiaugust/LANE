@@ -3,6 +3,7 @@ import { X, ChevronRight, ChevronLeft, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DEMO_LANES } from '@/data/demoData'
+import { dateStrToFracYear } from '@/lib/constants'
 import type { TimelineEvent } from '@/types/timeline'
 
 // ─── Step definitions ────────────────────────────────────────────────────────
@@ -89,7 +90,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
 
   // Onboarding form state
-  const [birthYear, setBirthYear] = useState('')
+  const [birthDate, setBirthDate] = useState('')
   const [rows, setRows] = useState<UserEventRow[]>([
     makeRow('place'),
     makeRow('work'),
@@ -204,14 +205,15 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
         title: r.title.trim(),
         description: '',
         type: 'range' as const,
-        startYear: parseFloat(r.fromYear),
-        endYear: r.toYear.trim() ? parseFloat(r.toYear) : undefined,
+        startYear: dateStrToFracYear(r.fromYear),
+        endYear: r.toYear.trim() ? dateStrToFracYear(r.toYear) : undefined,
       }))
 
-    const by = parseInt(birthYear) || 1990
-    const meta = { name: 'My Life', color: '#6366f1', start_year: by - 3, end_year: null, emoji: '👤' }
+    const birthFrac = birthDate ? dateStrToFracYear(birthDate) : 1990
+    const meta = { name: 'My Life', color: '#6366f1', start_year: birthFrac, end_year: null, emoji: '👤' }
     try {
       localStorage.setItem('timeline_demo_v3', JSON.stringify({ lanes: DEMO_LANES, events, meta }))
+      localStorage.setItem('timeline_guide_completed', '1')
     } catch { /* ignore */ }
     onClose()
     window.location.reload()
@@ -235,16 +237,15 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
 
           <div className="px-6 py-5 space-y-5">
 
-            {/* Birth year */}
+            {/* Birth date */}
             <div className="flex items-center gap-3">
-              <label className="text-sm font-medium shrink-0 w-24">Birth year</label>
+              <label className="text-sm font-medium shrink-0 w-24">Birth date</label>
               <Input
-                type="number"
-                value={birthYear}
-                onChange={e => setBirthYear(e.target.value)}
-                placeholder="e.g. 1990"
-                className="w-36 h-9"
-                min={1900} max={2020}
+                type="date"
+                value={birthDate}
+                onChange={e => setBirthDate(e.target.value)}
+                className="w-44 h-9"
+                min="1900-01-01" max="2020-12-31"
               />
             </div>
 
@@ -277,17 +278,15 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
                     <Input
                       value={row.fromYear}
                       onChange={e => updateRow(row.id, { fromYear: e.target.value })}
-                      placeholder="From"
-                      className="h-8 text-sm w-20"
-                      type="number" min={1900} max={2100}
+                      className="h-8 text-sm w-36"
+                      type="date" min="1900-01-01" max="2100-12-31"
                     />
                     <span className="text-muted-foreground text-xs">→</span>
                     <Input
                       value={row.toYear}
                       onChange={e => updateRow(row.id, { toYear: e.target.value })}
-                      placeholder="To"
-                      className="h-8 text-sm w-20"
-                      type="number" min={1900} max={2100}
+                      className="h-8 text-sm w-36"
+                      type="date" min="1900-01-01" max="2100-12-31"
                     />
                   </div>
 
