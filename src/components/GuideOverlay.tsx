@@ -326,7 +326,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
               onClick={onClose}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Continue with Alex example →
+              Continue with example →
             </button>
             <Button onClick={handleStartOwn} className="min-w-[140px]">
               Get started
