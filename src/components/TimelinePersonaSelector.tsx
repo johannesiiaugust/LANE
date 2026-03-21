@@ -30,9 +30,48 @@ import type { PersonaDisplayMode } from '@/hooks/usePersonas'
 import type { OverlayDisplayMode } from '@/hooks/useTimelineOverlays'
 import type { ExternalOverlayInfo } from '@/hooks/useExternalOverlays'
 import { fracYearToMs, msToFracYear } from '@/lib/constants'
-import { fetchLanes, getTimelineShares, addTimelineShare, removeTimelineShare, lookupUserByUsername, fetchPublicProfile } from '@/lib/api'
+import { fetchLanes, getTimelineShares, addTimelineShare, removeTimelineShare, lookupUserByUsername, fetchPublicProfile, incrementPersonaView } from '@/lib/api'
 
 const DEFAULT_COLOR = '#3b82f6'
+
+function PersonaRow({
+  p,
+  activePersonaIds,
+  alignedPersonaIds,
+  onToggle,
+  onToggleAlignment,
+}: {
+  p: DbPersona
+  activePersonaIds: Set<string>
+  alignedPersonaIds: Set<string>
+  onToggle: (id: string) => void
+  onToggleAlignment: (id: string) => void
+}) {
+  const isActive = activePersonaIds.has(p.id)
+  const aligned = alignedPersonaIds.has(p.id)
+  return (
+    <div className="rounded-md px-2 py-1.5 hover:bg-accent">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-medium truncate">{p.name}</p>
+          <p className="text-xs text-muted-foreground">{p.birth_year}–{p.death_year ?? 'present'}</p>
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {isActive && (
+            <button
+              onClick={() => onToggleAlignment(p.id)}
+              title={aligned ? 'Showing age-aligned — click for real years' : 'Showing real years — click to age-align'}
+              className={cn('p-1 rounded transition-colors', aligned ? 'text-primary bg-primary/10 animate-blink-fast hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted')}
+            >
+              {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
+            </button>
+          )}
+          <Switch checked={isActive} onCheckedChange={() => onToggle(p.id)} />
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function fracYearToDateStr(fy: number): string {
   const d = new Date(fracYearToMs(fy))
@@ -382,6 +421,38 @@ export function TimelinePersonaSelector({
     setDeleteConfirmId(null)
   }
 
+  // ── Persona search + recently viewed ──────────────────────────────────────
+  const [personaSearch, setPersonaSearch] = useState('')
+  const [recentPersonaIds, setRecentPersonaIds] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('persona_recently_viewed') ?? '[]') } catch { return [] }
+  })
+
+  function handleTogglePersona(id: string) {
+    if (!activePersonaIds.has(id)) {
+      // Record as recently viewed
+      incrementPersonaView(id)
+      setRecentPersonaIds(prev => {
+        const next = [id, ...prev.filter(x => x !== id)].slice(0, 5)
+        localStorage.setItem('persona_recently_viewed', JSON.stringify(next))
+        return next
+      })
+    }
+    onTogglePersona(id)
+  }
+
+  const top5Personas = [...personas]
+    .sort((a, b) => (b.view_count ?? 0) - (a.view_count ?? 0))
+    .slice(0, 5)
+
+  const recentPersonas = recentPersonaIds
+    .map(id => personas.find(p => p.id === id))
+    .filter((p): p is DbPersona => !!p)
+
+  const searchTrimmed = personaSearch.trim().toLowerCase()
+  const searchResults = searchTrimmed.length > 0
+    ? personas.filter(p => p.name.toLowerCase().includes(searchTrimmed)).slice(0, 20)
+    : []
+
   const buttonLabel = currentTimeline?.name ?? 'Timeline'
 
   return (
@@ -609,47 +680,55 @@ export function TimelinePersonaSelector({
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
               <Users className="h-3 w-3" />
               Persona Overlays
+              {activePersonaIds.size > 0 && (
+                <span className="ml-auto rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{activePersonaIds.size}</span>
+              )}
             </p>
           </div>
           <div className="px-1 pb-2">
             {personas.length === 0 ? (
               <p className="px-2 py-2 text-xs text-muted-foreground text-center">No personas available</p>
             ) : (
-              personas.map(p => {
-                const isActive = activePersonaIds.has(p.id)
-                const aligned = alignedPersonaIds.has(p.id)
-                return (
-                  <div key={p.id} className="rounded-md px-2 py-1.5 hover:bg-accent">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{p.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {p.birth_year}–{p.death_year ?? 'present'}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {isActive && (
-                          <>
-                            <button
-                              onClick={() => onTogglePersonaAlignment(p.id)}
-                              title={aligned ? 'Showing age-aligned — click for real years' : 'Showing real years — click to age-align'}
-                              className={cn(
-                                'p-1 rounded transition-colors',
-                                aligned
-                                  ? 'text-primary bg-primary/10 animate-blink-fast hover:bg-primary/20'
-                                  : 'text-muted-foreground hover:bg-muted',
-                              )}
-                            >
-                              {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
-                            </button>
-                          </>
-                        )}
-                        <Switch checked={isActive} onCheckedChange={() => onTogglePersona(p.id)} />
-                      </div>
-                    </div>
+              <>
+                {/* Top 5 most popular */}
+                <div className="px-2 pb-1">
+                  <p className="text-[10px] font-medium text-muted-foreground mb-1">Popular</p>
+                  {top5Personas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
+                </div>
+
+                {/* Search field */}
+                <div className="px-2 py-1.5 border-t">
+                  <div className="flex gap-1.5">
+                    <Input
+                      value={personaSearch}
+                      onChange={e => setPersonaSearch(e.target.value)}
+                      placeholder="Search personas…"
+                      className="h-7 text-xs flex-1"
+                    />
+                    {personaSearch && (
+                      <button type="button" onClick={() => setPersonaSearch('')} className="shrink-0 text-muted-foreground hover:text-foreground">
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
-                )
-              })
+                  {searchResults.length > 0 && (
+                    <div className="mt-1 space-y-0.5">
+                      {searchResults.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
+                    </div>
+                  )}
+                  {searchTrimmed.length > 0 && searchResults.length === 0 && (
+                    <p className="text-[10px] text-muted-foreground mt-1">No results</p>
+                  )}
+                </div>
+
+                {/* Recently viewed */}
+                {recentPersonas.length > 0 && searchTrimmed.length === 0 && (
+                  <div className="px-2 pt-1.5 border-t">
+                    <p className="text-[10px] font-medium text-muted-foreground mb-1">Recently viewed</p>
+                    {recentPersonas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </PopoverContent>
