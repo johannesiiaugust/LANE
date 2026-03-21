@@ -81,8 +81,8 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
 
   const currentTimeline = timelines.find(t => t.id === selectedTimelineId) ?? timelines[0]
 
-  // Alex Weber's birth year — used for age-aligning persona overlays
-  const DEMO_BIRTH_YEAR = DEMO_TIMELINE_START_YEAR
+  // Birth year for age-aligning persona overlays — use user's own if saved, else Alex's
+  const DEMO_BIRTH_YEAR = currentTimeline?.start_year ?? DEMO_TIMELINE_START_YEAR
 
   const {
     personas,
@@ -167,8 +167,9 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const guideWasOpenRef = useRef(false)
   const guideClosedRef = useRef(false)
 
-  // Auto-open guide after 5 seconds on the landing page
+  // Auto-open guide after 5 seconds — skip if user already completed onboarding
   useEffect(() => {
+    if (localStorage.getItem('timeline_guide_completed')) return
     const t = setTimeout(() => setGuideOpen(true), 5000)
     return () => clearTimeout(t)
   }, [])
