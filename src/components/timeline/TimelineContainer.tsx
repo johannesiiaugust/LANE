@@ -1131,8 +1131,6 @@ export function TimelineContainer({
 
   return (
     <div ref={containerRef} className="relative flex-1 overflow-hidden">
-      {/* Subtle vignette — dims edges very slightly, like room lighting */}
-      <div className="absolute inset-0 pointer-events-none z-[90]" style={{ background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.18) 100%)' }} />
       {/* Floating cursor date popup — fixed so it always appears next to the mouse */}
       <div
         ref={cursorPopupRef}
