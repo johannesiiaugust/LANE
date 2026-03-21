@@ -41,6 +41,7 @@ import {
 } from 'lucide-react'
 import { MIN_PIXELS_PER_YEAR, MAX_PIXELS_PER_YEAR, SIDEBAR_WIDTH, fracYearToMs, msToFracYear } from '@/lib/constants'
 import { Input } from '@/components/ui/input'
+import { DateInput } from '@/components/ui/DateInput'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -337,7 +338,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
                   </div>
                   <div>
                     <p className="text-[10px] text-muted-foreground mb-0.5">Start date</p>
-                    <Input type="date" value={tlEditStartDate} onChange={e => setTlEditStartDate(e.target.value)} className="h-7 text-xs" />
+                    <DateInput value={tlEditStartDate} onChange={setTlEditStartDate} />
                   </div>
                   <div className="flex gap-1.5 justify-end">
                     <button onClick={() => setTlEditOpen(false)} className="p-1 text-muted-foreground hover:text-foreground rounded"><X className="h-3.5 w-3.5" /></button>
