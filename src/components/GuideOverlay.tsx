@@ -114,20 +114,33 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
     return () => window.removeEventListener('resize', measure)
   }, [open, measure])
 
+  // Use a ref so the Escape handler always calls the latest dismiss logic
+  const dismissRef = useRef<() => void>(onClose)
+
   useEffect(() => {
     if (!open) return
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') dismissRef.current() }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [open, onClose])
+  }, [open])
 
   if (!open) return null
 
   const current = STEPS[step]
   const total   = STEPS.length
 
+  const onboardingStep = STEPS.length - 1
+
+  // Dismissing a spotlight step jumps to the onboarding step instead of closing.
+  // Only the onboarding step itself actually closes on X / backdrop.
+  function handleDismiss() {
+    if (current.isOnboarding) onClose()
+    else setStep(onboardingStep)
+  }
+  dismissRef.current = handleDismiss
+
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === overlayRef.current) onClose()
+    if (e.target === overlayRef.current) handleDismiss()
   }
 
   // ── Spotlight geometry ────────────────────────────────────────────────────
@@ -364,7 +377,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
 
         <div className="flex items-start justify-between px-4 pt-4 pb-2">
           <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{step + 1} / {total}</span>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors -mt-0.5 -mr-1">
+          <button onClick={handleDismiss} className="text-muted-foreground hover:text-foreground transition-colors -mt-0.5 -mr-1">
             <X className="h-4 w-4" />
           </button>
         </div>
