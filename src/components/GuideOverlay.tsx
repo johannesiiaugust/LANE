@@ -22,14 +22,14 @@ const STEPS: Step[] = [
   {
     target: 'compare',
     title: 'Compare your life with anyone',
-    text: 'Compare yourself with famous people, friends and others.',
+    text: 'Famous people, friends and others. See as-if you started the same time.',
     side: 'bottom',
     align: 'start',
   },
   {
     target: 'zoom',
     title: 'Navigate time',
-    text: 'Zoom in and out in time — slide to your future and past.',
+    text: 'Zoom in and out in time — slide to your future and past. See your wealth develop with alternative timeline paths.',
     side: 'bottom',
     align: 'end',
   },
@@ -43,7 +43,7 @@ const STEPS: Step[] = [
   {
     target: 'add-events',
     title: 'Add life events & plan with AI',
-    text: 'Add events across all LANEs of life — work, where you lived, health, and more. Then describe a future you want and our AI gives you concrete ways to reach it.',
+    text: 'Add events across all LANEs of life — work, where you lived, health, and more. Describe a future you want and our AI gives you concrete ways to reach it.',
     side: 'bottom',
     align: 'end',
   },
