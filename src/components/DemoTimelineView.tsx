@@ -521,7 +521,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onSignUpWithTimeline}>
-                Sign up with this timeline →
+                Continue with this timeline →
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <TranslateMenuContent />

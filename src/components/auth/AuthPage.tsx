@@ -11,11 +11,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/Footer'
 
-type AuthMode = 'sign-in' | 'sign-up' | 'forgot-password' | 'check-email'
+type AuthMode = 'landing' | 'sign-in' | 'sign-up' | 'forgot-password' | 'check-email'
 
 export function AuthPage() {
   useTitle('LifeLANE — Try the demo')
-  const [mode, setMode] = useState<AuthMode>('sign-in')
+  const [mode, setMode] = useState<AuthMode>('landing')
   const [authOpen, setAuthOpen] = useState(false)
   const [fromDemo, setFromDemo] = useState(false)
 
@@ -27,11 +27,9 @@ export function AuthPage() {
     setTimeout(() => setAuthOpen(true), 50)
   }
 
-  const modeLabel: Record<AuthMode, string> = {
-    'sign-in': 'Sign In',
-    'sign-up': 'Create Account',
-    'forgot-password': 'Reset Password',
-    'check-email': 'Check Email',
+  function openLanding() {
+    setMode('landing')
+    setAuthOpen(true)
   }
 
   return (
@@ -52,9 +50,24 @@ export function AuthPage() {
         {/* Auth popover anchored top-right */}
         <Popover open={authOpen} onOpenChange={setAuthOpen}>
           <PopoverTrigger asChild>
-            <Button size="sm">{modeLabel[mode]}</Button>
+            <Button size="sm" onClick={openLanding}>Start your life</Button>
           </PopoverTrigger>
           <PopoverContent align="end" sideOffset={8} className="w-80 p-4 max-h-[85vh] overflow-y-auto">
+            {mode === 'landing' && (
+              <div className="space-y-3">
+                <p className="text-sm font-semibold">Get started</p>
+                <Button className="w-full" onClick={() => { setFromDemo(true); localStorage.setItem('timeline_import_demo', '1'); setMode('sign-up') }}>
+                  Continue with this timeline
+                </Button>
+                <Button variant="outline" className="w-full" onClick={() => { setFromDemo(false); setMode('sign-up') }}>
+                  Create account
+                </Button>
+                <p className="text-center text-xs text-muted-foreground pt-1">
+                  Already have an account?{' '}
+                  <button className="underline hover:text-foreground" onClick={() => setMode('sign-in')}>Sign in</button>
+                </p>
+              </div>
+            )}
             {mode === 'sign-in' && (
               <SignInForm
                 onSwitchToSignUp={() => setMode('sign-up')}
