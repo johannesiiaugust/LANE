@@ -81,8 +81,8 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
 
   const currentTimeline = timelines.find(t => t.id === selectedTimelineId) ?? timelines[0]
 
-  // Alex Weber's birth year — used for age-aligning persona overlays
-  const DEMO_BIRTH_YEAR = DEMO_TIMELINE_START_YEAR
+  // Birth year for age-aligning persona overlays — use user's own if saved, else Alex's
+  const DEMO_BIRTH_YEAR = currentTimeline?.start_year ?? DEMO_TIMELINE_START_YEAR
 
   const {
     personas,
@@ -163,12 +163,15 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [searchOpen, setSearchOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
   useGoogleTranslate()
-  const [showExampleOverlay, setShowExampleOverlay] = useState(true)
+  const [showExampleOverlay, setShowExampleOverlay] = useState(
+    () => !localStorage.getItem('timeline_guide_completed')
+  )
   const guideWasOpenRef = useRef(false)
   const guideClosedRef = useRef(false)
 
-  // Auto-open guide after 5 seconds on the landing page
+  // Auto-open guide after 5 seconds — skip if user already completed onboarding
   useEffect(() => {
+    if (localStorage.getItem('timeline_guide_completed')) return
     const t = setTimeout(() => setGuideOpen(true), 5000)
     return () => clearTimeout(t)
   }, [])
@@ -520,7 +523,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onSignUpWithTimeline}>
-                Sign up with this timeline →
+                Continue with this timeline →
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <TranslateMenuContent />
@@ -552,9 +555,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
 
       <div
         className="flex-1 overflow-hidden flex flex-col"
-        onClick={() => {
-          if (guideClosedRef.current) setShowExampleOverlay(false)
-        }}
+        onClick={() => setShowExampleOverlay(false)}
       >
         <TimelineContainer
           lanes={lanes}
