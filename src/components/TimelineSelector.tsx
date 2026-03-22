@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ChevronDown, Plus, Pencil, Trash2, X, Copy, UserPlus } from 'lucide-react'
+import { ChevronDown, Plus, Pencil, Trash2, X, Copy, UserPlus, Users } from 'lucide-react'
 import { useTimelineContext } from '@/contexts/TimelineContext'
 import { fracYearToMs, msToFracYear } from '@/lib/constants'
 import { fetchLanes, getTimelineShares, addTimelineShare, removeTimelineShare, lookupUserByUsername } from '@/lib/api'
@@ -124,7 +124,6 @@ export function TimelineSelector() {
     return () => { cancelled = true }
   }, [copySourceId])
 
-  const currentTimeline = timelines.find(t => t.id === selectedTimelineId)
 
   function handleCreate() {
     setDialogMode('create')
@@ -252,16 +251,9 @@ export function TimelineSelector() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="max-w-48 gap-1.5">
-            {currentTimeline?.emoji ? (
-              <span className="shrink-0">{currentTimeline.emoji}</span>
-            ) : currentTimeline?.color ? (
-              <span
-                className="h-2.5 w-2.5 rounded-full shrink-0"
-                style={{ backgroundColor: currentTimeline.color }}
-              />
-            ) : null}
-            <span className="truncate">{currentTimeline?.name ?? 'Timeline'}</span>
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <Users className="h-4 w-4 shrink-0" />
+            <span>Timelines</span>
             <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-50" />
           </Button>
         </DropdownMenuTrigger>

@@ -477,6 +477,7 @@ function TimelineView() {
               overlayEvents={displayedOverlayEvents}
               overlayDisplayModes={mergedOverlayDisplayModes}
               activeOverlayTimelines={[...activeOverlayTimelines, ...externalOverlayTimelines]}
+              timelineName={selectedTimeline?.name}
             />
 
             {/* Event popover */}

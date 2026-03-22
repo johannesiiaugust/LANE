@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useState } from 'react'
 import { useGoogleTranslate, TranslateMenuContent } from '@/components/TranslateMenu'
-import { Plus, ZoomIn, ZoomOut, MoreHorizontal, CalendarSearch, Globe, FileText, Mic, Search, LogOut, UserPen } from 'lucide-react' // Globe kept for import menu item
+import { Plus, ZoomIn, ZoomOut, MoreHorizontal, CalendarSearch, Search, LogOut, UserPen } from 'lucide-react' // Globe kept for import menu item
 import { Button } from '@/components/ui/button'
 import { TimelinePersonaSelector } from '@/components/TimelinePersonaSelector'
 import { ProfileDialog } from '@/components/ProfileDialog'
@@ -351,19 +351,7 @@ export function Toolbar({
                 {/* Import */}
                 <DropdownMenuItem onClick={() => openImport('calendar-file')}>
                   <CalendarSearch className="h-4 w-4 mr-2" />
-                  Import Calendar File
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => openImport('google-calendar')}>
-                  <Globe className="h-4 w-4 mr-2" />
-                  Import Google Calendar
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => openImport('text')}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Import from Text
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => openImport('voice')}>
-                  <Mic className="h-4 w-4 mr-2" />
-                  Import from Voice
+                  Import Calendar File, Google or text/voice with AI
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
