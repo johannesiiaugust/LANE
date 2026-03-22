@@ -54,7 +54,7 @@ interface DemoTimelineViewProps {
 
 const SIZE_NAMES: Record<UiSize, string> = { small: 'Small', medium: 'Medium', large: 'Large', fitscreen: 'Fit Screen' }
 
-function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) {
+function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: DemoTimelineViewProps) {
   const {
     lanes,
     events,
@@ -576,10 +576,6 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
               <DropdownMenuItem onClick={() => openImport('calendar-file')}>
                 <CalendarDays className="h-4 w-4 mr-2" />
                 Import Calendar File, Google or text/voice with AI
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onSignUpWithTimeline}>
-                Continue with this timeline →
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <TranslateMenuContent />
