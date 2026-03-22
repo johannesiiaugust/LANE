@@ -51,6 +51,7 @@ interface LaneSidebarProps {
   onEditLane: (lane: Lane) => void
   onDeleteLane: (lane: Lane) => void
   totalAssetsHeight?: number
+  timelineName?: string
 }
 
 export function LaneSidebar({
@@ -77,6 +78,7 @@ export function LaneSidebar({
   onEditLane,
   onDeleteLane,
   totalAssetsHeight,
+  timelineName,
 }: LaneSidebarProps) {
   const [showHidden, setShowHidden] = useState(false)
   const { sc } = useSizeConfig()
@@ -101,8 +103,24 @@ export function LaneSidebar({
 
   return (
     <div className="bg-background" style={{ minWidth: W, width: W }}>
-      {/* header spacer */}
-      <div className="border-b bg-background" style={{ height: HEADER_HEIGHT }} />
+      {/* A1 cell — timeline name */}
+      <div
+        className="border-b bg-background flex items-end overflow-hidden"
+        style={{ height: HEADER_HEIGHT, paddingLeft: Math.round(W * 0.08), paddingRight: Math.round(W * 0.04), paddingBottom: Math.round(SIDEBAR_FONT * 0.3) }}
+      >
+        {timelineName && (
+          <span
+            className="font-semibold truncate text-foreground/80"
+            style={{
+              fontSize: SIDEBAR_FONT,
+              maskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
+              WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
+            }}
+          >
+            {timelineName}
+          </span>
+        )}
+      </div>
 
       {lanes.map((lane, i) => {
         const height = laneHeights[i] ?? BASE_LANE_HEIGHT

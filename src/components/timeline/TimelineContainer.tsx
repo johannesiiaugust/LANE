@@ -140,6 +140,7 @@ interface TimelineContainerProps {
   overlayDisplayModes?: Map<string, OverlayDisplayMode>
   activeOverlayTimelines?: DbTimeline[]
   onTodayVisibilityChange?: (offScreen: { direction: 'left' | 'right' } | null) => void
+  timelineName?: string
 }
 
 export function TimelineContainer({
@@ -169,6 +170,7 @@ export function TimelineContainer({
   overlayDisplayModes: _overlayDisplayModes = new Map(),
   activeOverlayTimelines = [],
   onTodayVisibilityChange,
+  timelineName,
 }: TimelineContainerProps) {
   const { sc, size, updateFitScreenConfig } = useSizeConfig()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, TOTAL_ASSETS_HEIGHT } = sc
@@ -1145,6 +1147,7 @@ export function TimelineContainer({
       >
         <div ref={sidebarInnerRef} className="pointer-events-auto">
           <LaneSidebar
+            timelineName={timelineName}
             lanes={visibleLanes}
             hiddenLanes={hiddenLanes}
             laneHeights={laneHeights}
