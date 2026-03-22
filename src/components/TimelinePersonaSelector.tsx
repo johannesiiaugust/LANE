@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { ChevronDown, ChevronRight, Plus, Pencil, Trash2, Users, Link2, Link2Off, Star, Copy, UserPlus, X, Globe, Search, ListX } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -30,7 +30,7 @@ import type { PersonaDisplayMode } from '@/hooks/usePersonas'
 import type { OverlayDisplayMode } from '@/hooks/useTimelineOverlays'
 import type { ExternalOverlayInfo } from '@/hooks/useExternalOverlays'
 import { fracYearToMs, msToFracYear } from '@/lib/constants'
-import { fetchLanes, getTimelineShares, addTimelineShare, removeTimelineShare, lookupUserByUsername, fetchPublicProfile, incrementPersonaView } from '@/lib/api'
+import { fetchLanes, getTimelineShares, addTimelineShare, removeTimelineShare, lookupUserByUsername, fetchPublicProfile, searchUsernames, incrementPersonaView } from '@/lib/api'
 
 const DEFAULT_COLOR = '#3b82f6'
 
@@ -198,14 +198,14 @@ export function TimelinePersonaSelector({
   const [userSearchError, setUserSearchError] = useState<string | null>(null)
   const [userSearchResults, setUserSearchResults] = useState<ExternalOverlayInfo[]>([])
   const [userSearchAccess, setUserSearchAccess] = useState<Map<string, 'public' | 'shared' | 'both'>>(new Map())
+  const [usernameSuggestions, setUsernameSuggestions] = useState<{ username: string; display_name: string }[]>([])
+  const userSearchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const handleUserSearch = useCallback(async () => {
-    const username = userSearchInput.trim().toLowerCase()
-    if (!username) return
+  // Load timelines for a specific username (called when suggestion is picked or on exact match)
+  const loadUserTimelines = useCallback(async (username: string) => {
     setUserSearching(true)
     setUserSearchError(null)
-    setUserSearchResults([])
-    setUserSearchAccess(new Map())
+    setUsernameSuggestions([])
 
     const profile = await fetchPublicProfile(username)
     const publicIds = new Set<string>()
@@ -216,23 +216,23 @@ export function TimelinePersonaSelector({
         })
       : []
 
-    const sharedIds = new Set<string>()
-    const sharedResults: ExternalOverlayInfo[] = sharedWithMe
+    const sharedExact = new Set<string>()
+    const sharedExactResults: ExternalOverlayInfo[] = sharedWithMe
       .filter(item => (item.owner.username ?? '').toLowerCase() === username)
       .map(item => {
-        sharedIds.add(item.timeline.id)
+        sharedExact.add(item.timeline.id)
         return { username: item.owner.username ?? '', timelineId: item.timeline.id, timelineName: item.timeline.name, displayName: item.owner.display_name || item.owner.username || '', startYear: item.timeline.start_year ?? null }
       })
 
     const seen = new Set<string>()
     const results: ExternalOverlayInfo[] = []
-    for (const r of [...publicResults, ...sharedResults]) {
+    for (const r of [...publicResults, ...sharedExactResults]) {
       if (!seen.has(r.timelineId)) { seen.add(r.timelineId); results.push(r) }
     }
 
     const access = new Map<string, 'public' | 'shared' | 'both'>()
     for (const id of seen) {
-      if (publicIds.has(id) && sharedIds.has(id)) access.set(id, 'both')
+      if (publicIds.has(id) && sharedExact.has(id)) access.set(id, 'both')
       else if (publicIds.has(id)) access.set(id, 'public')
       else access.set(id, 'shared')
     }
@@ -240,12 +240,46 @@ export function TimelinePersonaSelector({
     if (results.length === 0) {
       setUserSearchError(profile
         ? `@${username} has no public timelines and hasn't shared any with you`
-        : `No profile found for @${username}`)
+        : `No user found for @${username}`)
+      setUserSearchResults([])
+      setUserSearchAccess(new Map())
     } else {
       setUserSearchResults(results)
       setUserSearchAccess(access)
+      setUserSearchError(null)
     }
     setUserSearching(false)
+  }, [sharedWithMe])
+
+  // Debounced prefix search → suggestions
+  useEffect(() => {
+    const query = userSearchInput.trim().toLowerCase()
+
+    if (!query) {
+      setUsernameSuggestions([])
+      setUserSearchResults([])
+      setUserSearchError(null)
+      setUserSearching(false)
+      if (userSearchDebounce.current) clearTimeout(userSearchDebounce.current)
+      return
+    }
+
+    // Instant suggestions from sharedWithMe
+    const sharedSuggestions = sharedWithMe
+      .filter(item => (item.owner.username ?? '').toLowerCase().startsWith(query))
+      .map(item => ({ username: item.owner.username ?? '', display_name: item.owner.display_name || item.owner.username || '' }))
+    setUsernameSuggestions(sharedSuggestions)
+
+    if (userSearchDebounce.current) clearTimeout(userSearchDebounce.current)
+    userSearchDebounce.current = setTimeout(async () => {
+      const suggestions = await searchUsernames(query)
+      // Merge with sharedWithMe suggestions (dedupe by username)
+      const seen = new Set(suggestions.map(s => s.username))
+      const merged = [...suggestions, ...sharedSuggestions.filter(s => !seen.has(s.username))]
+      setUsernameSuggestions(merged)
+    }, 200)
+
+    return () => { if (userSearchDebounce.current) clearTimeout(userSearchDebounce.current) }
   }, [userSearchInput, sharedWithMe])
 
   const isRealSource = (id: string) => id !== COPY_DEFAULTS && id !== COPY_EMPTY
@@ -677,18 +711,40 @@ export function TimelinePersonaSelector({
             {/* Search for user timelines */}
             <div className={cn('px-2 py-1.5 space-y-1.5', (sharedWithMe.length > 0 || externalStored.length > 0) && 'border-t mt-1 pt-2')}>
               <p className="text-[10px] font-medium text-muted-foreground">Find timelines by username</p>
-              <div className="flex gap-1.5">
+              <div className="relative flex items-center">
+                <Search className="absolute left-2 h-3 w-3 text-muted-foreground pointer-events-none" />
                 <Input
                   value={userSearchInput}
-                  onChange={e => { setUserSearchInput(e.target.value); setUserSearchError(null); setUserSearchResults([]) }}
-                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleUserSearch())}
-                  placeholder="username"
-                  className="h-7 text-xs flex-1"
+                  onChange={e => { setUserSearchInput(e.target.value); setUserSearchResults([]); setUserSearchError(null) }}
+                  placeholder="Search by username…"
+                  className="h-7 text-xs pl-6 pr-6"
+                  autoComplete="off"
                 />
-                <Button type="button" size="sm" className="h-7 px-2 shrink-0" onClick={handleUserSearch} disabled={userSearching || !userSearchInput.trim()}>
-                  <Search className="h-3.5 w-3.5" />
-                </Button>
+                {userSearchInput && (
+                  <button type="button" onClick={() => { setUserSearchInput(''); setUsernameSuggestions([]); setUserSearchResults([]); setUserSearchError(null) }} className="absolute right-1.5 text-muted-foreground hover:text-foreground">
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
               </div>
+              {/* Username suggestions (prefix match) */}
+              {usernameSuggestions.length > 0 && userSearchResults.length === 0 && (
+                <div className="space-y-0.5">
+                  {usernameSuggestions.map(s => (
+                    <button
+                      key={s.username}
+                      type="button"
+                      className="w-full flex items-center gap-2 rounded px-2 py-1 hover:bg-accent text-left"
+                      onClick={() => { setUserSearchInput(s.username); loadUserTimelines(s.username) }}
+                    >
+                      <Users className="h-3 w-3 shrink-0 text-muted-foreground" />
+                      <span className="text-xs font-medium">@{s.username}</span>
+                      {s.display_name && s.display_name !== s.username && (
+                        <span className="text-[10px] text-muted-foreground truncate">{s.display_name}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
               {userSearching && <p className="text-[10px] text-muted-foreground">Searching…</p>}
               {userSearchError && <p className="text-[10px] text-destructive">{userSearchError}</p>}
               {userSearchResults.length > 0 && (
