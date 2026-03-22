@@ -128,6 +128,12 @@ export async function fetchPublicProfile(username: string): Promise<PublicProfil
   return data as PublicProfileData
 }
 
+export async function searchUsernames(query: string): Promise<{ username: string; display_name: string; avatar_url: string | null }[]> {
+  const { data, error } = await supabase.rpc('search_usernames', { p_query: query.toLowerCase(), p_limit: 8 })
+  if (error || !data) return []
+  return data as { username: string; display_name: string; avatar_url: string | null }[]
+}
+
 export async function isUsernameAvailable(username: string): Promise<boolean> {
   const { data } = await supabase.rpc('is_username_available', { p_username: username })
   return data === true
