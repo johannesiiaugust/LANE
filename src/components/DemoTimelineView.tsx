@@ -665,7 +665,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
           overlayEvents={[]}
           overlayDisplayModes={new Map()}
           activeOverlayTimelines={[]}
-          timelineName={localStorage.getItem('timeline_guide_completed') ? (currentTimeline?.name ?? 'My Life') : 'Example'}
+          timelineName={localStorage.getItem('timeline_guide_completed') ? (currentTimeline?.name ?? 'My Life') : 'Example - edit me!'}
         />
       </div>
 
