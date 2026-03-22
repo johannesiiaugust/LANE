@@ -14,7 +14,7 @@ import { Footer } from '@/components/Footer'
 type AuthMode = 'landing' | 'sign-in' | 'sign-up' | 'forgot-password' | 'check-email'
 
 export function AuthPage() {
-  useTitle('LifeLANE — Try the demo')
+  useTitle('LifeLANE — Start your life')
   const [mode, setMode] = useState<AuthMode>('landing')
   const [authOpen, setAuthOpen] = useState(false)
   const [fromDemo, setFromDemo] = useState(false)
