@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ChevronDown, ChevronRight, Plus, Pencil, Trash2, Users, Link2, Link2Off, Star, Copy, UserPlus, X, Globe, Search } from 'lucide-react'
+import { ChevronDown, ChevronRight, Plus, Pencil, Trash2, Users, Link2, Link2Off, Star, Copy, UserPlus, X, Globe, Search, ListX } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
@@ -476,13 +476,24 @@ export function TimelinePersonaSelector({
         </PopoverTrigger>
         <PopoverContent align="start" className="w-72 p-0 max-h-[85vh] overflow-y-auto">
           {/* ── Timelines ── */}
-          <button
-            className="w-full flex items-center gap-1.5 px-3 pt-2 pb-1 text-left hover:bg-accent/50 transition-colors"
-            onClick={() => toggleSection('tl_section_timelines', timelinesOpen, setTimelinesOpen)}
-          >
-            {timelinesOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex-1">Timelines</p>
-          </button>
+          <div className="flex items-center hover:bg-accent/50 transition-colors">
+            <button
+              className="flex items-center gap-1.5 px-3 pt-2 pb-1 text-left flex-1 min-w-0"
+              onClick={() => toggleSection('tl_section_timelines', timelinesOpen, setTimelinesOpen)}
+            >
+              {timelinesOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex-1">Timelines</p>
+            </button>
+            {otherTimelines.some(t => activeOverlayIds.has(t.id)) && (
+              <button
+                className="pr-3 pt-2 pb-1 text-[10px] text-muted-foreground hover:text-foreground shrink-0"
+                title="Deselect all"
+                onClick={() => otherTimelines.filter(t => activeOverlayIds.has(t.id)).forEach(t => onToggleOverlay(t.id))}
+              >
+                <ListX className="h-3 w-3" />
+              </button>
+            )}
+          </div>
           {timelinesOpen && <div className="px-1 pb-1">
             {/* Main (selected) timeline */}
             {currentTimeline && (
@@ -575,19 +586,30 @@ export function TimelinePersonaSelector({
           </div>}
 
           {/* ── Other Users (external overlays) ── */}
-          <button
-            className="w-full flex items-center gap-1.5 px-3 pt-2 pb-1 text-left border-t hover:bg-accent/50 transition-colors"
-            onClick={() => toggleSection('tl_section_users', otherUsersOpen, setOtherUsersOpen)}
-          >
-            {otherUsersOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 flex-1">
-              <Globe className="h-3 w-3" />
-              Other Users
-              {externalActiveIds.size > 0 && (
-                <span className="ml-1 rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{externalActiveIds.size}</span>
-              )}
-            </p>
-          </button>
+          <div className="flex items-center border-t hover:bg-accent/50 transition-colors">
+            <button
+              className="flex items-center gap-1.5 px-3 pt-2 pb-1 text-left flex-1 min-w-0"
+              onClick={() => toggleSection('tl_section_users', otherUsersOpen, setOtherUsersOpen)}
+            >
+              {otherUsersOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 flex-1">
+                <Globe className="h-3 w-3" />
+                Other Users
+                {externalActiveIds.size > 0 && (
+                  <span className="ml-1 rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{externalActiveIds.size}</span>
+                )}
+              </p>
+            </button>
+            {externalActiveIds.size > 0 && (
+              <button
+                className="pr-3 pt-2 pb-1 text-[10px] text-muted-foreground hover:text-foreground shrink-0"
+                title="Deselect all"
+                onClick={() => externalStored.filter(s => externalActiveIds.has(s.timelineId)).forEach(s => onToggleExternalActive?.(s.timelineId))}
+              >
+                <ListX className="h-3 w-3" />
+              </button>
+            )}
+          </div>
           {otherUsersOpen && <div className="px-1 pb-1">
             {/* Shared with you */}
             {sharedWithMe.length > 0 && (
@@ -694,19 +716,30 @@ export function TimelinePersonaSelector({
           </div>}
 
           {/* ── Personas ── */}
-          <button
-            className="w-full flex items-center gap-1.5 px-3 pt-2 pb-1 text-left border-t hover:bg-accent/50 transition-colors"
-            onClick={() => toggleSection('tl_section_personas', personasOpen, setPersonasOpen)}
-          >
-            {personasOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 flex-1">
-              <Users className="h-3 w-3" />
-              Personas
-              {activePersonaIds.size > 0 && (
-                <span className="ml-1 rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{activePersonaIds.size}</span>
-              )}
-            </p>
-          </button>
+          <div className="flex items-center border-t hover:bg-accent/50 transition-colors">
+            <button
+              className="flex items-center gap-1.5 px-3 pt-2 pb-1 text-left flex-1 min-w-0"
+              onClick={() => toggleSection('tl_section_personas', personasOpen, setPersonasOpen)}
+            >
+              {personasOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 flex-1">
+                <Users className="h-3 w-3" />
+                Personas
+                {activePersonaIds.size > 0 && (
+                  <span className="ml-1 rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{activePersonaIds.size}</span>
+                )}
+              </p>
+            </button>
+            {activePersonaIds.size > 0 && (
+              <button
+                className="pr-3 pt-2 pb-1 text-[10px] text-muted-foreground hover:text-foreground shrink-0"
+                title="Deselect all"
+                onClick={() => [...activePersonaIds].forEach(id => onTogglePersona(id))}
+              >
+                <ListX className="h-3 w-3" />
+              </button>
+            )}
+          </div>
           {personasOpen && <div className="px-1 pb-2">
             {personas.length === 0 ? (
               <p className="px-2 py-2 text-xs text-muted-foreground text-center">No personas available</p>
