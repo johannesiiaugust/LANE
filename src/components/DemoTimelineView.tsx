@@ -25,9 +25,6 @@ import {
   ZoomOut,
   MoreHorizontal,
   CalendarDays,
-  Globe,
-  FileText,
-  Mic,
   Search,
   Users,
   Link2,
@@ -578,19 +575,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
               {/* Import */}
               <DropdownMenuItem onClick={() => openImport('calendar-file')}>
                 <CalendarDays className="h-4 w-4 mr-2" />
-                Import Calendar File
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => openImport('google-calendar')}>
-                <Globe className="h-4 w-4 mr-2" />
-                Import Google Calendar
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => openImport('text')}>
-                <FileText className="h-4 w-4 mr-2" />
-                Import from Text
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => openImport('voice')}>
-                <Mic className="h-4 w-4 mr-2" />
-                Import from Voice
+                Import Calendar File, Google or text/voice with AI
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onSignUpWithTimeline}>
