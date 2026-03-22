@@ -111,11 +111,7 @@ export function LaneSidebar({
         {timelineName && (
           <span
             className="font-semibold truncate text-foreground/80"
-            style={{
-              fontSize: SIDEBAR_FONT,
-              maskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
-              WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
-            }}
+            style={{ fontSize: SIDEBAR_FONT }}
           >
             {timelineName}
           </span>
