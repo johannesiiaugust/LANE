@@ -525,6 +525,11 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
           <ZoomIn className="h-4 w-4" />
         </Button>
 
+        {/* How to use */}
+        <Button variant="outline" size="sm" onClick={() => setGuideOpen(true)} title="How to use" className="px-2 text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950">
+          <span className="font-bold text-base leading-none">?</span>
+        </Button>
+
         {/* Add dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -553,11 +558,6 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-52">
             <div className="max-h-[70vh] overflow-y-auto">
-              <DropdownMenuItem onClick={() => setGuideOpen(true)}>
-                <span className="mr-2 text-sm">❓</span>
-                How to use
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setSearchOpen(true)}>
                 <Search className="h-4 w-4 mr-2" />
                 Search Events
@@ -665,6 +665,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
           overlayEvents={[]}
           overlayDisplayModes={new Map()}
           activeOverlayTimelines={[]}
+          timelineName={localStorage.getItem('timeline_guide_completed') ? (currentTimeline?.name ?? 'My Life') : 'Example'}
         />
       </div>
 
