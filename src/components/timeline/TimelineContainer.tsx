@@ -1243,6 +1243,8 @@ export function TimelineContainer({
                 currentYear={currentYear}
                 laneRowCounts={laneRowCounts}
                 laneEventRowMaps={laneEventRowMaps}
+                scrollLeft={scrollLeft}
+                viewportWidth={viewportWidth}
               />
             )
           })}
@@ -1265,6 +1267,8 @@ export function TimelineContainer({
                 currentYear={currentYear}
                 laneRowCounts={laneRowCounts}
                 laneEventRowMaps={laneEventRowMaps}
+                scrollLeft={scrollLeft}
+                viewportWidth={viewportWidth}
               />
             )
           })}
