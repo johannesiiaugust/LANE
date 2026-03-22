@@ -60,7 +60,7 @@ export function AuthPage() {
                   Continue with this timeline
                 </Button>
                 <Button variant="outline" className="w-full" onClick={() => { setFromDemo(false); setMode('sign-up') }}>
-                  Create account
+                  Create account (blank timeline)
                 </Button>
                 <p className="text-center text-xs text-muted-foreground pt-1">
                   Already have an account?{' '}

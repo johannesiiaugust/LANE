@@ -25,9 +25,6 @@ import {
   ZoomOut,
   MoreHorizontal,
   CalendarDays,
-  Globe,
-  FileText,
-  Mic,
   Search,
   Users,
   Link2,
@@ -57,7 +54,7 @@ interface DemoTimelineViewProps {
 
 const SIZE_NAMES: Record<UiSize, string> = { small: 'Small', medium: 'Medium', large: 'Large', fitscreen: 'Fit Screen' }
 
-function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) {
+function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: DemoTimelineViewProps) {
   const {
     lanes,
     events,
@@ -195,11 +192,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [searchOpen, setSearchOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
   useGoogleTranslate()
-  const [showExampleOverlay, setShowExampleOverlay] = useState(
-    () => !localStorage.getItem('timeline_guide_completed')
-  )
   const guideWasOpenRef = useRef(false)
-  const guideClosedRef = useRef(false)
 
   // Auto-open guide after 3.5 seconds — skip if user already completed onboarding
   useEffect(() => {
@@ -208,14 +201,8 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
     return () => clearTimeout(t)
   }, [])
 
-  // Track when guide has been shown and then closed; auto-hide overlay 10s after close
   useEffect(() => {
     if (guideOpen) { guideWasOpenRef.current = true }
-    else if (guideWasOpenRef.current) {
-      guideClosedRef.current = true
-      const t = setTimeout(() => setShowExampleOverlay(false), 8000)
-      return () => clearTimeout(t)
-    }
   }, [guideOpen])
 
   const stepZoom = useCallback((factor: number) => {
@@ -525,6 +512,11 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
           <ZoomIn className="h-4 w-4" />
         </Button>
 
+        {/* How to use */}
+        <Button variant="outline" size="sm" onClick={() => setGuideOpen(true)} title="How to use" className="px-2 text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950">
+          <span className="font-bold text-base leading-none">?</span>
+        </Button>
+
         {/* Add dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -553,11 +545,6 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-52">
             <div className="max-h-[70vh] overflow-y-auto">
-              <DropdownMenuItem onClick={() => setGuideOpen(true)}>
-                <span className="mr-2 text-sm">❓</span>
-                How to use
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setSearchOpen(true)}>
                 <Search className="h-4 w-4 mr-2" />
                 Search Events
@@ -588,23 +575,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
               {/* Import */}
               <DropdownMenuItem onClick={() => openImport('calendar-file')}>
                 <CalendarDays className="h-4 w-4 mr-2" />
-                Import Calendar File
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => openImport('google-calendar')}>
-                <Globe className="h-4 w-4 mr-2" />
-                Import Google Calendar
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => openImport('text')}>
-                <FileText className="h-4 w-4 mr-2" />
-                Import from Text
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => openImport('voice')}>
-                <Mic className="h-4 w-4 mr-2" />
-                Import from Voice
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onSignUpWithTimeline}>
-                Continue with this timeline →
+                Import Calendar File, Google or text/voice with AI
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <TranslateMenuContent />
@@ -614,30 +585,8 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
         </div>
       </div>
 
-      {/* Example overlay text — fixed over full width incl. sidebar, own-lanes height only */}
-      <div
-        className="pointer-events-none fixed left-0 right-0 flex items-center justify-center"
-        style={{
-          top: '48px',
-          bottom: '45%',
-          zIndex: 100,
-          opacity: showExampleOverlay ? 1 : 0,
-          transform: showExampleOverlay ? 'translateY(0)' : 'translateY(80vh)',
-          transition: 'opacity 4000ms ease-in, transform 4000ms ease-in',
-        }}
-      >
-        <p
-          className="text-4xl font-black text-foreground/45 select-none text-center leading-tight"
-          style={{ transform: 'rotate(-45deg)', letterSpacing: '0.04em' }}
-        >
-          Example life<br />adjust to your story!!
-        </p>
-      </div>
 
-      <div
-        className="flex-1 overflow-hidden flex flex-col"
-        onClick={() => setShowExampleOverlay(false)}
-      >
+      <div className="flex-1 overflow-hidden flex flex-col">
         <TimelineContainer
           lanes={lanes}
           events={displayedEvents}
@@ -665,6 +614,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
           overlayEvents={[]}
           overlayDisplayModes={new Map()}
           activeOverlayTimelines={[]}
+          timelineName={localStorage.getItem('timeline_guide_completed') ? (currentTimeline?.name ?? 'My Life') : 'Example - edit me!'}
         />
       </div>
 
