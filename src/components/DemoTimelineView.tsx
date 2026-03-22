@@ -195,11 +195,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
   const [searchOpen, setSearchOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
   useGoogleTranslate()
-  const [showExampleOverlay, setShowExampleOverlay] = useState(
-    () => !localStorage.getItem('timeline_guide_completed')
-  )
   const guideWasOpenRef = useRef(false)
-  const guideClosedRef = useRef(false)
 
   // Auto-open guide after 3.5 seconds — skip if user already completed onboarding
   useEffect(() => {
@@ -208,14 +204,8 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
     return () => clearTimeout(t)
   }, [])
 
-  // Track when guide has been shown and then closed; auto-hide overlay 10s after close
   useEffect(() => {
     if (guideOpen) { guideWasOpenRef.current = true }
-    else if (guideWasOpenRef.current) {
-      guideClosedRef.current = true
-      const t = setTimeout(() => setShowExampleOverlay(false), 8000)
-      return () => clearTimeout(t)
-    }
   }, [guideOpen])
 
   const stepZoom = useCallback((factor: number) => {
@@ -614,30 +604,8 @@ function DemoTimelineViewInner({ onSignUpWithTimeline }: DemoTimelineViewProps) 
         </div>
       </div>
 
-      {/* Example overlay text — fixed over full width incl. sidebar, own-lanes height only */}
-      <div
-        className="pointer-events-none fixed left-0 right-0 flex items-center justify-center"
-        style={{
-          top: '48px',
-          bottom: '45%',
-          zIndex: 100,
-          opacity: showExampleOverlay ? 1 : 0,
-          transform: showExampleOverlay ? 'translateY(0)' : 'translateY(80vh)',
-          transition: 'opacity 4000ms ease-in, transform 4000ms ease-in',
-        }}
-      >
-        <p
-          className="text-4xl font-black text-foreground/45 select-none text-center leading-tight"
-          style={{ transform: 'rotate(-45deg)', letterSpacing: '0.04em' }}
-        >
-          Example life<br />adjust to your story!!
-        </p>
-      </div>
 
-      <div
-        className="flex-1 overflow-hidden flex flex-col"
-        onClick={() => setShowExampleOverlay(false)}
-      >
+      <div className="flex-1 overflow-hidden flex flex-col">
         <TimelineContainer
           lanes={lanes}
           events={displayedEvents}
