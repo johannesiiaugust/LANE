@@ -110,7 +110,7 @@ export function LaneSidebar({
       >
         {timelineName && (
           <span
-            className="font-semibold truncate text-foreground/80"
+            className="font-bold truncate text-foreground"
             style={{ fontSize: SIDEBAR_FONT }}
           >
             {timelineName}
