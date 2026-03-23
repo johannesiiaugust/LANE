@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { Sparkles, X, Send, Mic, MicOff, Loader2, Check, Trash2, CheckCheck, Pencil } from 'lucide-react'
+import { X, Send, Mic, MicOff, Loader2, Check, CheckCheck, Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { isOpenAIConfigured, transcribeAudio } from '@/lib/openai'
 import type { Lane, TimelineEvent } from '@/types/timeline'
@@ -8,6 +8,8 @@ import type { Lane, TimelineEvent } from '@/types/timeline'
 
 interface ProposedEvent {
   type: 'event'
+  action: 'create' | 'edit' | 'delete'
+  id?: string  // required for edit/delete
   title: string
   lane: string
   eventType: 'range' | 'point'
@@ -21,6 +23,8 @@ interface ProposedEvent {
 
 interface ProposedLane {
   type: 'lane'
+  action: 'create' | 'edit' | 'delete'
+  id?: string
   name: string
   color: string
   emoji?: string
@@ -28,6 +32,8 @@ interface ProposedLane {
 
 interface ProposedTimeline {
   type: 'timeline'
+  action: 'create' | 'delete'
+  id?: string
   name: string
 }
 
@@ -42,8 +48,13 @@ interface ChatMessage {
 
 interface LinaAssistantProps {
   lanes: Lane[]
+  events: TimelineEvent[]
   addEvent: (event: Omit<TimelineEvent, 'id'>) => Promise<TimelineEvent | null>
+  updateEvent: (id: string, updates: Partial<Omit<TimelineEvent, 'id'>>) => Promise<void>
+  deleteEvent: (id: string) => Promise<void>
   addLane: (lane: Omit<Lane, 'id' | 'order' | 'isDefault'>) => Promise<Lane | null>
+  updateLane: (id: string, updates: Partial<Omit<Lane, 'id' | 'isDefault'>>) => Promise<void>
+  deleteLane: (id: string) => Promise<void>
   createTimeline: (name?: string, emoji?: string, color?: string, withDefaultLanes?: boolean) => Promise<string | null>
 }
 
@@ -63,45 +74,67 @@ function formatYear(y: number): string {
   return monthFrac > 0.01 ? `${monthNames[monthIdx]} ${year}` : `${year}`
 }
 
-function buildSystemPrompt(laneNames: string[]): string {
+function buildSystemPrompt(laneNames: string[], existingEvents: { id: string; title: string; lane: string; startYear: number; endYear?: number }[]): string {
   const now = new Date()
   const currentYear = now.getFullYear()
   const currentMonth = now.getMonth()
   const currentFrac = currentYear + currentMonth / 12
 
+  const recentEvents = existingEvents.slice(0, 50).map(e =>
+    `- [${e.id.slice(0, 8)}] "${e.title}" in ${e.lane} (${e.startYear}${e.endYear ? `–${e.endYear}` : ''})`
+  ).join('\n')
+
   return `You are Lina, a friendly AI assistant for LifeLANE — a personal life timeline app.
-You help users add events, lanes, and timelines to their life timeline.
+You help users create, edit, and delete events, lanes, and timelines.
 
 Available lanes: ${JSON.stringify(laneNames)}
 Current date: ${now.toISOString().slice(0, 10)} (fractional year: ${currentFrac.toFixed(3)})
 
-When the user describes something they want to add:
-1. Determine if it's an event, lane, or timeline
-2. If missing critical info (dates, which lane, etc.), ask ONE concise follow-up question
-3. When you have enough info, respond with BOTH a brief friendly message AND a JSON proposal block on a new line
+Existing events (recent):
+${recentEvents || '(none yet)'}
+
+You support full CRUD operations:
+- **Create**: Add new events, lanes, or timelines
+- **Edit**: Modify existing events or lanes (user must reference which one)
+- **Delete**: Remove existing events, lanes, or timelines (user must reference which one)
+
+When the user describes what they want:
+1. Determine the operation (create/edit/delete) and target (event/lane/timeline)
+2. If missing critical info, ask ONE concise follow-up question
+3. When ready, respond with a brief message AND a JSON proposal block on a new line
 
 The JSON block must be on its own line, starting with {"action":"propose":
 {"action":"propose","items":[...]}
 
-For events:
-{"action":"propose","items":[{"type":"event","title":"...","lane":"...","eventType":"range"|"point","startYear":2020.5,"endYear":2021.0,"description":"...","location":"..."}]}
+For CREATING events:
+{"action":"propose","items":[{"type":"event","action":"create","title":"...","lane":"...","eventType":"range"|"point","startYear":2020.5,"endYear":2021.0,"description":"...","location":"..."}]}
+
+For EDITING events (include the id from the existing events list):
+{"action":"propose","items":[{"type":"event","action":"edit","id":"full-uuid","title":"New Title","lane":"Work","eventType":"range","startYear":2020.5,"endYear":2021.0,"description":"..."}]}
+
+For DELETING events:
+{"action":"propose","items":[{"type":"event","action":"delete","id":"full-uuid","title":"Event Title","lane":"Work","eventType":"point","startYear":2020,"description":""}]}
 
 For lanes:
-{"action":"propose","items":[{"type":"lane","name":"...","color":"#3b82f6","emoji":"..."}]}
+{"action":"propose","items":[{"type":"lane","action":"create","name":"...","color":"#3b82f6","emoji":"..."}]}
+{"action":"propose","items":[{"type":"lane","action":"edit","id":"full-uuid","name":"New Name","color":"#3b82f6"}]}
+{"action":"propose","items":[{"type":"lane","action":"delete","id":"full-uuid","name":"Lane Name","color":"#3b82f6"}]}
 
 For timelines:
-{"action":"propose","items":[{"type":"timeline","name":"..."}]}
+{"action":"propose","items":[{"type":"timeline","action":"create","name":"..."}]}
 
 Rules:
 - Convert dates to fractional years (Jan=.0, Feb=.083, Mar=.167, Apr=.25, May=.333, Jun=.5, Jul=.583, Aug=.667, Sep=.75, Oct=.833, Nov=.917, Dec=.958)
-- For relative dates like "last year", "3 years ago", compute from current date
+- For relative dates like "last year", compute from current date
 - Default lane: match to closest existing lane name
-- If no existing lane fits, suggest creating a new lane first, then the event
+- If no existing lane fits, suggest creating a new lane first
 - Be conversational and brief — max 2 sentences before the JSON
-- You can propose multiple items at once (e.g., a new lane + events for it)
-- For events without explicit end date that clearly span time, estimate a reasonable range
-- Always include description even if brief
-- If the user just wants to chat or asks a question unrelated to adding data, respond normally without JSON`
+- You can propose multiple items at once
+- For edits, only include fields that are changing (plus id and type/action)
+- For deletes, include the id and enough info (title, lane) so the user can confirm
+- When user says "delete" or "remove", match the event by title/description
+- If the user just wants to chat, respond normally without JSON
+- IMPORTANT: For edit/delete, you MUST use the full event id from the existing events list, not the truncated version`
 }
 
 function parseAssistantMessage(content: string): { text: string; proposals: ProposedItem[] } {
@@ -114,6 +147,8 @@ function parseAssistantMessage(content: string): { text: string; proposals: Prop
       if (item.type === 'event') {
         return {
           type: 'event',
+          action: (['create', 'edit', 'delete'].includes(String(item.action)) ? String(item.action) : 'create') as 'create' | 'edit' | 'delete',
+          id: item.id ? String(item.id) : undefined,
           title: String(item.title || ''),
           lane: String(item.lane || 'Other Activities'),
           eventType: item.eventType === 'range' ? 'range' : 'point',
@@ -128,6 +163,8 @@ function parseAssistantMessage(content: string): { text: string; proposals: Prop
       if (item.type === 'lane') {
         return {
           type: 'lane',
+          action: (['create', 'edit', 'delete'].includes(String(item.action)) ? String(item.action) : 'create') as 'create' | 'edit' | 'delete',
+          id: item.id ? String(item.id) : undefined,
           name: String(item.name || ''),
           color: String(item.color || '#3b82f6'),
           emoji: item.emoji ? String(item.emoji) : undefined,
@@ -135,6 +172,8 @@ function parseAssistantMessage(content: string): { text: string; proposals: Prop
       }
       return {
         type: 'timeline',
+        action: (['create', 'delete'].includes(String(item.action)) ? String(item.action) : 'create') as 'create' | 'delete',
+        id: item.id ? String(item.id) : undefined,
         name: String(item.name || 'New Timeline'),
       } as ProposedTimeline
     })
@@ -148,7 +187,7 @@ function parseAssistantMessage(content: string): { text: string; proposals: Prop
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export function LinaAssistant({ lanes, addEvent, addLane, createTimeline }: LinaAssistantProps) {
+export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEvent, addLane, updateLane, deleteLane, createTimeline }: LinaAssistantProps) {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
@@ -199,7 +238,13 @@ export function LinaAssistant({ lanes, addEvent, addLane, createTimeline }: Lina
 
     try {
       const apiMessages = [
-        { role: 'system' as const, content: buildSystemPrompt(laneNames) },
+        { role: 'system' as const, content: buildSystemPrompt(laneNames, events.map(e => ({
+          id: e.id,
+          title: e.title,
+          lane: lanes.find(l => l.id === e.laneId)?.name || 'Unknown',
+          startYear: e.startYear,
+          endYear: e.endYear,
+        }))) },
         ...newMessages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
       ]
 
@@ -306,33 +351,70 @@ export function LinaAssistant({ lanes, addEvent, addLane, createTimeline }: Lina
     const item = msg.proposals[itemIdx]
     let success = false
 
-    if (item.type === 'event') {
-      const lane = lanes.find(l => l.name === item.lane)
-      if (lane) {
-        const result = await addEvent({
-          laneId: lane.id,
-          title: item.title,
-          description: item.description,
-          type: item.eventType,
-          startYear: item.startYear,
-          endYear: item.endYear ?? undefined,
-          location: item.location,
-          color: item.color,
-          emoji: item.emoji,
-        })
-        success = !!result
+    try {
+      if (item.type === 'event') {
+        if (item.action === 'delete' && item.id) {
+          await deleteEvent(item.id)
+          success = true
+        } else if (item.action === 'edit' && item.id) {
+          const lane = lanes.find(l => l.name === item.lane)
+          await updateEvent(item.id, {
+            title: item.title,
+            description: item.description,
+            type: item.eventType,
+            startYear: item.startYear,
+            endYear: item.endYear ?? undefined,
+            ...(lane ? { laneId: lane.id } : {}),
+            location: item.location,
+            color: item.color,
+            emoji: item.emoji,
+          })
+          success = true
+        } else {
+          const lane = lanes.find(l => l.name === item.lane)
+          if (lane) {
+            const result = await addEvent({
+              laneId: lane.id,
+              title: item.title,
+              description: item.description,
+              type: item.eventType,
+              startYear: item.startYear,
+              endYear: item.endYear ?? undefined,
+              location: item.location,
+              color: item.color,
+              emoji: item.emoji,
+            })
+            success = !!result
+          }
+        }
+      } else if (item.type === 'lane') {
+        if (item.action === 'delete' && item.id) {
+          await deleteLane(item.id)
+          success = true
+        } else if (item.action === 'edit' && item.id) {
+          await updateLane(item.id, {
+            name: item.name,
+            color: item.color,
+            emoji: item.emoji,
+          })
+          success = true
+        } else {
+          const result = await addLane({
+            name: item.name,
+            color: item.color,
+            visible: true,
+            emoji: item.emoji,
+          })
+          success = !!result
+        }
+      } else if (item.type === 'timeline') {
+        if (item.action === 'create') {
+          const result = await createTimeline(item.name)
+          success = !!result
+        }
       }
-    } else if (item.type === 'lane') {
-      const result = await addLane({
-        name: item.name,
-        color: item.color,
-        visible: true,
-        emoji: item.emoji,
-      })
-      success = !!result
-    } else if (item.type === 'timeline') {
-      const result = await createTimeline(item.name)
-      success = !!result
+    } catch {
+      success = false
     }
 
     if (success) {
@@ -404,10 +486,10 @@ export function LinaAssistant({ lanes, addEvent, addLane, createTimeline }: Lina
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-2 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 px-4 py-3 sm:px-5 sm:py-3.5"
+          className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 flex flex-col items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:shadow-3xl transition-all duration-200 hover:scale-110 active:scale-95 h-20 w-20 sm:h-24 sm:w-24 animate-[lina-pulse_2s_ease-in-out_infinite]"
         >
-          <Sparkles className="h-5 w-5" />
-          <span className="text-sm font-semibold hidden sm:inline">Talk to Lina</span>
+          <span className="text-3xl sm:text-4xl leading-none">👩</span>
+          <span className="text-[10px] sm:text-xs font-bold mt-0.5 leading-tight">Talk to Lina</span>
         </button>
       )}
 
@@ -417,7 +499,7 @@ export function LinaAssistant({ lanes, addEvent, addLane, createTimeline }: Lina
           {/* Header */}
           <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-border bg-background">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
+              <span className="text-lg">👩</span>
               <span className="font-semibold text-foreground">Lina</span>
               <span className="text-xs text-muted-foreground">AI Assistant</span>
             </div>
@@ -433,7 +515,7 @@ export function LinaAssistant({ lanes, addEvent, addLane, createTimeline }: Lina
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
             {messages.length === 0 && (
               <div className="text-center py-8">
-                <Sparkles className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
+                <span className="text-4xl block mx-auto mb-3">👩</span>
                 <p className="text-sm text-muted-foreground">
                   Hi! I'm Lina. Tell me about events, lanes, or timelines you'd like to add.
                 </p>
@@ -466,6 +548,8 @@ export function LinaAssistant({ lanes, addEvent, addLane, createTimeline }: Lina
                               'rounded-lg border text-xs overflow-hidden transition-all',
                               status === 'accepted' ? 'border-green-300 bg-green-50' :
                               status === 'rejected' ? 'border-red-200 bg-red-50 opacity-50' :
+                              item.action === 'delete' ? 'border-red-300 bg-red-50/30' :
+                              item.action === 'edit' ? 'border-amber-300 bg-amber-50/30' :
                               'border-border bg-background',
                             )}
                           >
@@ -473,12 +557,14 @@ export function LinaAssistant({ lanes, addEvent, addLane, createTimeline }: Lina
                             <div className="flex items-center justify-between px-3 py-1.5 border-b border-border/50">
                               <span className={cn(
                                 'font-semibold uppercase tracking-wide text-[10px]',
+                                item.action === 'delete' ? 'text-red-600' :
+                                item.action === 'edit' ? 'text-amber-600' :
                                 item.type === 'event' ? 'text-blue-600' :
                                 item.type === 'lane' ? 'text-purple-600' : 'text-green-600',
                               )}>
-                                {item.type}
+                                {item.action !== 'create' ? `${item.action} ` : ''}{item.type}
                               </span>
-                              {status === 'accepted' && <span className="text-green-600 text-[10px] font-medium flex items-center gap-1"><Check className="h-3 w-3" />Added</span>}
+                              {status === 'accepted' && <span className="text-green-600 text-[10px] font-medium flex items-center gap-1"><Check className="h-3 w-3" />{item.action === 'delete' ? 'Deleted' : item.action === 'edit' ? 'Updated' : 'Added'}</span>}
                               {status === 'rejected' && <span className="text-red-500 text-[10px] font-medium">Rejected</span>}
                             </div>
 
@@ -524,15 +610,21 @@ export function LinaAssistant({ lanes, addEvent, addLane, createTimeline }: Lina
                               <div className="flex border-t border-border/50">
                                 <button
                                   onClick={() => handleAcceptItem(msgIdx, itemIdx)}
-                                  className="flex-1 flex items-center justify-center gap-1 py-2 text-green-600 hover:bg-green-50 transition-colors font-medium"
+                                  className={cn(
+                                    'flex-1 flex items-center justify-center gap-1 py-2 transition-colors font-medium',
+                                    item.action === 'delete' ? 'text-red-600 hover:bg-red-50' :
+                                    item.action === 'edit' ? 'text-amber-600 hover:bg-amber-50' :
+                                    'text-green-600 hover:bg-green-50',
+                                  )}
                                 >
-                                  <Check className="h-3 w-3" /> Accept
+                                  <Check className="h-3 w-3" />
+                                  {item.action === 'delete' ? 'Delete' : item.action === 'edit' ? 'Update' : 'Accept'}
                                 </button>
                                 <button
                                   onClick={() => handleRejectItem(msgIdx, itemIdx)}
-                                  className="flex-1 flex items-center justify-center gap-1 py-2 text-red-500 hover:bg-red-50 transition-colors font-medium border-l border-border/50"
+                                  className="flex-1 flex items-center justify-center gap-1 py-2 text-muted-foreground hover:bg-accent transition-colors font-medium border-l border-border/50"
                                 >
-                                  <Trash2 className="h-3 w-3" /> Reject
+                                  <X className="h-3 w-3" /> Cancel
                                 </button>
                               </div>
                             )}
