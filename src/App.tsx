@@ -538,8 +538,13 @@ function TimelineView() {
         <Footer />
         <LinaAssistant
           lanes={lanes}
+          events={events}
           addEvent={addEvent}
+          updateEvent={updateEvent}
+          deleteEvent={deleteEvent}
           addLane={addLane}
+          updateLane={updateLane}
+          deleteLane={deleteLane}
           createTimeline={createTimeline}
         />
       </div>
