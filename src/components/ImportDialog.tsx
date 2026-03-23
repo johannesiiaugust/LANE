@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import { pushEvent } from '@/lib/analytics'
 import { CalendarDays, Globe, FileText, Mic, Upload, CheckCircle2, AlertCircle, X, Loader2, ChevronRight } from 'lucide-react'
 import {
   Dialog,
@@ -195,6 +196,7 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
     }
     setImportedCount(count)
     setImporting(false)
+    if (count > 0) pushEvent('click', '/', 'import_calendar_file', { count })
   }
 
   const handleReset = () => {
@@ -685,6 +687,7 @@ function GoogleCalendarTab({ lanes, addEvent, addLane, onDone }: GoogleCalendarT
     }
     setImportedCount(count)
     setPhase('success')
+    if (count > 0) pushEvent('click', '/', 'import_google_calendar', { count })
   }
 
   const handleReset = () => {
@@ -1162,6 +1165,7 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
     }
     setImportedCount(count)
     setPhase('success')
+    if (count > 0) pushEvent('click', '/', 'import_text_ai', { count })
   }
 
   const handleReset = () => {
@@ -1580,6 +1584,7 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
     }
     setImportedCount(count)
     setPhase('success')
+    if (count > 0) pushEvent('click', '/', 'import_voice_ai', { count })
   }
 
   const handleReset = () => {

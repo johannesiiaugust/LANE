@@ -11,11 +11,13 @@ import type { SharedWithMeItem } from '@/types/database'
 import { useProfile } from '@/hooks/useProfile'
 import { isOpenAIConfigured } from '@/lib/openai'
 import { birthDateToFloatYear } from '@/lib/utils'
+import { useTrack } from '@/lib/analytics'
 import { OnboardingQuestionnaire } from '@/components/onboarding/OnboardingQuestionnaire'
 import { Toolbar, type AppView } from '@/components/Toolbar'
 import { TimelineContainer } from '@/components/timeline/TimelineContainer'
 import { TimelineOverview } from '@/components/TimelineOverview'
 import { KanbanBoard } from '@/components/kanban/KanbanBoard'
+import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
 import { EventPopover } from '@/components/EventPopover'
 import { EventDialog } from '@/components/dialogs/EventDialog'
 import { LaneDialog } from '@/components/dialogs/LaneDialog'
@@ -33,7 +35,7 @@ import { Footer } from '@/components/Footer'
 
 // ── Top-level route detection ─────────────────────────────────────────────────
 
-const RESERVED_PATHS = new Set(['/', '/kanban', '/overview', '/about', '/terms', '/demo'])
+const RESERVED_PATHS = new Set(['/', '/kanban', '/overview', '/about', '/terms', '/demo', '/anal'])
 const USERNAME_PATH_RE = /^\/([a-z0-9_]{3,32})$/
 const USERNAME_TIMELINE_PATH_RE = /^\/([a-z0-9_]{3,32})\/(\d+)$/
 
@@ -83,6 +85,7 @@ function getViewFromPath(): AppView {
   const p = window.location.pathname
   if (p === '/kanban') return 'kanban'
   if (p === '/overview') return 'overview'
+  if (p === '/anal') return 'anal'
   return 'timeline'
 }
 
@@ -96,7 +99,7 @@ function useAppView(): [AppView, (view: AppView) => void] {
   )
 
   const setView = useCallback((v: AppView) => {
-    const path = v === 'kanban' ? '/kanban' : v === 'overview' ? '/overview' : '/'
+    const path = v === 'kanban' ? '/kanban' : v === 'overview' ? '/overview' : v === 'anal' ? '/anal' : '/'
     if (window.location.pathname !== path) {
       window.history.pushState(null, '', path)
       // Trigger re-render via popstate
@@ -134,6 +137,9 @@ function TimelineView() {
   const selectedTimeline = timelines.find(t => t.id === selectedTimelineId)
 
   useTitle(selectedTimeline ? `LifeLANE — ${selectedTimeline.name}` : 'LifeLANE')
+
+  // Analytics page-view tracking
+  useTrack()
 
   const { user } = useAuth()
   const { profile } = useProfile()
@@ -449,6 +455,8 @@ function TimelineView() {
 
         {activeView === 'overview' ? (
           <TimelineOverview onSelectTimeline={() => setActiveView('timeline')} selectedTimelineEvents={events} />
+        ) : activeView === 'anal' ? (
+          <AnalyticsDashboard />
         ) : activeView === 'timeline' ? (
           <>
             <TimelineContainer

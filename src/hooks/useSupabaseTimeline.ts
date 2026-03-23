@@ -19,6 +19,7 @@ import {
   TIMELINE_YEAR_MAX,
   resolveEventLinks,
 } from '@/lib/constants'
+import { pushEvent } from '@/lib/analytics'
 
 export function useSupabaseTimeline(timelineId: string | null) {
   const [lanes, setLanes] = useState<Lane[]>([])
@@ -102,6 +103,7 @@ export function useSupabaseTimeline(timelineId: string | null) {
       if (dbRow) {
         const mapped = mapDbEvent(dbRow)
         setEvents(prev => prev.map(e => (e.id === tempId ? mapped : e)))
+        pushEvent('click', window.location.pathname, 'add_event', { type: event.type, source: event.source ?? null, lane_id: event.laneId })
         return mapped
       } else {
         // Rollback
@@ -138,7 +140,9 @@ export function useSupabaseTimeline(timelineId: string | null) {
       if ('metadata' in updates) dbUpdates.metadata = updates.metadata ?? null
 
       const ok = await updateEventDb(id, dbUpdates as Parameters<typeof updateEventDb>[1])
-      if (!ok) {
+      if (ok) {
+        pushEvent('click', window.location.pathname, 'edit_event')
+      } else {
         // Rollback: re-fetch
         if (timelineId) {
           const dbEvents = await fetchEvents(timelineId)
@@ -171,6 +175,7 @@ export function useSupabaseTimeline(timelineId: string | null) {
         setEvents(prev)
         return
       }
+      pushEvent('click', window.location.pathname, 'delete_event')
 
       // Cascade deletes + freeze (remove link) in parallel
       await Promise.all([
@@ -203,6 +208,7 @@ export function useSupabaseTimeline(timelineId: string | null) {
       if (dbRow) {
         const mapped = mapDbLane(dbRow)
         setLanes(prev => prev.map(l => (l.id === tempId ? mapped : l)))
+        pushEvent('click', window.location.pathname, 'add_lane', { name: lane.name })
         return mapped
       } else {
         setLanes(prev => prev.filter(l => l.id !== tempId))
@@ -241,7 +247,9 @@ export function useSupabaseTimeline(timelineId: string | null) {
       setEvents(p => p.filter(e => e.laneId !== id))
 
       const ok = await deleteLaneDb(id)
-      if (!ok) {
+      if (ok) {
+        pushEvent('click', window.location.pathname, 'delete_lane')
+      } else {
         setLanes(prevLanes)
         setEvents(prevEvents)
       }

@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useState } from 'react'
 import { useGoogleTranslate, TranslateMenuContent } from '@/components/TranslateMenu'
-import { Plus, ZoomIn, ZoomOut, MoreHorizontal, CalendarSearch, Search, LogOut, UserPen } from 'lucide-react' // Globe kept for import menu item
+import { Plus, ZoomIn, ZoomOut, MoreHorizontal, CalendarSearch, Search, LogOut, UserPen, BarChart3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TimelinePersonaSelector } from '@/components/TimelinePersonaSelector'
 import { ProfileDialog } from '@/components/ProfileDialog'
@@ -25,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-export type AppView = 'timeline' | 'kanban' | 'overview'
+export type AppView = 'timeline' | 'kanban' | 'overview' | 'anal'
 
 interface ToolbarProps {
   pixelsPerYear: number
@@ -352,6 +352,14 @@ export function Toolbar({
                 <DropdownMenuItem onClick={() => openImport('calendar-file')}>
                   <CalendarSearch className="h-4 w-4 mr-2" />
                   Import Calendar File, Google or text/voice with AI
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                {/* Analytics */}
+                <DropdownMenuItem onClick={() => _onSetActiveView('anal')}>
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Analytics
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
