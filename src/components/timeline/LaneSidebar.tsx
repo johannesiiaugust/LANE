@@ -1,9 +1,5 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import {
-  ChevronDown, ChevronRight, Eye, EyeOff, MoreHorizontal, Pencil, Trash2, TrendingUp, ArrowUp, ArrowDown,
-  MapPin, Briefcase, GraduationCap, Heart, Landmark, Zap, Plane, HeartPulse, Users, Car, Home, Trophy, Package, Layers,
-  type LucideIcon,
-} from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
+import { ChevronDown, ChevronRight, Eye, EyeOff, MoreHorizontal, Pencil, Trash2, TrendingUp, ArrowUp, ArrowDown } from 'lucide-react'
 import type { Lane } from '@/types/timeline'
 import {
   DropdownMenu,
@@ -13,37 +9,6 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
-
-// ── Lane icon mapping ──────────────────────────────────────────────────────────
-
-const LANE_ICON_MAP: Record<string, LucideIcon> = {
-  location: MapPin,
-  locations: MapPin,
-  work: Briefcase,
-  education: GraduationCap,
-  university: GraduationCap,
-  relationships: Heart,
-  relations: Heart,
-  assets: Landmark,
-  wealth: Landmark,
-  activities: Zap,
-  'other activities': Zap,
-  travel: Plane,
-  health: HeartPulse,
-  family: Users,
-  kids: Users,
-  parents: Users,
-  vehicles: Car,
-  cars: Car,
-  items: Package,
-  'type of house': Home,
-  housing: Home,
-  achievements: Trophy,
-}
-
-function getLaneIcon(name: string): LucideIcon {
-  return LANE_ICON_MAP[name.toLowerCase()] ?? Layers
-}
 
 export interface PersonaSidebarSection {
   personaId: string
@@ -60,59 +25,6 @@ export interface OverlaySidebarSection {
   label: string   // emoji or 2-char abbreviation
   color: string
   laneRowData: { name: string; hasOverlaps: boolean; rowCount: number }[]
-}
-
-// ── Drag-to-pan hook ──────────────────────────────────────────────────────────
-
-function useDragPan(onPan?: (dx: number) => void) {
-  const onPanRef = useRef(onPan)
-  useEffect(() => { onPanRef.current = onPan }, [onPan])
-  const lastXRef = useRef<number | null>(null)
-  const [dragging, setDragging] = useState(false)
-
-  const onMouseDown = useCallback((e: React.MouseEvent) => {
-    if (!onPanRef.current) return
-    e.preventDefault()
-    lastXRef.current = e.clientX
-    setDragging(true)
-    const onMove = (ev: MouseEvent) => {
-      if (lastXRef.current === null || !onPanRef.current) return
-      const dx = ev.clientX - lastXRef.current
-      lastXRef.current = ev.clientX
-      onPanRef.current(dx)
-    }
-    const onUp = () => {
-      lastXRef.current = null
-      setDragging(false)
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('mouseup', onUp)
-    }
-    window.addEventListener('mousemove', onMove)
-    window.addEventListener('mouseup', onUp)
-  }, [])
-
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    if (!onPanRef.current || e.touches.length !== 1) return
-    lastXRef.current = e.touches[0].clientX
-  }, [])
-
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!onPanRef.current || e.touches.length !== 1 || lastXRef.current === null) return
-    const dx = e.touches[0].clientX - lastXRef.current
-    lastXRef.current = e.touches[0].clientX
-    onPanRef.current(dx)
-  }, [])
-
-  const onTouchEnd = useCallback(() => { lastXRef.current = null }, [])
-
-  if (!onPan) return {}
-  return {
-    onMouseDown,
-    onTouchStart,
-    onTouchMove,
-    onTouchEnd,
-    style: { cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' as const },
-  }
 }
 
 interface LaneSidebarProps {
@@ -139,7 +51,6 @@ interface LaneSidebarProps {
   onEditLane: (lane: Lane) => void
   onDeleteLane: (lane: Lane) => void
   totalAssetsHeight?: number
-  onPan?: (dx: number) => void
   timelineName?: string
 }
 
@@ -167,7 +78,6 @@ export function LaneSidebar({
   onEditLane,
   onDeleteLane,
   totalAssetsHeight,
-  onPan,
   timelineName,
 }: LaneSidebarProps) {
   const [showHidden, setShowHidden] = useState(false)
@@ -184,7 +94,6 @@ export function LaneSidebar({
   const W = Math.min(SIDEBAR_WIDTH, Math.max(72, Math.round(viewportWidth * 0.28)))
 
   const iconPad = Math.round(ICON_SIZE / 12)
-  const panHandlers = useDragPan(onPan)
 
   // Full sorted lane order (visible + hidden) for move-up/down boundary checks
   const sortedAllLanes = useMemo(
@@ -215,13 +124,13 @@ export function LaneSidebar({
         return (
           <div
             key={lane.id}
-            className="border-b border-border/15 group"
+            className="border-b border-border/30 group"
             style={{ height, paddingLeft: Math.round(W * 0.04), paddingRight: Math.round(W * 0.04) }}
           >
             {/* Main lane label row */}
-            <div className="relative flex items-center" style={{ height: BASE_LANE_HEIGHT, paddingLeft: Math.round(W * 0.04), gap: Math.round(ICON_SIZE / 3) }}>
+            <div className="relative flex items-center" style={{ height: BASE_LANE_HEIGHT, paddingLeft: Math.round(W * 0.04) }}>
               {/* Expand chevron — left side, compact */}
-              {laneHasOverlaps.get(lane.id) ? (
+              {laneHasOverlaps.get(lane.id) && (
                 <button
                   onClick={() => onToggleExpand(lane.id)}
                   className="shrink-0 text-muted-foreground/50 hover:text-foreground transition-colors"
@@ -232,11 +141,9 @@ export function LaneSidebar({
                     ? <ChevronDown size={Math.round(ICON_SIZE * 0.75)} />
                     : <ChevronRight size={Math.round(ICON_SIZE * 0.75)} />}
                 </button>
-              ) : null}
-              {(() => {
-                const Icon = getLaneIcon(lane.name)
-                return <Icon size={ICON_SIZE} strokeWidth={1.5} className="shrink-0" style={{ color: lane.color, opacity: lane.visible ? 1 : 0.4 }} />
-              })()}
+              )}
+
+              {/* Text: fades out on the right */}
               <span
                 className="font-medium flex-1 min-w-0 whitespace-nowrap overflow-hidden"
                 style={{
@@ -246,7 +153,7 @@ export function LaneSidebar({
                   WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
                 }}
               >
-                {lane.name}
+                {lane.emoji && <span className="mr-1">{lane.emoji}</span>}{lane.name}
               </span>
 
               {/* Action buttons — absolute overlay on hover, no layout cost when hidden */}
@@ -390,7 +297,6 @@ export function LaneSidebar({
             paddingRight: Math.round(W * 0.04),
             gap: Math.round(ICON_SIZE / 4),
           }}
-          {...panHandlers}
         >
           <TrendingUp size={ICON_SIZE} className="shrink-0 text-teal-500" />
           <span className="font-medium truncate flex-1 text-teal-600" style={{ fontSize: SIDEBAR_FONT }}>
@@ -401,7 +307,7 @@ export function LaneSidebar({
 
       {/* Separate persona sections */}
       {separatePersonaSections.map(section => (
-        <div key={section.personaId} {...panHandlers}>
+        <div key={section.personaId}>
           {/* Persona header row */}
           <div
             className="border-t-2 border-border/60 flex items-center bg-muted/40"
@@ -429,7 +335,7 @@ export function LaneSidebar({
             return (
               <div
                 key={row.name}
-                className="border-b border-border/15 flex items-start text-muted-foreground"
+                className="border-b border-border/30 flex items-start text-muted-foreground bg-muted/20"
                 style={{
                   height: row.rowCount * BASE_LANE_HEIGHT,
                   paddingLeft: row.hasOverlaps ? Math.round(W * 0.04) : Math.round(W * 0.08),
@@ -457,7 +363,7 @@ export function LaneSidebar({
 
       {/* Separate overlay timeline sections */}
       {separateOverlaySections.map(section => (
-        <div key={section.timelineId} {...panHandlers}>
+        <div key={section.timelineId}>
           <div
             className="border-t-2 border-border/60 flex items-center bg-muted/40"
             style={{
@@ -477,7 +383,7 @@ export function LaneSidebar({
             return (
               <div
                 key={row.name}
-                className="border-b border-border/15 flex items-start text-muted-foreground"
+                className="border-b border-border/30 flex items-start text-muted-foreground bg-muted/20"
                 style={{
                   height: row.rowCount * BASE_LANE_HEIGHT,
                   paddingLeft: row.hasOverlaps ? Math.round(W * 0.04) : Math.round(W * 0.08),
@@ -537,10 +443,6 @@ export function LaneSidebar({
                     padding: `${Math.round(SIDEBAR_FONT * 0.25)}px ${Math.round(W * 0.04)}px`,
                   }}
                 >
-                  {(() => {
-                    const Icon = getLaneIcon(lane.name)
-                    return <Icon size={ICON_SIZE} strokeWidth={1.5} className="shrink-0 text-muted-foreground" style={{ opacity: 0.5 }} />
-                  })()}
                   <span
                     className="text-muted-foreground flex-1 min-w-0 whitespace-nowrap overflow-hidden"
                     style={{
@@ -549,7 +451,7 @@ export function LaneSidebar({
                       WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
                     }}
                   >
-                    {lane.name}
+                    {lane.emoji && <span className="mr-1">{lane.emoji}</span>}{lane.name}
                   </span>
                   <button
                     onClick={() => onToggleVisibility(lane.id)}

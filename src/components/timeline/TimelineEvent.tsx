@@ -1,7 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import type { TimelineEvent as TEvent } from '@/types/timeline'
 import { computeValueAtYear, generateSparklineSeries, formatValue } from '@/lib/valueCompute'
-import { fracYearToMs } from '@/lib/constants'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
 import { EventContextMenu } from './EventContextMenu'
 
@@ -23,7 +22,6 @@ export interface TimelineEventProps {
 
 interface TooltipState { clientX: number; clientY: number; value: number }
 interface HoverPos { clientX: number; clientY: number }
-interface EventHoverState { clientX: number; clientY: number }
 
 const STACK_PX = 3  // px shift per depth level
 
@@ -43,14 +41,13 @@ export function TimelineEventBar({
     ? event.startYear < currentYear
     : (event.endYear ?? event.startYear) < currentYear
 
-  const pastStyle = isPast ? { opacity: 0.5 } : undefined
+  const pastStyle = isPast ? { opacity: 0.35, filter: 'saturate(0.5)' } : undefined
   const draggingStyle: React.CSSProperties | undefined = isDragging ? { opacity: 0.25, pointerEvents: 'none' } : undefined
 
   const hasValue = !!event.valueProjection
   const hasImage = !!event.metadata?.image_url
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
   const [imageHover, setImageHover] = useState<HoverPos | null>(null)
-  const [eventHover, setEventHover] = useState<EventHoverState | null>(null)
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null)
   const [isGrabbing, setIsGrabbing] = useState(false)
 
@@ -175,23 +172,18 @@ export function TimelineEventBar({
       return (
         <>
           <div
-            className={`absolute flex items-center justify-center cursor-pointer hover:scale-125 transition-transform select-none ${grabRing}`}
+            className={`absolute flex items-center justify-center cursor-pointer hover:scale-110 transition-transform select-none ${grabRing}`}
             style={{ left: left - DOT_SIZE / 2, top, width: DOT_SIZE, height: DOT_SIZE, fontSize: DOT_SIZE - 2, lineHeight: 1, ...pastStyle, ...draggingStyle }}
             {...interactionProps}
-            onMouseEnter={e => {
-              setEventHover({ clientX: e.clientX, clientY: e.clientY })
-              if (hasPointValue) setTooltip({ clientX: e.clientX, clientY: e.clientY, value: event.pointValue! })
-            }}
+            onMouseEnter={hasPointValue ? e => setTooltip({ clientX: e.clientX, clientY: e.clientY, value: event.pointValue! }) : undefined}
             onMouseMove={e => {
-              setEventHover({ clientX: e.clientX, clientY: e.clientY })
               if (hasPointValue) setTooltip({ clientX: e.clientX, clientY: e.clientY, value: event.pointValue! })
               if (hasImage) setImageHover({ clientX: e.clientX, clientY: e.clientY })
             }}
-            onMouseLeave={() => { handleMouseLeave(); setTooltip(null); setImageHover(null); setEventHover(null) }}
+            onMouseLeave={() => { handleMouseLeave(); setTooltip(null); setImageHover(null) }}
           >
             {event.emoji}
           </div>
-          {eventHover && !tooltip && <EventBubble event={event} pos={eventHover} />}
           {tooltip && <ValueTooltip title={event.title} tooltip={tooltip} />}
           {imageHover && event.metadata?.image_url && <ImageHoverThumbnail imageUrl={event.metadata.image_url} pos={imageHover} />}
           {contextMenu}
@@ -206,17 +198,15 @@ export function TimelineEventBar({
           style={{ left: left - DOT_SIZE / 2, top, width: DOT_SIZE, height: DOT_SIZE, backgroundColor: color, opacity: 0.88, boxShadow: '0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.35)', ...pastStyle, ...draggingStyle }}
           {...interactionProps}
           onMouseEnter={e => {
-            setEventHover({ clientX: e.clientX, clientY: e.clientY })
-            if (hasPointValue) setTooltip({ clientX: e.clientX, clientY: e.clientY, value: event.pointValue! })
-          }}
-          onMouseMove={e => {
-            setEventHover({ clientX: e.clientX, clientY: e.clientY })
             if (hasPointValue) setTooltip({ clientX: e.clientX, clientY: e.clientY, value: event.pointValue! })
             if (hasImage) setImageHover({ clientX: e.clientX, clientY: e.clientY })
           }}
-          onMouseLeave={() => { handleMouseLeave(); setTooltip(null); setImageHover(null); setEventHover(null) }}
+          onMouseMove={e => {
+            if (hasPointValue) setTooltip({ clientX: e.clientX, clientY: e.clientY, value: event.pointValue! })
+            if (hasImage) setImageHover({ clientX: e.clientX, clientY: e.clientY })
+          }}
+          onMouseLeave={() => { handleMouseLeave(); setTooltip(null); setImageHover(null) }}
         />
-        {eventHover && !tooltip && <EventBubble event={event} pos={eventHover} />}
         {tooltip && <ValueTooltip title={event.title} tooltip={tooltip} />}
         {imageHover && event.metadata?.image_url && <ImageHoverThumbnail imageUrl={event.metadata.image_url} pos={imageHover} />}
         {contextMenu}
@@ -312,13 +302,11 @@ export function TimelineEventBar({
         style={{ left: barLeft, top, width: Math.max(barWidth, 4), height: h, opacity: 0.88, zIndex: stackZ, ...pastStyle, ...draggingStyle }}
         title={event.title}
         {...interactionProps}
-        onMouseEnter={e => { setEventHover({ clientX: e.clientX, clientY: e.clientY }) }}
         onMouseMove={e => {
-          setEventHover({ clientX: e.clientX, clientY: e.clientY })
           if (hasValue) handleMouseMove(e)
           if (hasImage) setImageHover({ clientX: e.clientX, clientY: e.clientY })
         }}
-        onMouseLeave={() => { handleMouseLeave(); setTooltip(null); setImageHover(null); setEventHover(null) }}
+        onMouseLeave={() => { handleMouseLeave(); setTooltip(null); setImageHover(null) }}
       >
 
         {/* ── Tails render FIRST so the solid bar paints over both junction seams ── */}
@@ -429,36 +417,10 @@ export function TimelineEventBar({
         )}
 
       </div>
-      {eventHover && !tooltip && <EventBubble event={event} pos={eventHover} />}
       {tooltip && <ValueTooltip title={event.title} tooltip={tooltip} />}
       {imageHover && event.metadata?.image_url && <ImageHoverThumbnail imageUrl={event.metadata.image_url} pos={imageHover} />}
       {contextMenu}
     </>
-  )
-}
-
-const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-
-function formatEventDate(fy: number): string {
-  const d = new Date(fracYearToMs(fy))
-  return `${d.getUTCDate()} ${MONTH_ABBR[d.getUTCMonth()]} ${d.getUTCFullYear()}`
-}
-
-function EventBubble({ event, pos }: { event: TEvent; pos: EventHoverState }) {
-  return (
-    <div
-      className="fixed z-50 pointer-events-none"
-      style={{ left: pos.clientX, top: pos.clientY - 8, transform: 'translate(-50%, -100%)' }}
-    >
-      <div className="text-xs rounded-lg px-3 py-2 shadow-lg whitespace-nowrap" style={{ backgroundColor: 'var(--color-primary, #124e78)', color: '#fff' }}>
-        <div className="font-semibold">{event.title}</div>
-        {event.description && <div style={{ opacity: 0.8 }}>{event.description}</div>}
-        <div className="mt-0.5" style={{ opacity: 0.6 }}>
-          {formatEventDate(event.startYear)}
-          {event.endYear != null ? ` – ${formatEventDate(event.endYear)}` : ''}
-        </div>
-      </div>
-    </div>
   )
 }
 

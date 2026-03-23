@@ -4,7 +4,7 @@ import {
   Loader2, BarChart3, Users, Eye, MousePointerClick,
   TrendingUp, Clock, Activity, RefreshCw,
   X, Search, ChevronDown, ChevronRight, CalendarDays,
-  FolderOpen, Filter, Database, Layers,
+  FolderOpen, Filter, Database, Layers, Crown,
 } from 'lucide-react'
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -180,6 +180,7 @@ export function AnalyticsDashboard() {
   // Data completeness state
   const [timelineEvents, setTimelineEvents] = useState<TimelineDataEvent[]>([])
   const [timelineLanes, setTimelineLanes] = useState<TimelineDataLane[]>([])
+  const [personas, setPersonas] = useState<{ id: string; name: string; bio: string; birth_year: number; death_year: number | null; view_count: number }[]>([])
 
   useEffect(() => {
     loadData()
@@ -234,6 +235,14 @@ export function AnalyticsDashboard() {
       .select('id, name, timeline_id')
 
     setTimelineLanes(lanes || [])
+
+    const { data: personaData } = await supabase
+      .from('personas')
+      .select('id, name, bio, birth_year, death_year, view_count')
+      .order('view_count', { ascending: false })
+      .limit(20)
+
+    setPersonas((personaData || []).map(p => ({ ...p, view_count: p.view_count ?? 0 })))
   }
 
   async function loadUserLog(userId: string) {
@@ -941,7 +950,7 @@ export function AnalyticsDashboard() {
                   <span className="text-[10px] text-muted-foreground">({timelineEvents.length} timeline events across all users)</span>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Events per lane */}
                   <Panel>
                     <PanelHeader title="Events per Lane" icon={<Layers size={16} />} />
@@ -959,6 +968,28 @@ export function AnalyticsDashboard() {
                       {importSources.map(s => (
                         <BarRow key={s.source} label={s.source} value={s.count} max={importSources[0]?.count || 1} color="#7B6D9E" />
                       ))}
+                    </div>
+                  </Panel>
+
+                  {/* Most used personas */}
+                  <Panel>
+                    <PanelHeader title="Most Used Personas" icon={<Crown size={16} />} />
+                    <div className="py-1">
+                      {personas.length > 0 ? personas.filter(p => p.view_count > 0).map((p, i) => (
+                        <div key={p.id} className="flex items-center gap-3 px-5 py-2 hover:bg-accent/50 transition-colors">
+                          <span className="text-[10px] font-bold w-5 text-center text-muted-foreground">{i + 1}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold truncate text-foreground">{p.name}</p>
+                            <p className="text-[10px] text-muted-foreground">{p.birth_year}–{p.death_year || 'present'}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs font-bold tabular-nums text-foreground">{p.view_count.toLocaleString()}</p>
+                            <p className="text-[10px] text-muted-foreground">views</p>
+                          </div>
+                        </div>
+                      )) : (
+                        <p className="text-xs text-center py-8 text-muted-foreground">No persona views yet</p>
+                      )}
                     </div>
                   </Panel>
                 </div>

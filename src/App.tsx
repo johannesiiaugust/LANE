@@ -18,13 +18,13 @@ import { TimelineContainer } from '@/components/timeline/TimelineContainer'
 import { TimelineOverview } from '@/components/TimelineOverview'
 import { KanbanBoard } from '@/components/kanban/KanbanBoard'
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
+import { LinaAssistant } from '@/components/LinaAssistant'
 import { EventPopover } from '@/components/EventPopover'
 import { EventDialog } from '@/components/dialogs/EventDialog'
 import { LaneDialog } from '@/components/dialogs/LaneDialog'
 import { DeleteConfirmDialog } from '@/components/dialogs/DeleteConfirmDialog'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { AuthPage } from '@/components/auth/AuthPage'
-import { LandingPage } from '@/components/LandingPage'
 import { UpdatePasswordForm } from '@/components/auth/UpdatePasswordForm'
 import { UiSizeProvider } from '@/contexts/UiSizeContext'
 import { SkinProvider } from '@/contexts/SkinContext'
@@ -132,6 +132,7 @@ function TimelineView() {
     selectedTimelineId,
     isFirstLogin,
     clearFirstLogin,
+    createTimeline,
   } = useTimelineContext()
 
   const selectedTimeline = timelines.find(t => t.id === selectedTimelineId)
@@ -535,6 +536,12 @@ function TimelineView() {
           <KanbanBoard />
         )}
         <Footer />
+        <LinaAssistant
+          lanes={lanes}
+          addEvent={addEvent}
+          addLane={addLane}
+          createTimeline={createTimeline}
+        />
       </div>
     </TooltipProvider>
   )
@@ -579,7 +586,7 @@ function App() {
   }
 
   if (!user) {
-    return <LandingPage />
+    return <AboutPage />
   }
 
   return (

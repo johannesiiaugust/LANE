@@ -29,7 +29,7 @@ export interface SkinDef {
 }
 
 const FONT_MAP: Record<string, string> = {
-  system: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+  system: 'system-ui, -apple-system, sans-serif',
   serif: 'Georgia, "Times New Roman", serif',
   mono: '"Courier New", Courier, monospace',
 }
@@ -74,7 +74,7 @@ export const SKINS: SkinDef[] = [
       muted: '#ece6d9', 'muted-foreground': '#8a7560',
       accent: '#ede5d6', 'accent-foreground': '#5c4a30',
       border: '#d4c9b5', input: '#d4c9b5', ring: '#8b6343',
-      fontFamily: FONT_MAP.system,
+      fontFamily: FONT_MAP.serif,
     },
   },
   {
