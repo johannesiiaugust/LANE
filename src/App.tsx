@@ -1,4 +1,5 @@
 import { useState, useCallback, useSyncExternalStore, useRef, useMemo, useEffect } from 'react'
+import { useTitle } from '@/hooks/useTitle'
 import type { Lane, TimelineEvent } from '@/types/timeline'
 import { useTimelineContext, TimelineProvider } from '@/contexts/TimelineContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -27,17 +28,19 @@ import { UiSizeProvider } from '@/contexts/UiSizeContext'
 import { SkinProvider } from '@/contexts/SkinContext'
 import { PublicProfilePage } from '@/components/PublicProfilePage'
 import { AboutPage } from '@/components/AboutPage'
+import { TermsPage } from '@/components/TermsPage'
 import { Footer } from '@/components/Footer'
 
 // ── Top-level route detection ─────────────────────────────────────────────────
 
-const RESERVED_PATHS = new Set(['/', '/kanban', '/overview', '/about', '/demo'])
+const RESERVED_PATHS = new Set(['/', '/kanban', '/overview', '/about', '/terms', '/demo'])
 const USERNAME_PATH_RE = /^\/([a-z0-9_]{3,32})$/
 const USERNAME_TIMELINE_PATH_RE = /^\/([a-z0-9_]{3,32})\/(\d+)$/
 
 type TopLevelRoute =
   | { type: 'app' }
   | { type: 'about' }
+  | { type: 'terms' }
   | { type: 'demo' }
   | { type: 'public'; username: string; timelineIndex?: number }
 
@@ -45,6 +48,7 @@ type TopLevelRoute =
 function getTopLevelRouteKey(): string {
   const p = window.location.pathname
   if (p === '/about') return 'about'
+  if (p === '/terms') return 'terms'
   if (p === '/demo') return 'demo'
   if (RESERVED_PATHS.has(p)) return 'app'
   const matchWithIndex = p.match(USERNAME_TIMELINE_PATH_RE)
@@ -63,6 +67,7 @@ function useTopLevelRoute(): TopLevelRoute {
     getTopLevelRouteKey,
   )
   if (key === 'about') return { type: 'about' }
+  if (key === 'terms') return { type: 'terms' }
   if (key === 'demo') return { type: 'demo' }
   if (key.startsWith('public:')) {
     const parts = key.slice(7).split(':')
@@ -128,6 +133,8 @@ function TimelineView() {
 
   const selectedTimeline = timelines.find(t => t.id === selectedTimelineId)
 
+  useTitle(selectedTimeline ? `LifeLANE — ${selectedTimeline.name}` : 'LifeLANE')
+
   const { user } = useAuth()
   const { profile } = useProfile()
 
@@ -164,7 +171,7 @@ function TimelineView() {
     togglePersonaAlignment,
     personaDisplayModes,
     setPersonaDisplayMode,
-  } = usePersonas(birthYear)
+  } = usePersonas(selectedTimeline?.start_year ?? null)
 
   const {
     activeOverlayIds,
@@ -466,11 +473,12 @@ function TimelineView() {
               personaDisplayModes={personaDisplayModes}
               scrollToTodayRef={scrollToTodayRef}
               scrollToEventRef={scrollToEventRef}
-              lifeSpan={profile?.birth_date ? { birthYear: birthDateToFloatYear(profile.birth_date), endYear: profile.end_date ? birthDateToFloatYear(profile.end_date) : null } : undefined}
+              lifeSpan={selectedTimeline?.start_year != null ? { birthYear: selectedTimeline.start_year, endYear: selectedTimeline.end_year ?? null, color: selectedTimeline.color ?? undefined } : undefined}
               onTodayVisibilityChange={setTodayOffScreen}
               overlayEvents={displayedOverlayEvents}
               overlayDisplayModes={mergedOverlayDisplayModes}
               activeOverlayTimelines={[...activeOverlayTimelines, ...externalOverlayTimelines]}
+              timelineName={selectedTimeline?.name}
             />
 
             {/* Event popover */}
@@ -532,6 +540,19 @@ function App() {
     return <AboutPage />
   }
 
+  if (route.type === 'terms') {
+    return <TermsPage />
+  }
+
+  if (route.type === 'demo') {
+    if (!loading && user) {
+      window.history.replaceState(null, '', '/')
+      window.dispatchEvent(new PopStateEvent('popstate'))
+      return null
+    }
+    return <AuthPage />
+  }
+
   // Public profile pages render without auth
   if (route.type === 'public') {
     return <PublicProfilePage username={route.username} timelineIndex={route.timelineIndex} />
@@ -550,9 +571,6 @@ function App() {
   }
 
   if (!user) {
-    if (route.type === 'demo') {
-      return <AuthPage />
-    }
     return <LandingPage />
   }
 

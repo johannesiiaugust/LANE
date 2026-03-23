@@ -10,22 +10,26 @@ import {
 
 const STORAGE_KEY = 'timeline_demo_v3'
 
+interface DemoTimelineMeta {
+  name: string
+  color: string
+  start_year: number | null
+  end_year: number | null
+  emoji: string
+}
+
 interface DemoState {
   lanes: Lane[]
   events: TimelineEvent[]
+  meta?: DemoTimelineMeta
 }
 
-const DEMO_TIMELINE: DbTimeline = {
-  id: 'demo',
-  user_id: '',
-  name: "Alex's Life",
-  start_year: 1980,
-  end_year: 2065,
+const DEFAULT_META: DemoTimelineMeta = {
+  name: "My Life",
   color: '#6366f1',
+  start_year: 1980,
+  end_year: null,
   emoji: '👤',
-  visibility: 'public',
-  created_at: '',
-  updated_at: '',
 }
 
 function loadState(): DemoState {
@@ -54,15 +58,29 @@ function saveState(state: DemoState) {
 export function useDemoTimeline() {
   const [lanes, setLanes] = useState<Lane[]>(() => loadState().lanes)
   const [events, setEvents] = useState<TimelineEvent[]>(() => loadState().events)
+  const [meta, setMeta] = useState<DemoTimelineMeta>(() => loadState().meta ?? DEFAULT_META)
   const [pixelsPerYear, setPixelsPerYear] = useState(MIN_PIXELS_PER_YEAR)
+
+  const demoTimeline: DbTimeline = {
+    id: 'demo',
+    user_id: '',
+    name: meta.name,
+    start_year: meta.start_year,
+    end_year: meta.end_year,
+    color: meta.color,
+    emoji: meta.emoji,
+    visibility: 'public',
+    created_at: '',
+    updated_at: '',
+  }
 
   const yearStart = TIMELINE_YEAR_MIN
   const yearEnd = TIMELINE_YEAR_MAX
 
   // Persist to localStorage on every change
   useEffect(() => {
-    saveState({ lanes, events })
-  }, [lanes, events])
+    saveState({ lanes, events, meta })
+  }, [lanes, events, meta])
 
   const allYears = events.flatMap(e =>
     e.endYear != null ? [e.startYear, e.endYear] : [e.startYear],
@@ -137,14 +155,24 @@ export function useDemoTimeline() {
   const selectTimeline = useCallback((_id: string) => {}, [])
   const createTimeline = useCallback(async (_name?: string, _emoji?: string, _color?: string, _withDefaultLanes?: boolean): Promise<string | null> => null, [])
   const copyTimelineData = useCallback(async (_sourceId: string, _destId: string, _options: { laneIds?: string[]; eventFilter?: 'all' | 'past_current' | 'none'; perLaneEventFilter?: Record<string, 'all' | 'past_current' | 'none'> }): Promise<boolean> => false, [])
-  const updateTimeline = useCallback(async (_id: string, _updates: object): Promise<boolean> => true, [])
+  const updateTimeline = useCallback(async (_id: string, updates: { name?: string; start_year?: number | null; end_year?: number | null; color?: string | null; emoji?: string | null }): Promise<boolean> => {
+    setMeta(prev => ({
+      ...prev,
+      ...(updates.name !== undefined ? { name: updates.name } : {}),
+      ...(updates.color !== undefined ? { color: updates.color ?? prev.color } : {}),
+      ...(updates.emoji !== undefined ? { emoji: updates.emoji ?? prev.emoji } : {}),
+      ...(updates.start_year !== undefined ? { start_year: updates.start_year } : {}),
+      ...(updates.end_year !== undefined ? { end_year: updates.end_year } : {}),
+    }))
+    return true
+  }, [])
   const renameTimeline = useCallback(async (_id: string, _name: string): Promise<boolean> => true, [])
   const deleteTimeline = useCallback(async (_id: string): Promise<boolean> => false, [])
   const clearFirstLogin = useCallback(() => {}, [])
 
   return {
     // Timeline list management
-    timelines: [DEMO_TIMELINE],
+    timelines: [demoTimeline],
     selectedTimelineId: 'demo' as string | null,
     selectTimeline,
     createTimeline,

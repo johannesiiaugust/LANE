@@ -1,10 +1,30 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useMemo } from 'react'
 import type { Lane, TimelineEvent } from '@/types/timeline'
 import type { AlignedPersonaEvent, OverlayTimelineEvent } from '@/types/database'
 import { TimelineEventBar } from './TimelineEvent'
 import { PersonaEventBar } from './PersonaEventBar'
 import { OverlayEventBar } from './OverlayEventBar'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
+
+/** For collapsed lanes: map event id → how many overlapping events end later (0 = front of stack). */
+function computeStackDepths(events: TimelineEvent[]): Map<string, number> {
+  const depths = new Map<string, number>()
+  for (const ev of events) {
+    const evEnd = ev.endYear ?? ev.startYear + 0.5
+    let depth = 0
+    let hasOverlap = false
+    for (const other of events) {
+      if (other.id === ev.id) continue
+      const otherEnd = other.endYear ?? other.startYear + 0.5
+      if (ev.startYear < otherEnd && other.startYear < evEnd) {
+        hasOverlap = true
+        if (otherEnd > evEnd || (otherEnd === evEnd && other.startYear > ev.startYear)) depth++
+      }
+    }
+    if (hasOverlap) depths.set(ev.id, depth)
+  }
+  return depths
+}
 
 const RANGE_HOLD_MS = 1000  // hold this long without moving to enter range-draw mode
 const PAN_THRESHOLD_PX = 4  // move this far within RANGE_HOLD_MS to enter pan mode
@@ -31,9 +51,11 @@ interface TimelineLaneProps {
   onEventMoveStart?: (event: TimelineEvent, clientX: number, clientY: number, origin: 'longpress' | 'contextmenu') => void
   onEventExtendStart?: (event: TimelineEvent, direction: 'forward' | 'backward', clientX: number) => void
   overlayEvents?: OverlayTimelineEvent[]
-  overlaySubRowMap?: Map<string, number>       // timeline_id -> sub-row index
-  overlayBaseOffset?: number                   // y-offset where overlay rows start
+  overlaySubRowMap?: Map<string, number>                       // timeline_id -> base sub-row offset
+  overlayEventRowMaps?: Map<string, Map<string, number>>       // timeline_id -> event_id -> row within group
+  overlayBaseOffset?: number                                   // y-offset where overlay rows start
   overlayTimelineInfoMap?: Map<string, { label: string; name: string; color?: string | null }>
+  personaEventRowMaps?: Map<string, Map<string, number>>       // persona_id -> event_id -> row within group
 }
 
 export function TimelineLane({
@@ -57,8 +79,10 @@ export function TimelineLane({
   onEventExtendStart,
   overlayEvents = [],
   overlaySubRowMap,
+  overlayEventRowMaps,
   overlayBaseOffset = 0,
   overlayTimelineInfoMap,
+  personaEventRowMaps,
 }: TimelineLaneProps) {
   const { sc } = useSizeConfig()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT } = sc
@@ -165,6 +189,12 @@ export function TimelineLane({
     onLaneClick(lane.id, year)
   }
 
+  // Stack depths for collapsed overlapping events (empty map when expanded)
+  const stackDepthMap = useMemo(() => {
+    if (eventRowMap && eventRowMap.size > 0) return new Map<string, number>()
+    return computeStackDepths(events)
+  }, [events, eventRowMap])
+
   // ── Render ───────────────────────────────────────────────────────────────
   // Separator is only drawn at the boundary between event rows and persona sub-rows,
   // NOT between stacked event rows. This prevents grey lines inside expanded lanes.
@@ -216,6 +246,7 @@ export function TimelineLane({
           onClick={onEventClick}
           currentYear={currentYear}
           topOffset={(eventRowMap?.get(event.id) ?? 0) * BASE_LANE_HEIGHT}
+          stackDepth={stackDepthMap.get(event.id)}
           scrollLeft={scrollLeft}
           isDragging={draggingEventId === event.id}
           onMoveStart={onEventMoveStart}
@@ -229,12 +260,13 @@ export function TimelineLane({
           yearStart={yearStart}
           pixelsPerYear={pixelsPerYear}
           laneColor={lane.color}
-          subRowIndex={personaSubRowMap.get(pe.persona_id)}
+          subRowIndex={(personaSubRowMap.get(pe.persona_id) ?? 0) + (personaEventRowMaps?.get(pe.persona_id)?.get(pe.id) ?? 0)}
           currentYear={currentYear}
         />
       ))}
       {overlayEvents.map(oe => {
-        const subRowIndex = overlaySubRowMap?.get(oe.timeline_id) ?? 0
+        const baseSubRow = overlaySubRowMap?.get(oe.timeline_id) ?? 0
+        const eventRow = overlayEventRowMaps?.get(oe.timeline_id)?.get(oe.id) ?? 0
         const info = overlayTimelineInfoMap?.get(oe.timeline_id)
         return (
           <OverlayEventBar
@@ -245,7 +277,7 @@ export function TimelineLane({
             yearStart={yearStart}
             pixelsPerYear={pixelsPerYear}
             laneColor={lane.color}
-            rowTop={overlayBaseOffset + subRowIndex * PERSONA_SUB_ROW_HEIGHT}
+            rowTop={overlayBaseOffset + (baseSubRow + eventRow) * PERSONA_SUB_ROW_HEIGHT}
             rowHeight={PERSONA_SUB_ROW_HEIGHT}
             currentYear={currentYear}
           />

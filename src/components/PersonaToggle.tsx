@@ -1,4 +1,4 @@
-import { Layers, LayoutList, Users, Link2, Link2Off } from 'lucide-react'
+import { Users, Link2, Link2Off } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
@@ -22,8 +22,8 @@ export function PersonaToggle({
   onToggle,
   alignedPersonaIds,
   onToggleAlignment,
-  personaDisplayModes,
-  onSetDisplayMode,
+  personaDisplayModes: _personaDisplayModes,
+  onSetDisplayMode: _onSetDisplayMode,
 }: PersonaToggleProps) {
   const activeCount = activePersonaIds.size
 
@@ -47,7 +47,6 @@ export function PersonaToggle({
         {personas.map(p => {
           const isActive = activePersonaIds.has(p.id)
           const aligned = alignedPersonaIds.has(p.id)
-          const mode = personaDisplayModes.get(p.id) ?? 'separate'
           return (
             <div
               key={p.id}
@@ -75,32 +74,6 @@ export function PersonaToggle({
                       >
                         {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
                       </button>
-                      <div className="flex items-center rounded border overflow-hidden">
-                        <button
-                          onClick={() => onSetDisplayMode(p.id, 'integrated')}
-                          title="Blend into my timeline lanes"
-                          className={cn(
-                            'p-1 transition-colors',
-                            mode === 'integrated'
-                              ? 'bg-primary text-primary-foreground'
-                              : 'text-muted-foreground hover:bg-muted',
-                          )}
-                        >
-                          <Layers className="h-3 w-3" />
-                        </button>
-                        <button
-                          onClick={() => onSetDisplayMode(p.id, 'separate')}
-                          title="Show as separate timeline below"
-                          className={cn(
-                            'p-1 transition-colors',
-                            mode === 'separate'
-                              ? 'bg-primary text-primary-foreground'
-                              : 'text-muted-foreground hover:bg-muted',
-                          )}
-                        >
-                          <LayoutList className="h-3 w-3" />
-                        </button>
-                      </div>
                     </>
                   )}
                   <Switch

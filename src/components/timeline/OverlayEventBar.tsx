@@ -138,7 +138,7 @@ export function OverlayEventBar({
     return (
       <>
         <div
-          className="absolute rounded-full border-2 border-dashed border-white/60 cursor-pointer"
+          className="absolute rounded-full border-2 border-dashed border-white/60 cursor-pointer transition-all hover:scale-125 hover:shadow-lg"
           style={{
             left: left - DOT_SIZE / 2,
             top,
@@ -147,6 +147,7 @@ export function OverlayEventBar({
             backgroundColor: color,
             opacity,
             filter,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3)',
           }}
           {...pointerHandlers}
         />
@@ -157,13 +158,13 @@ export function OverlayEventBar({
 
   const displayEnd = event.display_end_year ?? event.display_start_year + 1
   const width = (displayEnd - event.display_start_year) * pixelsPerYear
-  const barHeight = Math.round(BAR_HEIGHT * 0.75)
+  const barHeight = BAR_HEIGHT
   const top = rowTop + (rowHeight - barHeight) / 2
 
   return (
     <>
       <div
-        className="absolute rounded-sm border-2 border-dashed border-white/60 overflow-hidden cursor-pointer"
+        className="absolute rounded-lg border-2 border-dashed border-white/60 overflow-hidden cursor-pointer transition-all hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50"
         style={{
           left,
           top,
@@ -172,18 +173,21 @@ export function OverlayEventBar({
           backgroundColor: color,
           opacity,
           filter,
+          boxShadow: '0 2px 5px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)',
         }}
         {...pointerHandlers}
       >
+        {/* 3D sheen */}
+        <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 55%)' }} />
         {width > EVENT_FONT * 5 && (
           <span
-            className="px-1 text-white/80 font-medium truncate block"
+            className="absolute px-1 text-white/80 font-medium truncate drop-shadow-[0_0_2px_rgba(0,0,0,0.5)]"
             style={{ fontSize: Math.round(EVENT_FONT * 0.9), lineHeight: `${EVENT_LINE_HEIGHT}px` }}
           >
             <span className="inline-flex items-center gap-1">
-                <span className="inline-block rounded-full shrink-0" style={{ width: 7, height: 7, backgroundColor: bulletColor }} />
-                {event.title}
-              </span>
+              <span className="inline-block rounded-full shrink-0" style={{ width: 7, height: 7, backgroundColor: bulletColor }} />
+              {event.title}
+            </span>
           </span>
         )}
       </div>

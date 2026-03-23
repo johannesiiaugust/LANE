@@ -1,5 +1,6 @@
 import { useMemo, useCallback, useState } from 'react'
-import { Plus, ZoomIn, ZoomOut, MoreHorizontal, CalendarSearch, Globe, FileText, Mic, Search, LogOut, UserPen } from 'lucide-react' // Globe kept for import menu item
+import { useGoogleTranslate, TranslateMenuContent } from '@/components/TranslateMenu'
+import { Plus, ZoomIn, ZoomOut, MoreHorizontal, CalendarSearch, Search, LogOut, UserPen } from 'lucide-react' // Globe kept for import menu item
 import { Button } from '@/components/ui/button'
 import { TimelinePersonaSelector } from '@/components/TimelinePersonaSelector'
 import { ProfileDialog } from '@/components/ProfileDialog'
@@ -130,6 +131,7 @@ export function Toolbar({
   showUserMenu = true,
   extraActions,
 }: ToolbarProps) {
+  useGoogleTranslate()
   const { size, setSize } = useSizeConfig()
   const { skinId, setSkinId, customInput } = useSkin()
   const { user, signOut } = useAuth()
@@ -189,7 +191,7 @@ export function Toolbar({
       <div className="flex items-center justify-between border-b bg-background px-3 py-2 gap-2">
         {/* ── Left: branding + timeline selector ── */}
         <div className="flex items-center gap-2 min-w-0">
-          <h1 className="text-lg font-semibold shrink-0 hidden sm:block">TimeLANE</h1>
+          <h1 className="text-lg font-semibold shrink-0 hidden sm:block">LifeLANE</h1>
           <TimelinePersonaSelector
             personas={personas}
             activePersonaIds={activePersonaIds}
@@ -232,10 +234,10 @@ export function Toolbar({
                   {todayOffScreen.direction === 'left' ? '← ' : '→ '}Back to Today
                 </button>
               )}
-              <Button variant="outline" size="sm" onClick={() => stepZoom(1 / 1.3)} title="Zoom out">
+              <Button variant="outline" size="sm" onClick={() => stepZoom(1 / 1.69)} title="Zoom out">
                 <ZoomOut className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm" onClick={() => stepZoom(1.3)} title="Zoom in">
+              <Button variant="outline" size="sm" onClick={() => stepZoom(1.69)} title="Zoom in">
                 <ZoomIn className="h-4 w-4" />
               </Button>
             </>
@@ -349,20 +351,11 @@ export function Toolbar({
                 {/* Import */}
                 <DropdownMenuItem onClick={() => openImport('calendar-file')}>
                   <CalendarSearch className="h-4 w-4 mr-2" />
-                  Import Calendar File
+                  Import Calendar File, Google or text/voice with AI
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => openImport('google-calendar')}>
-                  <Globe className="h-4 w-4 mr-2" />
-                  Import Google Calendar
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => openImport('text')}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Import from Text
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => openImport('voice')}>
-                  <Mic className="h-4 w-4 mr-2" />
-                  Import from Voice
-                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+                <TranslateMenuContent />
 
                 {/* User section */}
                 {showUserMenu && user && (

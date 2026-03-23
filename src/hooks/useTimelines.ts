@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import {
   fetchTimelines,
-  fetchProfile,
   createTimelineWithDefaults,
   createEmptyTimeline,
   copyTimelineData as copyTimelineDataApi,
@@ -10,7 +9,6 @@ import {
   deleteTimeline as deleteTimelineApi,
 } from '@/lib/api'
 import type { DbTimeline } from '@/types/database'
-import { birthDateToFloatYear } from '@/lib/utils'
 
 const SELECTED_TIMELINE_KEY = 'timeline_selected_id'
 
@@ -53,20 +51,16 @@ export function useTimelines() {
         const newId = await createTimelineWithDefaults(user!.id)
         if (cancelled) return
         if (newId) {
-          // Set timeline start/end years from user's birth date
-          const profile = await fetchProfile(user!.id)
-          if (profile?.birth_date) {
-            const floatYear = birthDateToFloatYear(profile.birth_date)
-            await updateTimelineApi(newId, {
-              start_year: floatYear,
-              end_year: floatYear + 100,
-            })
-          }
           // Check if user wants to import their demo timeline
           if (localStorage.getItem('timeline_import_demo') === '1') {
             try {
-              const { DEMO_LANES, DEMO_EVENTS } = await import('@/data/demoData')
+              const { DEMO_LANES, DEMO_EVENTS, DEMO_TIMELINE_START_YEAR, DEMO_TIMELINE_END_YEAR } = await import('@/data/demoData')
               const { applyDemoTimeline } = await import('@/lib/api')
+              // Set timeline start/end from demo constants
+              await updateTimelineApi(newId, {
+                start_year: DEMO_TIMELINE_START_YEAR,
+                end_year: DEMO_TIMELINE_END_YEAR,
+              })
               // Load user-modified demo from localStorage
               const raw = localStorage.getItem('timeline_demo_v3')
               const demoState = raw

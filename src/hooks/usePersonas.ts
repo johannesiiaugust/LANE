@@ -53,29 +53,42 @@ function saveAlignedIds(ids: Set<string>) {
 export function usePersonas(userBirthYear: number | null = null) {
   const [personas, setPersonas] = useState<DbPersona[]>([])
   const [rawPersonaEvents, setRawPersonaEvents] = useState<DbPersonaEvent[]>([])
+  const [loadedPersonaIds, setLoadedPersonaIds] = useState<Set<string>>(new Set())
   const [activePersonaIds, setActivePersonaIds] = useState<Set<string>>(loadActiveIds)
   const [alignedPersonaIds, setAlignedPersonaIds] = useState<Set<string>>(loadAlignedIds)
   const [personaDisplayModes, setPersonaDisplayModesState] = useState<Map<string, PersonaDisplayMode>>(loadDisplayModes)
   const [loading, setLoading] = useState(true)
 
-  // Fetch all personas on mount
+  // Fetch all personas (metadata only) on mount
   useEffect(() => {
     let cancelled = false
     async function load() {
       const list = await fetchPersonas()
       if (cancelled) return
       setPersonas(list)
-
-      if (list.length > 0) {
-        const events = await fetchPersonaEvents(list.map(p => p.id))
-        if (cancelled) return
-        setRawPersonaEvents(events)
-      }
       setLoading(false)
     }
     load()
     return () => { cancelled = true }
   }, [])
+
+  // Fetch events lazily — only for active personas not yet loaded
+  useEffect(() => {
+    const missing = [...activePersonaIds].filter(id => !loadedPersonaIds.has(id))
+    if (missing.length === 0) return
+    let cancelled = false
+    fetchPersonaEvents(missing).then(events => {
+      if (cancelled) return
+      setRawPersonaEvents(prev => [...prev, ...events])
+      setLoadedPersonaIds(prev => {
+        const next = new Set(prev)
+        missing.forEach(id => next.add(id))
+        return next
+      })
+    })
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePersonaIds])
 
   // Compute aligned events reactively based on alignment toggles
   const allPersonaEvents = useMemo(() => {

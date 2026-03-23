@@ -84,6 +84,8 @@ export function useSupabaseTimeline(timelineId: string | null) {
         description: event.description,
         start_time: fracYearToDbTime(event.startYear),
         end_time: event.endYear != null ? fracYearToDbTime(event.endYear) : null,
+        fade_in_time: event.fadeInYear != null ? fracYearToDbTime(event.fadeInYear) : null,
+        fade_out_time: event.fadeOutYear != null ? fracYearToDbTime(event.fadeOutYear) : null,
         color: event.color,
         emoji: event.emoji,
         point_value: event.pointValue,
@@ -121,6 +123,8 @@ export function useSupabaseTimeline(timelineId: string | null) {
       if (updates.description !== undefined) dbUpdates.description = updates.description
       if (updates.startYear !== undefined) dbUpdates.start_time = fracYearToDbTime(updates.startYear)
       if ('endYear' in updates) dbUpdates.end_time = updates.endYear != null ? fracYearToDbTime(updates.endYear) : null
+      if ('fadeInYear' in updates) dbUpdates.fade_in_time = updates.fadeInYear != null ? fracYearToDbTime(updates.fadeInYear) : null
+      if ('fadeOutYear' in updates) dbUpdates.fade_out_time = updates.fadeOutYear != null ? fracYearToDbTime(updates.fadeOutYear) : null
       if ('color' in updates) dbUpdates.color = updates.color ?? null
       if ('emoji' in updates) dbUpdates.emoji = updates.emoji ?? null
       if ('pointValue' in updates) dbUpdates.point_value = updates.pointValue ?? null

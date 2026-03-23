@@ -51,7 +51,7 @@ export interface PersonaSidebarSection {
   initials: string
   birthYear: number
   deathYear?: number | null
-  laneNames: string[]
+  laneRowData: { name: string; hasOverlaps: boolean; rowCount: number }[]
 }
 
 export interface OverlaySidebarSection {
@@ -59,7 +59,7 @@ export interface OverlaySidebarSection {
   name: string
   label: string   // emoji or 2-char abbreviation
   color: string
-  laneNames: string[]
+  laneRowData: { name: string; hasOverlaps: boolean; rowCount: number }[]
 }
 
 // ── Drag-to-pan hook ──────────────────────────────────────────────────────────
@@ -119,19 +119,28 @@ interface LaneSidebarProps {
   lanes: Lane[]
   hiddenLanes: Lane[]
   laneHeights: number[]
-  lanePersonaLabels: Map<string, { initials: string; name: string }[]>
-  laneOverlayLabels?: Map<string, { label: string; name: string }[]>
+  lanePersonaLabels: Map<string, { initials: string; name: string; personaId: string; hasOverlaps: boolean; rowCount: number }[]>
+  laneOverlayLabels?: Map<string, { label: string; name: string; timelineId: string; hasOverlaps: boolean; rowCount: number }[]>
   laneHasOverlaps: Map<string, boolean>
   expandedLanes: Set<string>
+  expandedPersonaRows: Set<string>
+  expandedOverlayRows: Set<string>
+  expandedSeparatePersonaLanes: Set<string>
+  expandedSeparateOverlayLanes: Set<string>
   separatePersonaSections?: PersonaSidebarSection[]
   separateOverlaySections?: OverlaySidebarSection[]
   onToggleExpand: (id: string) => void
+  onTogglePersonaExpand: (laneId: string, personaId: string) => void
+  onToggleOverlayExpand: (laneId: string, timelineId: string) => void
+  onToggleSeparatePersonaLane: (personaId: string, laneName: string) => void
+  onToggleSeparateOverlayLane: (timelineId: string, laneName: string) => void
   onToggleVisibility: (id: string) => void
   onMoveLane: (id: string, direction: 'up' | 'down') => void
   onEditLane: (lane: Lane) => void
   onDeleteLane: (lane: Lane) => void
   totalAssetsHeight?: number
   onPan?: (dx: number) => void
+  timelineName?: string
 }
 
 export function LaneSidebar({
@@ -142,15 +151,24 @@ export function LaneSidebar({
   laneOverlayLabels,
   laneHasOverlaps,
   expandedLanes,
+  expandedPersonaRows,
+  expandedOverlayRows,
+  expandedSeparatePersonaLanes,
+  expandedSeparateOverlayLanes,
   separatePersonaSections = [],
   separateOverlaySections = [],
   onToggleExpand,
+  onTogglePersonaExpand,
+  onToggleOverlayExpand,
+  onToggleSeparatePersonaLane,
+  onToggleSeparateOverlayLane,
   onToggleVisibility,
   onMoveLane,
   onEditLane,
   onDeleteLane,
   totalAssetsHeight,
   onPan,
+  timelineName,
 }: LaneSidebarProps) {
   const [showHidden, setShowHidden] = useState(false)
   const { sc } = useSizeConfig()
@@ -176,8 +194,20 @@ export function LaneSidebar({
 
   return (
     <div className="bg-background" style={{ minWidth: W, width: W }}>
-      {/* header spacer */}
-      <div className="border-b bg-background" style={{ height: HEADER_HEIGHT }} />
+      {/* A1 cell — timeline name */}
+      <div
+        className="border-b bg-background flex items-end overflow-hidden"
+        style={{ height: HEADER_HEIGHT, paddingLeft: Math.round(W * 0.08), paddingRight: Math.round(W * 0.04), paddingBottom: Math.round(SIDEBAR_FONT * 0.3) }}
+      >
+        {timelineName && (
+          <span
+            className="font-bold truncate text-foreground"
+            style={{ fontSize: SIDEBAR_FONT }}
+          >
+            {timelineName}
+          </span>
+        )}
+      </div>
 
       {lanes.map((lane, i) => {
         const height = laneHeights[i] ?? BASE_LANE_HEIGHT
@@ -189,17 +219,18 @@ export function LaneSidebar({
             style={{ height, paddingLeft: Math.round(W * 0.04), paddingRight: Math.round(W * 0.04) }}
           >
             {/* Main lane label row */}
-            <div className="flex items-center" style={{ height: BASE_LANE_HEIGHT, gap: Math.round(ICON_SIZE / 3) }}>
+            <div className="relative flex items-center" style={{ height: BASE_LANE_HEIGHT, paddingLeft: Math.round(W * 0.04), gap: Math.round(ICON_SIZE / 3) }}>
+              {/* Expand chevron — left side, compact */}
               {laneHasOverlaps.get(lane.id) ? (
                 <button
                   onClick={() => onToggleExpand(lane.id)}
-                  className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
-                  style={{ padding: iconPad }}
+                  className="shrink-0 text-muted-foreground/50 hover:text-foreground transition-colors"
+                  style={{ padding: iconPad, marginRight: Math.round(W * 0.02) }}
                   title={expandedLanes.has(lane.id) ? 'Collapse rows' : 'Expand overlapping events'}
                 >
                   {expandedLanes.has(lane.id)
-                    ? <ChevronDown size={ICON_SIZE} />
-                    : <ChevronRight size={ICON_SIZE} />}
+                    ? <ChevronDown size={Math.round(ICON_SIZE * 0.75)} />
+                    : <ChevronRight size={Math.round(ICON_SIZE * 0.75)} />}
                 </button>
               ) : null}
               {(() => {
@@ -207,104 +238,144 @@ export function LaneSidebar({
                 return <Icon size={ICON_SIZE} strokeWidth={1.5} className="shrink-0" style={{ color: lane.color, opacity: lane.visible ? 1 : 0.4 }} />
               })()}
               <span
-                className="font-medium truncate flex-1 text-muted-foreground hidden sm:inline"
-                style={{ fontSize: SIDEBAR_FONT, opacity: lane.visible ? 1 : 0.4 }}
+                className="font-medium flex-1 min-w-0 whitespace-nowrap overflow-hidden"
+                style={{
+                  fontSize: SIDEBAR_FONT,
+                  opacity: lane.visible ? 1 : 0.4,
+                  maskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
+                  WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
+                }}
               >
                 {lane.name}
               </span>
-              <button
-                onClick={() => onToggleVisibility(lane.id)}
-                className="text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ padding: iconPad }}
+
+              {/* Action buttons — absolute overlay on hover, no layout cost when hidden */}
+              <div
+                className="absolute inset-y-0 right-0 flex items-center opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity"
+                style={{
+                  paddingRight: Math.round(W * 0.02),
+                  paddingLeft: ICON_SIZE * 2,
+                  background: `linear-gradient(to right, transparent, hsl(var(--background)) ${ICON_SIZE * 2}px)`,
+                }}
               >
-                {lane.visible ? <Eye size={ICON_SIZE} /> : <EyeOff size={ICON_SIZE} />}
-              </button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className="text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ padding: iconPad }}
-                  >
-                    <MoreHorizontal size={ICON_SIZE} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" sideOffset={4}>
-                  <DropdownMenuItem onClick={() => onEditLane(lane)}>
-                    <Pencil className="h-4 w-4 mr-2" />
-                    Edit Lane
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => onMoveLane(lane.id, 'up')}
-                    disabled={sortedAllLanes[0]?.id === lane.id}
-                  >
-                    <ArrowUp className="h-4 w-4 mr-2" />
-                    Move Up
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onMoveLane(lane.id, 'down')}
-                    disabled={sortedAllLanes[sortedAllLanes.length - 1]?.id === lane.id}
-                  >
-                    <ArrowDown className="h-4 w-4 mr-2" />
-                    Move Down
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onClick={() => onDeleteLane(lane)}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Lane
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                <button
+                  onClick={() => onToggleVisibility(lane.id)}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  style={{ padding: iconPad }}
+                >
+                  {lane.visible ? <Eye size={ICON_SIZE} /> : <EyeOff size={ICON_SIZE} />}
+                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                      style={{ padding: iconPad }}
+                    >
+                      <MoreHorizontal size={ICON_SIZE} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" sideOffset={4}>
+                    <DropdownMenuItem onClick={() => onEditLane(lane)}>
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Edit Lane
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => onMoveLane(lane.id, 'up')}
+                      disabled={sortedAllLanes[0]?.id === lane.id}
+                    >
+                      <ArrowUp className="h-4 w-4 mr-2" />
+                      Move Up
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onMoveLane(lane.id, 'down')}
+                      disabled={sortedAllLanes[sortedAllLanes.length - 1]?.id === lane.id}
+                    >
+                      <ArrowDown className="h-4 w-4 mr-2" />
+                      Move Down
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive"
+                      onClick={() => onDeleteLane(lane)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Lane
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
 
             {/* Persona sub-row labels */}
-            {personaLabels.map((pl, j) => (
-              <div
-                key={j}
-                className="flex items-center text-muted-foreground"
-                style={{
-                  height: PERSONA_SUB_ROW_HEIGHT,
-                  paddingLeft: Math.round(W * 0.08),
-                  gap: Math.round(ICON_SIZE / 6),
-                }}
-              >
-                <span
-                  className="font-semibold bg-muted rounded shrink-0"
-                  style={{ fontSize: Math.round(SIDEBAR_FONT * 0.85), padding: '0 4px' }}
+            {personaLabels.map((pl, j) => {
+              const isPersonaExpanded = expandedPersonaRows.has(`${lane.id}:${pl.personaId}`)
+              const rowH = pl.rowCount * PERSONA_SUB_ROW_HEIGHT
+              const topPad = Math.round((PERSONA_SUB_ROW_HEIGHT - SIDEBAR_FONT * 1.4) / 2)
+              return (
+                <div
+                  key={j}
+                  className="flex items-start text-muted-foreground"
+                  style={{
+                    height: rowH,
+                    paddingLeft: pl.hasOverlaps ? Math.round(W * 0.04) : Math.round(W * 0.08),
+                    paddingTop: topPad,
+                    gap: Math.round(ICON_SIZE / 6),
+                  }}
                 >
-                  {pl.initials}
-                </span>
-                <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>
-                  {pl.name}
-                </span>
-              </div>
-            ))}
+                  {pl.hasOverlaps && (
+                    <button
+                      onClick={() => onTogglePersonaExpand(lane.id, pl.personaId)}
+                      className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+                      style={{ padding: iconPad }}
+                      title={isPersonaExpanded ? 'Collapse rows' : 'Expand overlapping events'}
+                    >
+                      {isPersonaExpanded
+                        ? <ChevronDown size={ICON_SIZE} />
+                        : <ChevronRight size={ICON_SIZE} />}
+                    </button>
+                  )}
+                  <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>
+                    {pl.name}
+                  </span>
+                </div>
+              )
+            })}
 
             {/* Overlay sub-row labels */}
-            {(laneOverlayLabels?.get(lane.name) ?? []).map((ol, j) => (
-              <div
-                key={`ov-${j}`}
-                className="flex items-center text-muted-foreground"
-                style={{
-                  height: PERSONA_SUB_ROW_HEIGHT,
-                  paddingLeft: Math.round(W * 0.08),
-                  gap: Math.round(ICON_SIZE / 6),
-                }}
-              >
-                <span
-                  className="font-semibold bg-primary/15 text-primary rounded shrink-0"
-                  style={{ fontSize: Math.round(SIDEBAR_FONT * 0.85), padding: '0 4px' }}
+            {(laneOverlayLabels?.get(lane.name) ?? []).map((ol, j) => {
+              const isOverlayExpanded = expandedOverlayRows.has(`${lane.id}:${ol.timelineId}`)
+              const rowH = ol.rowCount * PERSONA_SUB_ROW_HEIGHT
+              const topPad = Math.round((PERSONA_SUB_ROW_HEIGHT - SIDEBAR_FONT * 1.4) / 2)
+              return (
+                <div
+                  key={`ov-${j}`}
+                  className="flex items-start text-muted-foreground"
+                  style={{
+                    height: rowH,
+                    paddingLeft: ol.hasOverlaps ? Math.round(W * 0.04) : Math.round(W * 0.08),
+                    paddingTop: topPad,
+                    gap: Math.round(ICON_SIZE / 6),
+                  }}
                 >
-                  {ol.label}
-                </span>
-                <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>
-                  {ol.name}
-                </span>
-              </div>
-            ))}
+                  {ol.hasOverlaps && (
+                    <button
+                      onClick={() => onToggleOverlayExpand(lane.id, ol.timelineId)}
+                      className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+                      style={{ padding: iconPad }}
+                      title={isOverlayExpanded ? 'Collapse rows' : 'Expand overlapping events'}
+                    >
+                      {isOverlayExpanded
+                        ? <ChevronDown size={ICON_SIZE} />
+                        : <ChevronRight size={ICON_SIZE} />}
+                    </button>
+                  )}
+                  <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>
+                    {ol.name}
+                  </span>
+                </div>
+              )
+            })}
           </div>
         )
       })}
@@ -341,12 +412,6 @@ export function LaneSidebar({
               gap: Math.round(ICON_SIZE / 6),
             }}
           >
-            <span
-              className="font-bold bg-muted-foreground/20 rounded shrink-0"
-              style={{ fontSize: Math.round(SIDEBAR_FONT * 0.85), padding: '1px 4px' }}
-            >
-              {section.initials}
-            </span>
             <span className="font-semibold text-muted-foreground truncate" style={{ fontSize: SIDEBAR_FONT }}>
               {section.name}
             </span>
@@ -358,20 +423,35 @@ export function LaneSidebar({
             </span>
           </div>
           {/* One label row per lane */}
-          {section.laneNames.map(laneName => (
-            <div
-              key={laneName}
-              className="border-b border-border/15 flex items-center text-muted-foreground"
-              style={{
-                height: BASE_LANE_HEIGHT,
-                paddingLeft: Math.round(W * 0.08),
-                paddingRight: Math.round(W * 0.04),
-                gap: Math.round(ICON_SIZE / 4),
-              }}
-            >
-              <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>{laneName}</span>
-            </div>
-          ))}
+          {section.laneRowData.map(row => {
+            const sepKey = `${section.personaId}:${row.name}`
+            const isRowExpanded = expandedSeparatePersonaLanes.has(sepKey)
+            return (
+              <div
+                key={row.name}
+                className="border-b border-border/15 flex items-start text-muted-foreground"
+                style={{
+                  height: row.rowCount * BASE_LANE_HEIGHT,
+                  paddingLeft: row.hasOverlaps ? Math.round(W * 0.04) : Math.round(W * 0.08),
+                  paddingRight: Math.round(W * 0.04),
+                  paddingTop: Math.round((BASE_LANE_HEIGHT - SIDEBAR_FONT * 1.4) / 2),
+                  gap: Math.round(ICON_SIZE / 4),
+                }}
+              >
+                {row.hasOverlaps && (
+                  <button
+                    onClick={() => onToggleSeparatePersonaLane(section.personaId, row.name)}
+                    className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+                    style={{ padding: iconPad }}
+                    title={isRowExpanded ? 'Collapse rows' : 'Expand overlapping events'}
+                  >
+                    {isRowExpanded ? <ChevronDown size={ICON_SIZE} /> : <ChevronRight size={ICON_SIZE} />}
+                  </button>
+                )}
+                <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>{row.name}</span>
+              </div>
+            )
+          })}
         </div>
       ))}
 
@@ -387,36 +467,45 @@ export function LaneSidebar({
               gap: Math.round(ICON_SIZE / 6),
             }}
           >
-            <span
-              className="font-bold bg-primary/15 text-primary rounded shrink-0"
-              style={{ fontSize: Math.round(SIDEBAR_FONT * 0.85), padding: '1px 4px' }}
-            >
-              {section.label}
-            </span>
             <span className="font-semibold text-muted-foreground truncate" style={{ fontSize: SIDEBAR_FONT }}>
               {section.name}
             </span>
           </div>
-          {section.laneNames.map(laneName => (
-            <div
-              key={laneName}
-              className="border-b border-border/15 flex items-center text-muted-foreground"
-              style={{
-                height: BASE_LANE_HEIGHT,
-                paddingLeft: Math.round(W * 0.08),
-                paddingRight: Math.round(W * 0.04),
-                gap: Math.round(ICON_SIZE / 4),
-              }}
-            >
-              <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>{laneName}</span>
-            </div>
-          ))}
+          {section.laneRowData.map(row => {
+            const sepKey = `${section.timelineId}:${row.name}`
+            const isRowExpanded = expandedSeparateOverlayLanes.has(sepKey)
+            return (
+              <div
+                key={row.name}
+                className="border-b border-border/15 flex items-start text-muted-foreground"
+                style={{
+                  height: row.rowCount * BASE_LANE_HEIGHT,
+                  paddingLeft: row.hasOverlaps ? Math.round(W * 0.04) : Math.round(W * 0.08),
+                  paddingRight: Math.round(W * 0.04),
+                  paddingTop: Math.round((BASE_LANE_HEIGHT - SIDEBAR_FONT * 1.4) / 2),
+                  gap: Math.round(ICON_SIZE / 4),
+                }}
+              >
+                {row.hasOverlaps && (
+                  <button
+                    onClick={() => onToggleSeparateOverlayLane(section.timelineId, row.name)}
+                    className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+                    style={{ padding: iconPad }}
+                    title={isRowExpanded ? 'Collapse rows' : 'Expand overlapping events'}
+                  >
+                    {isRowExpanded ? <ChevronDown size={ICON_SIZE} /> : <ChevronRight size={ICON_SIZE} />}
+                  </button>
+                )}
+                <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>{row.name}</span>
+              </div>
+            )
+          })}
         </div>
       ))}
 
-      {/* Hidden lanes recovery section */}
+      {/* Hidden lanes recovery section — list floats above the button via absolute positioning */}
       {hiddenLanes.length > 0 && (
-        <div className="border-t border-border/50">
+        <div className="border-t border-border/50 relative">
           <button
             onClick={() => setShowHidden(!showHidden)}
             className="flex items-center w-full text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
@@ -435,7 +524,10 @@ export function LaneSidebar({
             <span>Hidden ({hiddenLanes.length})</span>
           </button>
           {showHidden && (
-            <div style={{ paddingBottom: Math.round(SIDEBAR_FONT * 0.3) }}>
+            <div
+              className="absolute w-full bg-background border border-border/50 rounded-t shadow-md z-10"
+              style={{ bottom: '100%' }}
+            >
               {hiddenLanes.map(lane => (
                 <div
                   key={lane.id}
@@ -450,8 +542,12 @@ export function LaneSidebar({
                     return <Icon size={ICON_SIZE} strokeWidth={1.5} className="shrink-0 text-muted-foreground" style={{ opacity: 0.5 }} />
                   })()}
                   <span
-                    className="text-muted-foreground truncate flex-1"
-                    style={{ fontSize: SIDEBAR_FONT }}
+                    className="text-muted-foreground flex-1 min-w-0 whitespace-nowrap overflow-hidden"
+                    style={{
+                      fontSize: SIDEBAR_FONT,
+                      maskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
+                      WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
+                    }}
                   >
                     {lane.name}
                   </span>

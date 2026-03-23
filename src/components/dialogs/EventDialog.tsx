@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { Plus, X, Smile, Link2, ChevronDown, ChevronUp, Star, Upload, ImageIcon } from 'lucide-react'
+import { Plus, X, Link2, ChevronDown, ChevronUp, Star, Upload, ImageIcon } from 'lucide-react'
 import { uploadEventImage } from '@/lib/imageUpload'
 import type {
   Lane,
@@ -19,7 +19,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+import { EmojiPickerPopover } from '@/components/ui/EmojiPickerPopover'
+import { ColorPicker } from '@/components/ui/ColorPicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -33,15 +34,6 @@ import {
 } from '@/components/ui/select'
 import { fracYearToDMY, dmyToFracYear, formatDMYInput, fracYearToTimeStr, dmyTimeToFracYear, dateToFracYear } from '@/lib/constants'
 
-const EMOJIS = [
-  '👶','🎓','💼','🏠','❤️','💍','🤝','🏆','🎯','🌍',
-  '✈️','🏖️','⛰️','🚗','🚂','🚢','🏡','🌆','🌄','🌊',
-  '📚','✏️','🔬','💡','🖥️','📊','📱','🎵','🎮','🎨',
-  '🏋️','🚴','⚽','🏊','🎉','🎁','🎂','🎭','🎬','🏅',
-  '💰','💳','🏦','📈','📉','💎','🔑','📌','🌟','⭐',
-  '☀️','🌙','❄️','🔥','🌈','⚡','🌱','🌳','🐶','🐱',
-  '😊','🙏','👋','💪','🦁','🐸','🐦','🌺','🍕','🎪',
-]
 
 interface EventDialogProps {
   open: boolean
@@ -56,27 +48,21 @@ interface EventDialogProps {
   userId?: string | null
 }
 
-interface DraftSpotChange { id: string; dateStr: string; amountStr: string; label: string }
-interface DraftGrowthPeriod {
-  id: string; startDateStr: string; endDateStr: string
-  rateStr: string; applyOnNegative: boolean; wholeEvent: boolean
-}
+interface DraftSpotChange { id: string; dateStr: string; amountStr: string; label: string; growthStr: string }
 interface DraftDeposit {
   id: string; label: string; amount: string
   frequency: 'monthly' | 'yearly' | 'weekly' | 'daily' | 'quarterly' | 'custom'
   customIntervalStr: string; customUnit: 'day' | 'week' | 'month' | 'quarter' | 'year'
-  annualGrowthStr: string
+  annualGrowthStr: string   // deposit amount increases X%/yr (e.g. salary raises)
+  balanceGrowthStr: string  // accumulated balance earns X%/yr (e.g. savings interest)
   wholeEvent: boolean; startDateStr: string; endDateStr: string
 }
 
 function newSpotChange(): DraftSpotChange {
-  return { id: crypto.randomUUID(), dateStr: '', amountStr: '', label: '' }
-}
-function newGrowthPeriod(): DraftGrowthPeriod {
-  return { id: crypto.randomUUID(), startDateStr: '', endDateStr: '', rateStr: '', applyOnNegative: false, wholeEvent: false }
+  return { id: crypto.randomUUID(), dateStr: '', amountStr: '', label: '', growthStr: '' }
 }
 function newDeposit(): DraftDeposit {
-  return { id: crypto.randomUUID(), label: '', amount: '', frequency: 'monthly', customIntervalStr: '1', customUnit: 'month', annualGrowthStr: '', wholeEvent: false, startDateStr: '', endDateStr: '' }
+  return { id: crypto.randomUUID(), label: '', amount: '', frequency: 'monthly', customIntervalStr: '1', customUnit: 'month', annualGrowthStr: '', balanceGrowthStr: '', wholeEvent: false, startDateStr: '', endDateStr: '' }
 }
 
 export function EventDialog({
@@ -98,17 +84,25 @@ export function EventDialog({
   const [endDate, setEndDate] = useState('')
   const [color, setColor] = useState('')
   const [emoji, setEmoji] = useState('')
-  const [emojiOpen, setEmojiOpen] = useState(false)
-  const [pointValueStr, setPointValueStr] = useState('')
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
+
+  // Fade in/out
+  const [fadeInDate, setFadeInDate] = useState('')
+  const [fadeInTime, setFadeInTime] = useState('')
+  const [fadeOutDate, setFadeOutDate] = useState('')
+  const [fadeOutTime, setFadeOutTime] = useState('')
+  const [showTimeOptions, setShowTimeOptions] = useState(false)
+
+  // Validation
+  const [submitAttempted, setSubmitAttempted] = useState(false)
 
   // Value tracking (range events)
 
   const [valueEnabled, setValueEnabled] = useState(false)
   const [startValue, setStartValue] = useState('')
+  const [startValueGrowthStr, setStartValueGrowthStr] = useState('')
   const [spotChanges, setSpotChanges] = useState<DraftSpotChange[]>([])
-  const [growthPeriods, setGrowthPeriods] = useState<DraftGrowthPeriod[]>([])
   const [deposits, setDeposits] = useState<DraftDeposit[]>([])
 
   // Enrichment fields
@@ -157,46 +151,61 @@ export function EventDialog({
       setEndDate(editingEvent.endYear != null ? fracYearToDMY(editingEvent.endYear) : '')
       setColor(editingEvent.color ?? '')
       setEmoji(editingEvent.emoji ?? '')
-      setPointValueStr(editingEvent.pointValue != null ? String(editingEvent.pointValue) : '')
       const st = fracYearToTimeStr(editingEvent.startYear)
       setStartTime(st === '00:00' ? '' : st)
       const et = editingEvent.endYear != null ? fracYearToTimeStr(editingEvent.endYear) : ''
       setEndTime(et === '00:00' ? '' : et)
+      // Fade in/out
+      if (editingEvent.fadeInYear != null) {
+        setFadeInDate(fracYearToDMY(editingEvent.fadeInYear))
+        const fit = fracYearToTimeStr(editingEvent.fadeInYear)
+        setFadeInTime(fit === '00:00' ? '' : fit)
+      } else { setFadeInDate(''); setFadeInTime('') }
+      if (editingEvent.fadeOutYear != null) {
+        setFadeOutDate(fracYearToDMY(editingEvent.fadeOutYear))
+        const fot = fracYearToTimeStr(editingEvent.fadeOutYear)
+        setFadeOutTime(fot === '00:00' ? '' : fot)
+      } else { setFadeOutDate(''); setFadeOutTime('') }
+      setShowTimeOptions(!!(editingEvent.fadeInYear != null || editingEvent.fadeOutYear != null))
 
       const proj = editingEvent.valueProjection
       setValueEnabled(!!proj)
       if (proj) {
-        setStartValue(proj.startValue != null ? String(proj.startValue) : '')
-        setSpotChanges((proj.spotChanges ?? []).map(s => ({
-          id: s.id,
-          dateStr: fracYearToDMY(s.year),
-          amountStr: String(s.amount),
-          label: s.label ?? '',
-        })))
-        setGrowthPeriods((proj.growthPeriods ?? []).map(g => ({
-          id: g.id,
-          startDateStr: fracYearToDMY(g.startYear),
-          endDateStr: fracYearToDMY(g.endYear),
-          rateStr: String(g.growthPercent),
-          applyOnNegative: g.applyOnNegative,
-          wholeEvent: false,
-        })))
-        setDeposits((proj.deposits ?? []).map(d => ({
-          id: d.id,
-          label: d.label ?? '',
-          amount: String(d.amount),
-          frequency: d.frequency,
-          customIntervalStr: String(d.customInterval ?? 1),
-          customUnit: d.customUnit ?? 'month',
-          annualGrowthStr: d.annualGrowthPercent != null ? String(d.annualGrowthPercent) : '',
-          wholeEvent: false,
-          startDateStr: fracYearToDMY(d.startYear),
-          endDateStr: d.endYear != null ? fracYearToDMY(d.endYear) : '',
-        })))
+        setStartValue(proj.startValue != null ? String(proj.startValue) : editingEvent.pointValue != null ? String(editingEvent.pointValue) : '')
+        // Map growth periods back to inline fields: period starting at event start → start value growth;
+        // period starting near a spot change → that spot change's growth.
+        const startGrowth = (proj.growthPeriods ?? []).find(g => Math.abs(g.startYear - editingEvent.startYear) < 0.01)
+        setStartValueGrowthStr(startGrowth ? String(startGrowth.growthPercent) : '')
+        setSpotChanges((proj.spotChanges ?? []).map(s => {
+          const matched = (proj.growthPeriods ?? []).find(g => Math.abs(g.startYear - s.year) < 0.01)
+          return {
+            id: s.id,
+            dateStr: fracYearToDMY(s.year),
+            amountStr: String(s.amount),
+            label: s.label ?? '',
+            growthStr: matched ? String(matched.growthPercent) : '',
+          }
+        }))
+        setDeposits((proj.deposits ?? []).map(d => {
+          const matchedBalGrowth = (proj.growthPeriods ?? []).find(g => Math.abs(g.startYear - d.startYear) < 0.01)
+          return {
+            id: d.id,
+            label: d.label ?? '',
+            amount: String(d.amount),
+            frequency: d.frequency,
+            customIntervalStr: String(d.customInterval ?? 1),
+            customUnit: d.customUnit ?? 'month',
+            annualGrowthStr: d.annualGrowthPercent != null ? String(d.annualGrowthPercent) : '',
+            balanceGrowthStr: matchedBalGrowth ? String(matchedBalGrowth.growthPercent) : '',
+            wholeEvent: false,
+            startDateStr: fracYearToDMY(d.startYear),
+            endDateStr: d.endYear != null ? fracYearToDMY(d.endYear) : '',
+          }
+        }))
       } else {
-        setStartValue('')
+        setStartValue(editingEvent.pointValue != null ? String(editingEvent.pointValue) : '')
+        setStartValueGrowthStr('')
         setSpotChanges([])
-        setGrowthPeriods([])
         setDeposits([])
       }
       // Enrichment
@@ -234,13 +243,12 @@ export function EventDialog({
       setEndDate(defaultEndYear != null ? fracYearToDMY(defaultEndYear) : '')
       setColor('')
       setEmoji('')
-      setPointValueStr('')
       setStartTime('')
       setEndTime('')
       setValueEnabled(false)
       setStartValue('')
+      setStartValueGrowthStr('')
       setSpotChanges([])
-      setGrowthPeriods([])
       setDeposits([])
       setLinkEnabled(false)
       setLinkAnchorType('today')
@@ -250,6 +258,9 @@ export function EventDialog({
       setLinkDurationStr('')
       setLinkOnDelete('freeze')
       setLinkFixedDate(''); setLinkFixedTime('')
+      setFadeInDate(''); setFadeInTime('')
+      setFadeOutDate(''); setFadeOutTime('')
+      setShowTimeOptions(false)
       setUrl('')
       setLocation('')
       setRating(0)
@@ -257,6 +268,7 @@ export function EventDialog({
       setTags('')
       setSource('')
       setShowDetails(false)
+      setSubmitAttempted(false)
     }
   }, [editingEvent, open, lanes, defaultLaneId, defaultStartYear, defaultEndYear])
 
@@ -291,8 +303,22 @@ export function EventDialog({
     return { startYear, endYear }
   }, [linkEnabled, linkAnchorType, linkFixedDate, linkFixedTime, linkEventId, linkEventAnchor, linkStartOffsetStr, linkDurationStr, events])
 
+  // Fractional years for the event boundaries — used to validate value-tracking dates
+  const evStartFrac = startDate.length === 10 ? dmyToFracYear(startDate) : null
+  const evEndFrac = endDate.length === 10 ? dmyToFracYear(endDate) : null
+
+  function isOutOfEventRange(dateStr: string): boolean {
+    if (!dateStr || dateStr.length < 10) return false
+    const y = dmyToFracYear(dateStr)
+    if (isNaN(y)) return false
+    if (evStartFrac !== null && !isNaN(evStartFrac) && y < evStartFrac - 0.001) return true
+    if (evEndFrac !== null && !isNaN(evEndFrac) && y > evEndFrac + 0.001) return true
+    return false
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setSubmitAttempted(true)
     // When link is active, start date isn't required (computed); otherwise validate
     if (!title.trim() || !laneId) return
     if (!linkEnabled && !startDate) return
@@ -314,16 +340,27 @@ export function EventDialog({
         }))
         .filter(s => !isNaN(s.year) && s.year >= evStart - 0.001 && s.year <= evEnd + 0.001)
 
-      const periods: ValueGrowthPeriod[] = growthPeriods
-        .filter(g => g.rateStr && !isNaN(Number(g.rateStr)))
-        .map(g => ({
-          id: g.id,
-          startYear: g.wholeEvent ? evStart : dmyToFracYear(g.startDateStr),
-          endYear: g.wholeEvent ? evEnd : dmyToFracYear(g.endDateStr),
-          growthPercent: Number(g.rateStr),
-          applyOnNegative: g.applyOnNegative,
-        }))
-        .filter(p => !isNaN(p.startYear) && !isNaN(p.endYear))
+      // Build growth periods from inline growth fields on start value and spot changes.
+      // Sort by startYear descending so later periods take priority in growthAt().
+      const periods: ValueGrowthPeriod[] = []
+      if (startValueGrowthStr && !isNaN(Number(startValueGrowthStr)) && Number(startValueGrowthStr) !== 0) {
+        periods.push({ id: crypto.randomUUID(), startYear: evStart, endYear: evEnd, growthPercent: Number(startValueGrowthStr), applyOnNegative: false })
+      }
+      for (const s of spots) {
+        const sc = spotChanges.find(d => d.id === s.id)
+        if (sc?.growthStr && !isNaN(Number(sc.growthStr)) && Number(sc.growthStr) !== 0) {
+          periods.push({ id: crypto.randomUUID(), startYear: s.year, endYear: evEnd, growthPercent: Number(sc.growthStr), applyOnNegative: false })
+        }
+      }
+      // Deposit balance growth (earns X%/yr on the accumulated total during that deposit's window)
+      for (const d of deposits) {
+        if (!d.balanceGrowthStr || isNaN(Number(d.balanceGrowthStr)) || Number(d.balanceGrowthStr) === 0) continue
+        const dStart = d.wholeEvent ? evStart : dmyToFracYear(d.startDateStr)
+        const dEnd = d.wholeEvent ? evEnd : d.endDateStr ? dmyToFracYear(d.endDateStr) : evEnd
+        if (isNaN(dStart)) continue
+        periods.push({ id: crypto.randomUUID(), startYear: dStart, endYear: dEnd, growthPercent: Number(d.balanceGrowthStr), applyOnNegative: false })
+      }
+      periods.sort((a, b) => b.startYear - a.startYear)
 
       const deps: ValueDeposit[] = deposits
         .filter(d => d.amount && !isNaN(Number(d.amount)) && (d.wholeEvent || d.startDateStr))
@@ -351,8 +388,14 @@ export function EventDialog({
       }
     }
 
-    const pv = !isRange && pointValueStr && !isNaN(Number(pointValueStr))
-      ? Number(pointValueStr) : undefined
+    if (!isRange && startValue && !isNaN(Number(startValue))) {
+      valueProjectionOut = {
+        startValue: Number(startValue),
+        spotChanges: [],
+        growthPeriods: [],
+        deposits: [],
+      }
+    }
 
     // Resolve start/end from link or from date fields
     const resolvedStart = computedLink?.startYear ?? dmyTimeToFracYear(startDate, startTime)
@@ -391,6 +434,10 @@ export function EventDialog({
         }
       : undefined
 
+    // Resolve fade years
+    const fadeInResolved = fadeInDate.length === 10 ? dmyTimeToFracYear(fadeInDate, fadeInTime) : undefined
+    const fadeOutResolved = fadeOutDate.length === 10 ? dmyTimeToFracYear(fadeOutDate, fadeOutTime) : undefined
+
     const data: Omit<TimelineEvent, 'id'> = {
       laneId,
       title: title.trim(),
@@ -398,9 +445,10 @@ export function EventDialog({
       type: resolvedEnd !== undefined ? 'range' : 'point',
       startYear: resolvedStart,
       ...(resolvedEnd !== undefined ? { endYear: resolvedEnd } : {}),
+      ...(fadeInResolved !== undefined && !isNaN(fadeInResolved) ? { fadeInYear: fadeInResolved } : {}),
+      ...(fadeOutResolved !== undefined && !isNaN(fadeOutResolved) ? { fadeOutYear: fadeOutResolved } : {}),
       ...(color ? { color } : {}),
       ...(emoji ? { emoji } : {}),
-      ...(pv != null ? { pointValue: pv } : {}),
       ...(valueProjectionOut ? { valueProjection: valueProjectionOut } : {}),
       ...(linkOut ? { link: linkOut } : {}),
       ...(url.trim() ? { url: url.trim() } : {}),
@@ -418,13 +466,6 @@ export function EventDialog({
   function removeSpotChange(i: number) { setSpotChanges(s => s.filter((_, j) => j !== i)) }
   function updateSpotChange(i: number, field: keyof DraftSpotChange, val: string) {
     setSpotChanges(s => s.map((sc, j) => j === i ? { ...sc, [field]: val } : sc))
-  }
-
-  // Growth periods CRUD
-  function addGrowthPeriod() { setGrowthPeriods(g => [...g, newGrowthPeriod()]) }
-  function removeGrowthPeriod(i: number) { setGrowthPeriods(g => g.filter((_, j) => j !== i)) }
-  function updateGrowthPeriod(i: number, field: keyof DraftGrowthPeriod, val: string | boolean) {
-    setGrowthPeriods(g => g.map((gp, j) => j === i ? { ...gp, [field]: val } : gp))
   }
 
   // Deposits CRUD
@@ -454,60 +495,37 @@ export function EventDialog({
             </Select>
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="title">Title</Label>
-            <Input id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder="Event title" />
+            <Label htmlFor="title" className={submitAttempted && !title.trim() ? 'text-destructive' : ''}>
+              Title <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder="Event title"
+              className={submitAttempted && !title.trim() ? 'border-destructive focus-visible:ring-destructive text-destructive placeholder:text-destructive/50' : ''}
+            />
           </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="desc">Description</Label>
-            <Input id="desc" value={description} onChange={e => setDescription(e.target.value)} placeholder="Optional description" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="grid gap-1.5">
+          {/* Color + Emoji in one row */}
+          <div className="flex items-end gap-3">
+            <div className="flex-1 grid gap-1.5">
               <Label>Color</Label>
-              <Input type="color" value={color || '#3b82f6'} onChange={e => setColor(e.target.value)} className="h-9 p-1" />
+              <ColorPicker value={color || '#3b82f6'} onChange={setColor} allowNone noneLabel="Lane default" />
             </div>
             <div className="grid gap-1.5">
               <Label>Emoji</Label>
-              <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="h-9 w-full border rounded-md flex items-center justify-center text-lg hover:bg-muted/50 transition-colors"
-                    title="Pick emoji"
-                  >
-                    {emoji || <Smile className="h-4 w-4 text-muted-foreground" />}
+              <div className="flex items-center gap-1.5">
+                <EmojiPickerPopover value={emoji} onChange={em => setEmoji(em)} />
+                {emoji && (
+                  <button type="button" className="text-muted-foreground hover:text-foreground" onClick={() => setEmoji('')} title="Clear">
+                    <X className="h-4 w-4" />
                   </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-60 p-2" align="start">
-                  <div className="grid grid-cols-10 gap-0.5">
-                    {emoji && (
-                      <button
-                        type="button"
-                        className="h-6 w-6 text-xs text-muted-foreground hover:bg-muted rounded flex items-center justify-center"
-                        title="Clear emoji"
-                        onClick={() => { setEmoji(''); setEmojiOpen(false) }}
-                      >
-                        ×
-                      </button>
-                    )}
-                    {EMOJIS.map(em => (
-                      <button
-                        key={em}
-                        type="button"
-                        className="h-6 w-6 text-base hover:bg-muted rounded flex items-center justify-center leading-none"
-                        onClick={() => { setEmoji(em); setEmojiOpen(false) }}
-                      >
-                        {em}
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+                )}
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">
-              <Label htmlFor="start">Start Date</Label>
+              <Label htmlFor="start" className={submitAttempted && !startDate && !linkEnabled ? 'text-destructive' : ''}>
+                Start Date <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="start" type="text"
                 value={linkEnabled && computedLink ? fracYearToDMY(computedLink.startYear) : startDate}
@@ -515,7 +533,7 @@ export function EventDialog({
                 onChange={e => !linkEnabled && setStartDate(formatDMYInput(e.target.value))}
                 disabled={linkEnabled}
                 required={!linkEnabled}
-                className={linkEnabled ? 'opacity-60' : ''}
+                className={linkEnabled ? 'opacity-60' : submitAttempted && !startDate ? 'border-destructive focus-visible:ring-destructive' : ''}
               />
             </div>
             <div className="grid gap-1.5">
@@ -530,20 +548,215 @@ export function EventDialog({
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="grid gap-1.5">
-              <Label htmlFor="starttime" className="text-xs text-muted-foreground">Start Time (optional)</Label>
-              <Input id="starttime" type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="h-8 text-xs" />
-            </div>
-            {endDate.trim() ? (
-              <div className="grid gap-1.5">
-                <Label htmlFor="endtime" className="text-xs text-muted-foreground">End Time (optional)</Label>
-                <Input id="endtime" type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="h-8 text-xs" />
-              </div>
-            ) : (
-              <div className="grid gap-1.5">
-                <Label htmlFor="pointval" className="text-xs text-muted-foreground">Point Value (optional)</Label>
-                <Input id="pointval" type="number" value={pointValueStr} placeholder="e.g. 50000" onChange={e => setPointValueStr(e.target.value)} className="h-8 text-xs" />
+          {/* ── More time options (collapsible) ── */}
+          <div className="rounded-md border">
+            <button
+              type="button"
+              onClick={() => setShowTimeOptions(v => !v)}
+              className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium hover:bg-muted/40 transition-colors rounded-md"
+            >
+              <span className="flex items-center gap-2">
+                More time options
+                {(fadeInDate || fadeOutDate || linkEnabled) && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" title="Has values" />
+                )}
+              </span>
+              {showTimeOptions ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+            </button>
+            {showTimeOptions && (
+              <div className="px-3 pb-3 space-y-3 border-t pt-3">
+
+                {/* Start / end times */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-1.5">
+                    <Label className="text-xs text-muted-foreground">Start Time</Label>
+                    <Input id="starttime" type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="h-8 text-xs" />
+                  </div>
+                  {endDate.trim() ? (
+                    <div className="grid gap-1.5">
+                      <Label className="text-xs text-muted-foreground">End Time</Label>
+                      <Input id="endtime" type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="h-8 text-xs" />
+                    </div>
+                  ) : (
+                    <div className="grid gap-1.5">
+                      <Label className="text-xs text-muted-foreground">Value (point)</Label>
+                      <Input id="pointval" type="number" value={startValue} placeholder="e.g. 50000" onChange={e => setStartValue(e.target.value)} className="h-8 text-xs" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Fade in/out */}
+                <p className="text-[11px] text-muted-foreground leading-snug">
+                  Set a <strong>fade-in</strong> date before the real start, or a <strong>fade-out</strong> date after the real end.
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-1.5">
+                    <Label className="text-xs text-muted-foreground">Fade-in start date</Label>
+                    <Input
+                      type="text" value={fadeInDate} placeholder="DD/MM/YYYY"
+                      onChange={e => setFadeInDate(formatDMYInput(e.target.value))}
+                      className="h-8 text-xs"
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label className="text-xs text-muted-foreground">Fade-in start time</Label>
+                    <Input type="time" value={fadeInTime} onChange={e => setFadeInTime(e.target.value)} className="h-8 text-xs" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-1.5">
+                    <Label className="text-xs text-muted-foreground">Fade-out end date</Label>
+                    <Input
+                      type="text" value={fadeOutDate} placeholder="DD/MM/YYYY"
+                      onChange={e => setFadeOutDate(formatDMYInput(e.target.value))}
+                      className="h-8 text-xs"
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label className="text-xs text-muted-foreground">Fade-out end time</Label>
+                    <Input type="time" value={fadeOutTime} onChange={e => setFadeOutTime(e.target.value)} className="h-8 text-xs" />
+                  </div>
+                </div>
+
+                {/* Dependency */}
+                <div className="space-y-3 pt-2 border-t">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Link2 className="h-4 w-4 text-muted-foreground" />
+                      <Label className="text-sm font-medium">Dependency</Label>
+                    </div>
+                    <Switch checked={linkEnabled} onCheckedChange={setLinkEnabled} />
+                  </div>
+
+                  {linkEnabled && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Label className="text-xs text-muted-foreground shrink-0 w-20">Anchor to</Label>
+                        <select
+                          value={linkAnchorType}
+                          onChange={e => setLinkAnchorType(e.target.value as 'today' | 'event' | 'start_to_today' | 'today_to_end')}
+                          className="h-7 text-xs border rounded-md px-1 bg-background flex-1"
+                        >
+                          <option value="today">Today's date</option>
+                          <option value="event">Another event</option>
+                          <option value="start_to_today">Fixed start → today (ongoing)</option>
+                          <option value="today_to_end">Today → fixed end date</option>
+                        </select>
+                      </div>
+
+                      {(linkAnchorType === 'start_to_today' || linkAnchorType === 'today_to_end') && (
+                        <div className="flex items-center gap-2">
+                          <Label className="text-xs text-muted-foreground shrink-0 w-20">
+                            {linkAnchorType === 'start_to_today' ? 'Start date' : 'End date'}
+                          </Label>
+                          <Input
+                            type="text" value={linkFixedDate} placeholder="DD/MM/YYYY"
+                            onChange={e => setLinkFixedDate(formatDMYInput(e.target.value))}
+                            className="w-32 h-7 text-xs"
+                          />
+                          <input
+                            type="time" value={linkFixedTime}
+                            onChange={e => setLinkFixedTime(e.target.value)}
+                            className="h-7 text-xs border rounded-md px-1 bg-background"
+                          />
+                        </div>
+                      )}
+
+                      {linkAnchorType === 'event' && (
+                        <>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">Event</Label>
+                            <select
+                              value={linkEventId}
+                              onChange={e => setLinkEventId(e.target.value)}
+                              className="h-7 text-xs border rounded-md px-1 bg-background flex-1 min-w-0"
+                            >
+                              <option value="">— select event —</option>
+                              {events
+                                .filter(e => e.id !== editingEvent?.id)
+                                .map(e => {
+                                  const lane = lanes.find(l => l.id === e.laneId)
+                                  return (
+                                    <option key={e.id} value={e.id}>
+                                      {lane ? `[${lane.name}] ` : ''}{e.emoji ? `${e.emoji} ` : ''}{e.title}
+                                    </option>
+                                  )
+                                })}
+                            </select>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">Anchor at</Label>
+                            <select
+                              value={linkEventAnchor}
+                              onChange={e => setLinkEventAnchor(e.target.value as 'start' | 'end')}
+                              className="h-7 text-xs border rounded-md px-1 bg-background"
+                            >
+                              <option value="start">Start of event</option>
+                              <option value="end">End of event</option>
+                            </select>
+                          </div>
+                        </>
+                      )}
+
+                      {linkAnchorType !== 'start_to_today' && linkAnchorType !== 'today_to_end' && (
+                        <>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">Start offset</Label>
+                            <Input
+                              type="number" step="0.01" value={linkStartOffsetStr}
+                              onChange={e => setLinkStartOffsetStr(e.target.value)}
+                              className="w-24 h-7 text-xs" placeholder="0"
+                            />
+                            <span className="text-xs text-muted-foreground">years (− before, + after)</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">Duration</Label>
+                            <Input
+                              type="number" step="0.01" min="0" value={linkDurationStr}
+                              onChange={e => setLinkDurationStr(e.target.value)}
+                              className="w-24 h-7 text-xs" placeholder="optional"
+                            />
+                            <span className="text-xs text-muted-foreground">years (sets end date)</span>
+                          </div>
+                        </>
+                      )}
+
+                      {computedLink ? (
+                        <div className="rounded bg-muted/50 px-2 py-1.5 text-xs text-muted-foreground space-y-0.5">
+                          <div>Start → <span className="text-foreground font-medium">{fracYearToDMY(computedLink.startYear)}</span></div>
+                          {computedLink.endYear != null && (
+                            <div>End → <span className="text-foreground font-medium">{fracYearToDMY(computedLink.endYear)}</span></div>
+                          )}
+                        </div>
+                      ) : linkAnchorType === 'event' && !linkEventId ? (
+                        <p className="text-xs text-muted-foreground italic">Select an event to preview computed dates.</p>
+                      ) : null}
+
+                      {linkAnchorType === 'event' && (
+                        <div className="space-y-1 pt-1 border-t">
+                          <Label className="text-xs text-muted-foreground">If linked event is deleted</Label>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setLinkOnDelete('freeze')}
+                              className={`flex-1 h-7 rounded-md border text-xs transition-colors ${linkOnDelete === 'freeze' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-muted/50'}`}
+                            >
+                              Freeze dates
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setLinkOnDelete('delete')}
+                              className={`flex-1 h-7 rounded-md border text-xs transition-colors ${linkOnDelete === 'delete' ? 'bg-destructive text-destructive-foreground border-destructive' : 'bg-background hover:bg-muted/50'}`}
+                            >
+                              Delete this event too
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
               </div>
             )}
           </div>
@@ -565,6 +778,11 @@ export function EventDialog({
             </button>
             {showDetails && (
               <div className="px-3 pb-3 space-y-3 border-t pt-3">
+                {/* Description */}
+                <div className="grid gap-1.5">
+                  <Label htmlFor="desc" className="text-xs">Description</Label>
+                  <Input id="desc" value={description} onChange={e => setDescription(e.target.value)} placeholder="Optional description" className="h-8 text-xs" />
+                </div>
                 {/* URL */}
                 <div className="grid gap-1.5">
                   <Label htmlFor="ev-url" className="text-xs">URL <span className="text-muted-foreground font-normal">(link to article, post, activity…)</span></Label>
@@ -700,6 +918,13 @@ export function EventDialog({
                       onChange={e => setStartValue(e.target.value)}
                       className="w-36 h-7 text-xs"
                     />
+                    <span className="text-[10px] text-muted-foreground shrink-0">grows</span>
+                    <Input
+                      type="number" step="0.1" value={startValueGrowthStr} placeholder="0"
+                      onChange={e => setStartValueGrowthStr(e.target.value)}
+                      className="w-16 h-7 text-xs"
+                    />
+                    <span className="text-[10px] text-muted-foreground shrink-0">%/yr</span>
                   </div>
 
                   {/* Spot changes */}
@@ -710,7 +935,8 @@ export function EventDialog({
                         <Input
                           type="text" value={sc.dateStr} placeholder="DD/MM/YYYY"
                           onChange={e => updateSpotChange(i, 'dateStr', formatDMYInput(e.target.value))}
-                          className="w-28 h-7 text-xs"
+                          className={`w-28 h-7 text-xs${isOutOfEventRange(sc.dateStr) ? ' border-destructive text-destructive' : ''}`}
+                          title={isOutOfEventRange(sc.dateStr) ? 'Date is outside the event range' : undefined}
                         />
                         <Input
                           type="number" value={sc.amountStr} placeholder="Amount (+/-)"
@@ -722,6 +948,13 @@ export function EventDialog({
                           onChange={e => updateSpotChange(i, 'label', e.target.value)}
                           className="flex-1 h-7 text-xs"
                         />
+                        <span className="text-[10px] text-muted-foreground shrink-0">grows</span>
+                        <Input
+                          type="number" step="0.1" value={sc.growthStr} placeholder="0"
+                          onChange={e => updateSpotChange(i, 'growthStr', e.target.value)}
+                          className="w-14 h-7 text-xs"
+                        />
+                        <span className="text-[10px] text-muted-foreground shrink-0">%/yr</span>
                         <button type="button" onClick={() => removeSpotChange(i)} className="text-muted-foreground hover:text-destructive shrink-0">
                           <X className="h-3.5 w-3.5" />
                         </button>
@@ -732,67 +965,12 @@ export function EventDialog({
                     </Button>
                   </div>
 
-                  {/* Growth periods */}
-                  <div className="space-y-1.5 pt-1 border-t">
-                    <Label className="text-xs text-muted-foreground">Annual growth periods</Label>
-                    {growthPeriods.map((gp, i) => (
-                      <div key={gp.id} className="rounded border p-2 space-y-1.5">
-                        <div className="flex gap-1 items-center">
-                          <label className="flex items-center gap-1 text-[10px] text-muted-foreground shrink-0 cursor-pointer select-none">
-                            <input
-                              type="checkbox" checked={gp.wholeEvent}
-                              onChange={e => updateGrowthPeriod(i, 'wholeEvent', e.target.checked)}
-                              className="h-3 w-3"
-                            />
-                            Whole event
-                          </label>
-                          <Input
-                            type="text"
-                            value={gp.wholeEvent ? startDate : gp.startDateStr}
-                            placeholder="DD/MM/YYYY"
-                            disabled={gp.wholeEvent}
-                            onChange={e => updateGrowthPeriod(i, 'startDateStr', formatDMYInput(e.target.value))}
-                            className="flex-1 h-7 text-xs"
-                          />
-                          <span className="text-[10px] text-muted-foreground shrink-0">→</span>
-                          <Input
-                            type="text"
-                            value={gp.wholeEvent ? endDate : gp.endDateStr}
-                            placeholder="DD/MM/YYYY"
-                            disabled={gp.wholeEvent}
-                            onChange={e => updateGrowthPeriod(i, 'endDateStr', formatDMYInput(e.target.value))}
-                            className="flex-1 h-7 text-xs"
-                          />
-                          <Input
-                            type="number" step="0.1" value={gp.rateStr} placeholder="Rate"
-                            onChange={e => updateGrowthPeriod(i, 'rateStr', e.target.value)}
-                            className="w-16 h-7 text-xs"
-                          />
-                          <span className="text-[10px] shrink-0">%</span>
-                          <button type="button" onClick={() => removeGrowthPeriod(i)} className="text-muted-foreground hover:text-destructive shrink-0">
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                        <label className="flex items-center gap-1 text-[10px] text-muted-foreground cursor-pointer select-none">
-                          <input
-                            type="checkbox" checked={gp.applyOnNegative}
-                            onChange={e => updateGrowthPeriod(i, 'applyOnNegative', e.target.checked)}
-                            className="h-3 w-3"
-                          />
-                          Apply growth on negative balance
-                        </label>
-                      </div>
-                    ))}
-                    <Button type="button" variant="outline" size="sm" onClick={addGrowthPeriod} className="h-7 text-xs">
-                      <Plus className="h-3 w-3 mr-1" /> Add growth period
-                    </Button>
-                  </div>
-
                   {/* Recurring changes */}
                   <div className="space-y-1.5 pt-1 border-t">
                     <Label className="text-xs text-muted-foreground">Recurring changes (within event range)</Label>
                     {deposits.map((dep, i) => (
                       <div key={dep.id} className="rounded border p-2 space-y-1.5">
+                        {/* Row 1: label · amount · frequency · X */}
                         <div className="flex gap-1 items-center">
                           <Input
                             value={dep.label} placeholder="Label (opt)"
@@ -802,13 +980,8 @@ export function EventDialog({
                           <Input
                             type="number" value={dep.amount} placeholder="Amount (+/-)"
                             onChange={e => updateDeposit(i, 'amount', e.target.value)}
-                            className="w-28 h-7 text-xs"
+                            className="w-24 h-7 text-xs"
                           />
-                          <button type="button" onClick={() => removeDeposit(i)} className="text-muted-foreground hover:text-destructive shrink-0">
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                        <div className="flex gap-1 items-center flex-wrap">
                           <select
                             value={dep.frequency}
                             onChange={e => updateDeposit(i, 'frequency', e.target.value)}
@@ -826,7 +999,7 @@ export function EventDialog({
                               <Input
                                 type="number" min="1" value={dep.customIntervalStr} placeholder="1"
                                 onChange={e => updateDeposit(i, 'customIntervalStr', e.target.value)}
-                                className="w-14 h-7 text-xs"
+                                className="w-12 h-7 text-xs"
                               />
                               <select
                                 value={dep.customUnit}
@@ -841,14 +1014,11 @@ export function EventDialog({
                               </select>
                             </>
                           )}
-                          <span className="text-[10px] text-muted-foreground shrink-0">grows</span>
-                          <Input
-                            type="number" step="0.1" value={dep.annualGrowthStr} placeholder="0"
-                            onChange={e => updateDeposit(i, 'annualGrowthStr', e.target.value)}
-                            className="w-16 h-7 text-xs"
-                          />
-                          <span className="text-[10px] text-muted-foreground shrink-0">%/yr</span>
+                          <button type="button" onClick={() => removeDeposit(i)} className="text-muted-foreground hover:text-destructive shrink-0">
+                            <X className="h-3.5 w-3.5" />
+                          </button>
                         </div>
+                        {/* Row 2: date range */}
                         <div className="flex gap-1 items-center">
                           <label className="flex items-center gap-1 text-[10px] text-muted-foreground shrink-0 cursor-pointer select-none">
                             <input
@@ -864,7 +1034,8 @@ export function EventDialog({
                             placeholder="From DD/MM/YYYY"
                             disabled={dep.wholeEvent}
                             onChange={e => updateDeposit(i, 'startDateStr', formatDMYInput(e.target.value))}
-                            className="flex-1 h-7 text-xs"
+                            className={`flex-1 h-7 text-xs${!dep.wholeEvent && isOutOfEventRange(dep.startDateStr) ? ' border-destructive text-destructive' : ''}`}
+                            title={!dep.wholeEvent && isOutOfEventRange(dep.startDateStr) ? 'Date is outside the event range' : undefined}
                           />
                           <Input
                             type="text"
@@ -872,8 +1043,27 @@ export function EventDialog({
                             placeholder="To DD/MM/YYYY"
                             disabled={dep.wholeEvent}
                             onChange={e => updateDeposit(i, 'endDateStr', formatDMYInput(e.target.value))}
-                            className="flex-1 h-7 text-xs"
+                            className={`flex-1 h-7 text-xs${!dep.wholeEvent && isOutOfEventRange(dep.endDateStr) ? ' border-destructive text-destructive' : ''}`}
+                            title={!dep.wholeEvent && isOutOfEventRange(dep.endDateStr) ? 'Date is outside the event range' : undefined}
                           />
+                        </div>
+                        {/* Row 3: increase %/yr · grows %/yr */}
+                        <div className="flex gap-1 items-center">
+                          <span className="text-[10px] text-muted-foreground shrink-0">increase</span>
+                          <Input
+                            type="number" step="0.1" value={dep.annualGrowthStr} placeholder="0"
+                            onChange={e => updateDeposit(i, 'annualGrowthStr', e.target.value)}
+                            className="w-16 h-7 text-xs"
+                            title="Deposit amount increases by this % each year (e.g. salary raise)"
+                          />
+                          <span className="text-[10px] text-muted-foreground shrink-0">%/yr · grows</span>
+                          <Input
+                            type="number" step="0.1" value={dep.balanceGrowthStr} placeholder="0"
+                            onChange={e => updateDeposit(i, 'balanceGrowthStr', e.target.value)}
+                            className="w-16 h-7 text-xs"
+                            title="Accumulated balance grows at this % per year (e.g. savings interest)"
+                          />
+                          <span className="text-[10px] text-muted-foreground shrink-0">%/yr</span>
                         </div>
                       </div>
                     ))}

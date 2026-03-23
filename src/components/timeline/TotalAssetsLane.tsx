@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import type { TimelineEvent } from '@/types/timeline'
-import { computeValueAtYear, formatValue } from '@/lib/valueCompute'
+import { computeValueAtYear, formatValue, getDiscreteDepositYears } from '@/lib/valueCompute'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
 
 const TEAL = '#14b8a6'
@@ -51,7 +51,7 @@ export function TotalAssetsLane({
   } | null>(null)
 
   const valueEvents = useMemo(
-    () => events.filter(e => e.type === 'range' && !!e.valueProjection),
+    () => events.filter(e => !!e.valueProjection),
     [events],
   )
 
@@ -63,11 +63,53 @@ export function TotalAssetsLane({
     const vizWidth   = Math.max(4, (rangeEnd - rangeStart) * pixelsPerYear)
     const leftOffset = (rangeStart - yearStart) * pixelsPerYear
 
-    const samples: { year: number; total: number }[] = []
-    for (let i = 0; i <= NUM_SAMPLES; i++) {
-      const year = rangeStart + (i / NUM_SAMPLES) * (rangeEnd - rangeStart)
-      samples.push({ year, total: computeTotalAtYear(year, valueEvents) })
+    // Collect years that need sharp-step anchors (instant jumps in the graph).
+    // We use sy-1e-6 (value before) and sy+1e-9 (value after) to bracket each
+    // jump. sy+1e-9 rather than sy itself is needed because computeValueAtYear
+    // has an early return for targetYear <= startYear, so sampling exactly at
+    // startYear misses spot changes scheduled there.
+    const jumpYears = new Set<number>()
+
+    // Spot-change years
+    for (const ev of valueEvents) {
+      for (const sc of ev.valueProjection?.spotChanges ?? []) {
+        jumpYears.add(sc.year)
+      }
     }
+
+    // Event start years with a non-zero starting value — these also appear as
+    // instant jumps (the value goes from 0 to startValue the moment the event
+    // begins, whether it is a momentary "spot" event or a longer range event).
+    for (const ev of valueEvents) {
+      if ((ev.valueProjection?.startValue ?? 0) !== 0) {
+        jumpYears.add(ev.startYear)
+      }
+    }
+
+    // Discrete deposit occurrence years (monthly/quarterly/yearly) — each
+    // occurrence is a lump-sum addition and must render as an instant jump.
+    for (const ev of valueEvents) {
+      if (!ev.valueProjection) continue
+      const evEnd = ev.endYear ?? rangeEnd
+      for (const occ of getDiscreteDepositYears(ev.valueProjection, rangeStart, evEnd)) {
+        jumpYears.add(occ)
+      }
+    }
+
+    const yearSet = new Set<number>()
+    for (let i = 0; i <= NUM_SAMPLES; i++) {
+      yearSet.add(rangeStart + (i / NUM_SAMPLES) * (rangeEnd - rangeStart))
+    }
+    for (const sy of jumpYears) {
+      if (sy >= rangeStart && sy <= rangeEnd) {
+        yearSet.add(sy - 1e-6)
+        yearSet.add(sy + 1e-9)
+      }
+    }
+
+    const samples: { year: number; total: number }[] = Array.from(yearSet)
+      .sort((a, b) => a - b)
+      .map(year => ({ year, total: computeTotalAtYear(year, valueEvents) }))
 
     const totals  = samples.map(s => s.total)
     const minV    = Math.min(...totals)
@@ -75,7 +117,7 @@ export function TotalAssetsLane({
     const vRange  = maxV - minV || 1
 
     function toXY(year: number, total: number): [number, number] {
-      const x = ((year - rangeStart) / (rangeEnd - rangeStart)) * vizWidth
+      const x = (year - rangeStart) * pixelsPerYear
       const y = PAD_V + CHART_H - (CHART_H * (total - minV)) / vRange
       return [x, y]
     }
