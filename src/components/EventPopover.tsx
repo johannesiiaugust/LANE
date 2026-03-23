@@ -17,7 +17,7 @@ interface EventPopoverProps {
   onClose: () => void
 }
 
-export function EventPopover({ event, anchorEl, anchorX, anchorY, laneName, laneEmoji: _laneEmoji, onEdit, onDelete, onClose }: EventPopoverProps) {
+export function EventPopover({ event, anchorEl, anchorX, anchorY, laneName, laneEmoji, onEdit, onDelete, onClose }: EventPopoverProps) {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -36,21 +36,21 @@ export function EventPopover({ event, anchorEl, anchorX, anchorY, laneName, lane
   return (
     <div
       ref={ref}
-      className="fixed z-50 w-64 rounded-xl border border-border/30 bg-white p-3 text-foreground shadow-lg"
+      className="fixed z-50 w-64 rounded-md border bg-popover p-3 text-popover-foreground shadow-md"
       style={{ left, top }}
     >
-      <div className="flex items-start justify-between mb-1.5">
-        <h4 className="text-sm font-semibold leading-tight">
+      <div className="flex items-start justify-between mb-1">
+        <h4 className="text-sm font-semibold">
           {event.emoji && <span className="mr-1">{event.emoji}</span>}
           {event.title}
         </h4>
-        <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors ml-2 shrink-0">
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
           <X className="h-3.5 w-3.5" />
         </button>
       </div>
-      <p className="text-[11px] text-muted-foreground mb-1">{laneName}</p>
-      {event.description && <p className="text-xs text-foreground/70 mb-1.5">{event.description}</p>}
-      <p className="text-[11px] text-muted-foreground mb-1.5">
+      <p className="text-xs text-muted-foreground mb-1">{laneEmoji && <span className="mr-1">{laneEmoji}</span>}{laneName}</p>
+      {event.description && <p className="text-xs mb-1">{event.description}</p>}
+      <p className="text-xs text-muted-foreground mb-1">
         {event.type === 'point'
           ? (() => { const t = fracYearToTimeStr(event.startYear); return t !== '00:00' ? `${fracYearToDMY(event.startYear)} ${t}` : fracYearToDMY(event.startYear) })()
           : (() => {
@@ -62,7 +62,7 @@ export function EventPopover({ event, anchorEl, anchorX, anchorY, laneName, lane
             })()}
       </p>
       {event.pointValue != null && (
-        <p className="text-[11px] text-muted-foreground mb-1.5">
+        <p className="text-xs text-muted-foreground mb-1">
           Value: <span className="font-medium text-foreground">{formatValue(event.pointValue)}</span>
         </p>
       )}
@@ -71,27 +71,27 @@ export function EventPopover({ event, anchorEl, anchorX, anchorY, laneName, lane
         <img
           src={event.metadata.image_url}
           alt=""
-          className="w-full rounded-lg mb-2 max-h-28 object-cover"
+          className="w-full rounded-md mb-2 max-h-28 object-cover"
           onError={e => (e.currentTarget.style.display = 'none')}
         />
       )}
       {event.location && (
-        <p className="flex items-center gap-1 text-[11px] text-muted-foreground mb-1.5">
+        <p className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
           <MapPin className="h-3 w-3 shrink-0" />
           {event.location}
         </p>
       )}
       {event.rating != null && event.rating > 0 && (
-        <div className="flex items-center gap-0.5 mb-1.5">
+        <div className="flex items-center gap-0.5 mb-1">
           {[1,2,3,4,5].map(n => (
-            <Star key={n} className={`h-3 w-3 ${n <= event.rating! ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30'}`} />
+            <Star key={n} className={`h-3 w-3 ${n <= event.rating! ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`} />
           ))}
         </div>
       )}
       {event.metadata?.tags && event.metadata.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-2">
           {event.metadata.tags.map(tag => (
-            <span key={tag} className="inline-flex items-center rounded-full border border-border/30 px-1.5 py-0.5 text-[10px] text-muted-foreground">{tag}</span>
+            <span key={tag} className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] text-muted-foreground">{tag}</span>
           ))}
         </div>
       )}
@@ -100,17 +100,17 @@ export function EventPopover({ event, anchorEl, anchorX, anchorY, laneName, lane
           href={event.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1 text-[11px] text-primary hover:underline mb-2 truncate"
+          className="flex items-center gap-1 text-xs text-primary hover:underline mb-2 truncate"
         >
           <ExternalLink className="h-3 w-3 shrink-0" />
           <span className="truncate">{event.url.replace(/^https?:\/\//, '')}</span>
         </a>
       )}
-      <div className="flex gap-1.5 mt-2">
-        <Button variant="outline" size="sm" className="h-7 text-xs rounded-lg border-border/30" onClick={() => onEdit(event)}>
+      <div className="flex gap-1">
+        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => onEdit(event)}>
           <Pencil className="h-3 w-3 mr-1" /> Edit
         </Button>
-        <Button variant="outline" size="sm" className="h-7 text-xs rounded-lg border-border/30 text-destructive hover:text-destructive" onClick={() => onDelete(event)}>
+        <Button variant="outline" size="sm" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => onDelete(event)}>
           <Trash2 className="h-3 w-3 mr-1" /> Delete
         </Button>
       </div>

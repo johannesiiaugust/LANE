@@ -118,7 +118,7 @@ export function YearGrid({ yearStart, yearEnd, pixelsPerYear, totalHeight, compa
       {lines.map(y => (
         <div
           key={y}
-          className="absolute top-0 border-l border-dashed border-border/20 opacity-0 group-hover/grid:opacity-100 transition-opacity duration-300"
+          className="absolute top-0 border-l border-dashed border-border/50"
           style={{ left: (y - yearStart) * pixelsPerYear, height: totalHeight }}
         />
       ))}
@@ -127,8 +127,9 @@ export function YearGrid({ yearStart, yearEnd, pixelsPerYear, totalHeight, compa
         className="absolute top-0"
         style={{
           left: (currentYear - yearStart) * pixelsPerYear,
+          width: 2,
           height: totalHeight,
-          borderLeft: '1px solid #d74e09',
+          backgroundColor: '#ef4444',
         }}
       />
       {comparedHeight > 0 && (

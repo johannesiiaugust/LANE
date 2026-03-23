@@ -135,7 +135,7 @@ export function PersonaSeparateTimeline({
         return (
           <div
             key={laneName}
-            className="relative border-b border-border/15"
+            className="relative border-b border-border/30 bg-muted/20"
             style={{ height: rowCount * BASE_LANE_HEIGHT, width }}
           >
             {laneEvents.map(e => (

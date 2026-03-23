@@ -1171,7 +1171,6 @@ export function TimelineContainer({
             onEditLane={onEditLane}
             onDeleteLane={onDeleteLane}
             totalAssetsHeight={hasValueEvents ? TOTAL_ASSETS_HEIGHT : undefined}
-            onPan={handlePan}
           />
         </div>
       </div>
@@ -1179,7 +1178,7 @@ export function TimelineContainer({
       <div ref={scrollRef} className="absolute inset-0 overflow-auto">
         <div className="relative" style={{ width: effectiveTotalWidth, minHeight: grandTotalHeight + 24 }}>
           <TimelineHeader yearStart={effectiveYearStart} yearEnd={effectiveYearEnd} pixelsPerYear={pixelsPerYear} currentYear={currentYear} scrollLeft={scrollLeft} viewportWidth={viewportWidth} cursorRef={cursorHeaderRef} lifeSpan={lifeSpan} />
-          <div className="relative group/grid">
+          <div className="relative">
             <YearGrid yearStart={effectiveYearStart} yearEnd={effectiveYearEnd} pixelsPerYear={pixelsPerYear} totalHeight={totalHeight} comparedHeight={personaSectionsTotalHeight + overlaySectionsTotalHeight} currentYear={currentYear} scrollLeft={scrollLeft} viewportWidth={viewportWidth} lifeSpan={lifeSpan} />
             {/* Cursor line — positioned in content space, updated via ref */}
             <div

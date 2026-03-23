@@ -2,52 +2,30 @@
 
 @theme {
   --color-background: #ffffff;
-  --color-foreground: #124e78;
+  --color-foreground: #09090b;
   --color-card: #ffffff;
-  --color-card-foreground: #124e78;
+  --color-card-foreground: #09090b;
   --color-popover: #ffffff;
-  --color-popover-foreground: #124e78;
-  --color-primary: #124e78;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #124e780a;
-  --color-secondary-foreground: #124e78;
-  --color-muted: #124e7806;
-  --color-muted-foreground: #124e78aa;
-  --color-accent: #124e780a;
-  --color-accent-foreground: #124e78;
-  --color-destructive: #6e0e0a;
-  --color-destructive-foreground: #ffffff;
-  --color-border: #124e7820;
-  --color-input: #124e7825;
-  --color-ring: #124e78;
+  --color-popover-foreground: #09090b;
+  --color-primary: #18181b;
+  --color-primary-foreground: #fafafa;
+  --color-secondary: #f4f4f5;
+  --color-secondary-foreground: #18181b;
+  --color-muted: #f4f4f5;
+  --color-muted-foreground: #71717a;
+  --color-accent: #f4f4f5;
+  --color-accent-foreground: #18181b;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fafafa;
+  --color-border: #e4e4e7;
+  --color-input: #e4e4e7;
+  --color-ring: #18181b;
   --radius: 0.5rem;
-}
-
-body, input, button, select, textarea, table {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 body {
   @apply bg-background text-foreground;
-}
-
-.theme-landing {
-  --color-background: #f0f0c9;
-  --color-foreground: #124e78;
-  --color-popover: #f0f0c9;
-  --color-popover-foreground: #124e78;
-  --color-primary: #124e78;
-  --color-primary-foreground: #f0f0c9;
-  --color-secondary: #124e7812;
-  --color-secondary-foreground: #124e78;
-  --color-muted: #124e780a;
-  --color-muted-foreground: #124e78aa;
-  --color-accent: #124e7812;
-  --color-accent-foreground: #124e78;
-  --color-border: #124e7825;
-  --color-input: #124e7830;
-  --color-ring: #124e78;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
 * {

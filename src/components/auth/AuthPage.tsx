@@ -8,17 +8,10 @@ import { DemoTimelineProvider } from '@/contexts/DemoTimelineContext'
 import { DemoTimelineView } from '@/components/DemoTimelineView'
 import { SkinProvider } from '@/contexts/SkinContext'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/Footer'
-import { Logo } from '@/components/Logo'
 
 type AuthMode = 'landing' | 'sign-in' | 'sign-up' | 'forgot-password' | 'check-email'
-
-const C = {
-  yale: '#124e78',
-  cream: '#f0f0c9',
-  gold: '#f2bb05',
-  orange: '#d74e09',
-} as const
 
 export function AuthPage() {
   useTitle('LifeLANE — Start your life')
@@ -30,6 +23,7 @@ export function AuthPage() {
     localStorage.setItem('timeline_import_demo', '1')
     setFromDemo(true)
     setMode('sign-up')
+    // Defer opening to let the dropdown finish closing before the popover opens
     setTimeout(() => setAuthOpen(true), 50)
   }
 
@@ -39,57 +33,35 @@ export function AuthPage() {
   }
 
   return (
-    <div
-      className="flex flex-col h-screen overflow-hidden"
-      style={{ backgroundColor: C.cream, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
-    >
+    <div className="flex flex-col h-screen bg-background overflow-hidden">
       {/* Top header bar */}
-      <div
-        className="shrink-0 shadow-sm px-6 md:px-10 py-3 flex items-center justify-between gap-4"
-        style={{ backgroundColor: `${C.cream}cc`, backdropFilter: 'blur(20px) saturate(1.8)', borderBottom: `1px solid ${C.yale}15` }}
-      >
+      <div className="shrink-0 border-b shadow-sm bg-background px-4 py-3 flex items-center justify-between gap-4">
         {/* Brand + tagline */}
         <div className="shrink-0">
-          <Logo size="md" />
-          <div className="text-xs italic" style={{ color: `${C.yale}88` }}>The operating system for your life</div>
+          <div className="text-xl font-bold leading-tight">LifeLANE</div>
+          <div className="text-xs text-muted-foreground italic">The operating system for your life</div>
         </div>
 
         {/* Short description — hidden on small screens */}
-        <p className="hidden sm:block text-sm text-center flex-1 max-w-md leading-snug" style={{ color: `${C.yale}88` }}>
+        <p className="hidden sm:block text-sm text-muted-foreground text-center flex-1 max-w-md leading-snug">
           Visualize lives. Compare with others. Shape your future.
         </p>
 
         {/* Auth popover anchored top-right */}
         <Popover open={authOpen} onOpenChange={setAuthOpen}>
           <PopoverTrigger asChild>
-            <button
-              className="px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200"
-              style={{ backgroundColor: C.yale, color: C.cream, border: `1px solid ${C.yale}` }}
-              onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#0d3d5e' }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = C.yale }}
-              onClick={openLanding}
-            >
-              Start your life
-            </button>
+            <Button size="sm" onClick={openLanding}>Start your life</Button>
           </PopoverTrigger>
           <PopoverContent align="end" sideOffset={8} className="w-80 p-4 max-h-[85vh] overflow-y-auto">
             {mode === 'landing' && (
               <div className="space-y-3">
-                <p className="text-sm font-semibold" style={{ color: C.yale }}>Get started</p>
-                <button
-                  className="w-full px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200"
-                  style={{ backgroundColor: C.yale, color: C.cream }}
-                  onClick={() => { setFromDemo(true); localStorage.setItem('timeline_import_demo', '1'); setMode('sign-up') }}
-                >
+                <p className="text-sm font-semibold">Get started</p>
+                <Button className="w-full" onClick={() => { setFromDemo(true); localStorage.setItem('timeline_import_demo', '1'); setMode('sign-up') }}>
                   Continue with this timeline
-                </button>
-                <button
-                  className="w-full px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 border"
-                  style={{ borderColor: C.yale, color: C.yale }}
-                  onClick={() => { setFromDemo(false); setMode('sign-up') }}
-                >
+                </Button>
+                <Button variant="outline" className="w-full" onClick={() => { setFromDemo(false); setMode('sign-up') }}>
                   Create account (blank timeline)
-                </button>
+                </Button>
                 <p className="text-center text-xs text-muted-foreground pt-1">
                   Already have an account?{' '}
                   <button className="underline hover:text-foreground" onClick={() => setMode('sign-in')}>Sign in</button>
@@ -123,7 +95,7 @@ export function AuthPage() {
       </div>
 
       {/* Demo timeline fills remaining space */}
-      <div className="flex-1 overflow-hidden px-6 md:px-10 py-4">
+      <div className="flex-1 overflow-hidden">
         <SkinProvider>
           <DemoTimelineProvider>
             <DemoTimelineView onSignUpWithTimeline={handleSignUpWithTimeline} />

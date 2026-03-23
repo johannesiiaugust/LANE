@@ -1,0 +1,692 @@
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { Sparkles, X, Send, Mic, MicOff, Loader2, Check, Trash2, CheckCheck, Pencil } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { isOpenAIConfigured, transcribeAudio } from '@/lib/openai'
+import type { Lane, TimelineEvent } from '@/types/timeline'
+
+// ── Types ────────────────────────────────────────────────────────────────────
+
+interface ProposedEvent {
+  type: 'event'
+  title: string
+  lane: string
+  eventType: 'range' | 'point'
+  startYear: number
+  endYear?: number | null
+  description: string
+  location?: string
+  color?: string
+  emoji?: string
+}
+
+interface ProposedLane {
+  type: 'lane'
+  name: string
+  color: string
+  emoji?: string
+}
+
+interface ProposedTimeline {
+  type: 'timeline'
+  name: string
+}
+
+type ProposedItem = ProposedEvent | ProposedLane | ProposedTimeline
+
+interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+  proposals?: ProposedItem[]
+  proposalStatus?: ('pending' | 'accepted' | 'rejected')[]
+}
+
+interface LinaAssistantProps {
+  lanes: Lane[]
+  addEvent: (event: Omit<TimelineEvent, 'id'>) => Promise<TimelineEvent | null>
+  addLane: (lane: Omit<Lane, 'id' | 'order' | 'isDefault'>) => Promise<Lane | null>
+  createTimeline: (name?: string, emoji?: string, color?: string, withDefaultLanes?: boolean) => Promise<string | null>
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+const OPENAI_API_URL = 'https://api.openai.com/v1'
+
+function getApiKey(): string {
+  return import.meta.env.VITE_OPENAI_API_KEY as string
+}
+
+function formatYear(y: number): string {
+  const year = Math.floor(y)
+  const monthFrac = y - year
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const monthIdx = Math.min(11, Math.round(monthFrac * 12))
+  return monthFrac > 0.01 ? `${monthNames[monthIdx]} ${year}` : `${year}`
+}
+
+function buildSystemPrompt(laneNames: string[]): string {
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth()
+  const currentFrac = currentYear + currentMonth / 12
+
+  return `You are Lina, a friendly AI assistant for LifeLANE — a personal life timeline app.
+You help users add events, lanes, and timelines to their life timeline.
+
+Available lanes: ${JSON.stringify(laneNames)}
+Current date: ${now.toISOString().slice(0, 10)} (fractional year: ${currentFrac.toFixed(3)})
+
+When the user describes something they want to add:
+1. Determine if it's an event, lane, or timeline
+2. If missing critical info (dates, which lane, etc.), ask ONE concise follow-up question
+3. When you have enough info, respond with BOTH a brief friendly message AND a JSON proposal block on a new line
+
+The JSON block must be on its own line, starting with {"action":"propose":
+{"action":"propose","items":[...]}
+
+For events:
+{"action":"propose","items":[{"type":"event","title":"...","lane":"...","eventType":"range"|"point","startYear":2020.5,"endYear":2021.0,"description":"...","location":"..."}]}
+
+For lanes:
+{"action":"propose","items":[{"type":"lane","name":"...","color":"#3b82f6","emoji":"..."}]}
+
+For timelines:
+{"action":"propose","items":[{"type":"timeline","name":"..."}]}
+
+Rules:
+- Convert dates to fractional years (Jan=.0, Feb=.083, Mar=.167, Apr=.25, May=.333, Jun=.5, Jul=.583, Aug=.667, Sep=.75, Oct=.833, Nov=.917, Dec=.958)
+- For relative dates like "last year", "3 years ago", compute from current date
+- Default lane: match to closest existing lane name
+- If no existing lane fits, suggest creating a new lane first, then the event
+- Be conversational and brief — max 2 sentences before the JSON
+- You can propose multiple items at once (e.g., a new lane + events for it)
+- For events without explicit end date that clearly span time, estimate a reasonable range
+- Always include description even if brief
+- If the user just wants to chat or asks a question unrelated to adding data, respond normally without JSON`
+}
+
+function parseAssistantMessage(content: string): { text: string; proposals: ProposedItem[] } {
+  const jsonMatch = content.match(/\{"action"\s*:\s*"propose".*\}/)
+  if (!jsonMatch) return { text: content, proposals: [] }
+
+  try {
+    const parsed = JSON.parse(jsonMatch[0])
+    const items: ProposedItem[] = (parsed.items || []).map((item: Record<string, unknown>) => {
+      if (item.type === 'event') {
+        return {
+          type: 'event',
+          title: String(item.title || ''),
+          lane: String(item.lane || 'Other Activities'),
+          eventType: item.eventType === 'range' ? 'range' : 'point',
+          startYear: Number(item.startYear) || 2020,
+          endYear: item.endYear != null ? Number(item.endYear) : null,
+          description: String(item.description || ''),
+          location: item.location ? String(item.location) : undefined,
+          color: item.color ? String(item.color) : undefined,
+          emoji: item.emoji ? String(item.emoji) : undefined,
+        } as ProposedEvent
+      }
+      if (item.type === 'lane') {
+        return {
+          type: 'lane',
+          name: String(item.name || ''),
+          color: String(item.color || '#3b82f6'),
+          emoji: item.emoji ? String(item.emoji) : undefined,
+        } as ProposedLane
+      }
+      return {
+        type: 'timeline',
+        name: String(item.name || 'New Timeline'),
+      } as ProposedTimeline
+    })
+
+    const text = content.replace(jsonMatch[0], '').trim()
+    return { text, proposals: items }
+  } catch {
+    return { text: content, proposals: [] }
+  }
+}
+
+// ── Component ────────────────────────────────────────────────────────────────
+
+export function LinaAssistant({ lanes, addEvent, addLane, createTimeline }: LinaAssistantProps) {
+  const [open, setOpen] = useState(false)
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [input, setInput] = useState('')
+  const [sending, setSending] = useState(false)
+  const [recording, setRecording] = useState(false)
+  const [transcribing, setTranscribing] = useState(false)
+  const [elapsed, setElapsed] = useState(0)
+  const [editingCell, setEditingCell] = useState<{ msgIdx: number; itemIdx: number; field: string } | null>(null)
+  const [editValue, setEditValue] = useState('')
+
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const chunksRef = useRef<Blob[]>([])
+  const streamRef = useRef<MediaStream | null>(null)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Auto-scroll on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  // Focus input when opening
+  useEffect(() => {
+    if (open) setTimeout(() => inputRef.current?.focus(), 100)
+  }, [open])
+
+  // Cleanup recording on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+      streamRef.current?.getTracks().forEach(t => t.stop())
+    }
+  }, [])
+
+  const laneNames = lanes.map(l => l.name)
+
+  // ── Send message to GPT ──────────────────────────────────────────────────
+
+  const sendMessage = useCallback(async (text: string) => {
+    if (!text.trim() || sending) return
+
+    const userMsg: ChatMessage = { role: 'user', content: text.trim() }
+    const newMessages = [...messages, userMsg]
+    setMessages(newMessages)
+    setInput('')
+    setSending(true)
+
+    try {
+      const apiMessages = [
+        { role: 'system' as const, content: buildSystemPrompt(laneNames) },
+        ...newMessages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
+      ]
+
+      const res = await fetch(`${OPENAI_API_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getApiKey()}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: apiMessages,
+          temperature: 0.4,
+        }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error?.message || `API error: ${res.status}`)
+      }
+
+      const data = await res.json()
+      const content = data.choices?.[0]?.message?.content || 'Sorry, I could not process that.'
+
+      const { text: displayText, proposals } = parseAssistantMessage(content)
+
+      const assistantMsg: ChatMessage = {
+        role: 'assistant',
+        content,
+        proposals: proposals.length > 0 ? proposals : undefined,
+        proposalStatus: proposals.length > 0 ? proposals.map(() => 'pending' as const) : undefined,
+      }
+
+      setMessages([...newMessages, { ...assistantMsg, content: displayText || content }])
+    } catch (err) {
+      const errorMsg: ChatMessage = {
+        role: 'assistant',
+        content: `Sorry, something went wrong: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      }
+      setMessages([...newMessages, errorMsg])
+    } finally {
+      setSending(false)
+    }
+  }, [messages, sending, laneNames])
+
+  // ── Voice recording ────────────────────────────────────────────────────────
+
+  const startRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      streamRef.current = stream
+      chunksRef.current = []
+
+      const mimeType = ['audio/webm', 'audio/ogg', 'audio/mp4']
+        .find(t => MediaRecorder.isTypeSupported(t)) || ''
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined)
+      mediaRecorderRef.current = recorder
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data)
+      }
+
+      recorder.onstop = async () => {
+        streamRef.current?.getTracks().forEach(t => t.stop())
+        if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
+        setRecording(false)
+        setTranscribing(true)
+
+        try {
+          const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' })
+          const text = await transcribeAudio(blob)
+          setTranscribing(false)
+          if (text.trim()) {
+            setInput(text.trim())
+            // Auto-send after transcription
+            sendMessage(text.trim())
+          }
+        } catch {
+          setTranscribing(false)
+        }
+      }
+
+      recorder.start()
+      setRecording(true)
+      setElapsed(0)
+      timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000)
+    } catch {
+      // Mic permission denied
+    }
+  }, [sendMessage])
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current?.state !== 'inactive') {
+      mediaRecorderRef.current?.stop()
+    }
+  }, [])
+
+  // ── Accept/reject proposals ────────────────────────────────────────────────
+
+  const handleAcceptItem = useCallback(async (msgIdx: number, itemIdx: number) => {
+    const msg = messages[msgIdx]
+    if (!msg?.proposals || !msg.proposalStatus) return
+
+    const item = msg.proposals[itemIdx]
+    let success = false
+
+    if (item.type === 'event') {
+      const lane = lanes.find(l => l.name === item.lane)
+      if (lane) {
+        const result = await addEvent({
+          laneId: lane.id,
+          title: item.title,
+          description: item.description,
+          type: item.eventType,
+          startYear: item.startYear,
+          endYear: item.endYear ?? undefined,
+          location: item.location,
+          color: item.color,
+          emoji: item.emoji,
+        })
+        success = !!result
+      }
+    } else if (item.type === 'lane') {
+      const result = await addLane({
+        name: item.name,
+        color: item.color,
+        visible: true,
+        emoji: item.emoji,
+      })
+      success = !!result
+    } else if (item.type === 'timeline') {
+      const result = await createTimeline(item.name)
+      success = !!result
+    }
+
+    if (success) {
+      setMessages(prev => prev.map((m, i) => {
+        if (i !== msgIdx || !m.proposalStatus) return m
+        const newStatus = [...m.proposalStatus]
+        newStatus[itemIdx] = 'accepted'
+        return { ...m, proposalStatus: newStatus }
+      }))
+    }
+  }, [messages, lanes, addEvent, addLane, createTimeline])
+
+  const handleRejectItem = useCallback((msgIdx: number, itemIdx: number) => {
+    setMessages(prev => prev.map((m, i) => {
+      if (i !== msgIdx || !m.proposalStatus) return m
+      const newStatus = [...m.proposalStatus]
+      newStatus[itemIdx] = 'rejected'
+      return { ...m, proposalStatus: newStatus }
+    }))
+  }, [])
+
+  const handleAcceptAll = useCallback(async (msgIdx: number) => {
+    const msg = messages[msgIdx]
+    if (!msg?.proposals || !msg.proposalStatus) return
+
+    for (let i = 0; i < msg.proposals.length; i++) {
+      if (msg.proposalStatus[i] === 'pending') {
+        await handleAcceptItem(msgIdx, i)
+      }
+    }
+  }, [messages, handleAcceptItem])
+
+  // ── Inline editing ─────────────────────────────────────────────────────────
+
+  const startEdit = (msgIdx: number, itemIdx: number, field: string, currentValue: string) => {
+    setEditingCell({ msgIdx, itemIdx, field })
+    setEditValue(currentValue)
+  }
+
+  const commitEdit = () => {
+    if (!editingCell) return
+    const { msgIdx, itemIdx, field } = editingCell
+
+    setMessages(prev => prev.map((m, i) => {
+      if (i !== msgIdx || !m.proposals) return m
+      const newProposals = [...m.proposals]
+      const item = { ...newProposals[itemIdx] } as Record<string, unknown>
+
+      if (field === 'startYear' || field === 'endYear') {
+        item[field] = parseFloat(editValue) || item[field]
+      } else {
+        item[field] = editValue
+      }
+
+      newProposals[itemIdx] = item as unknown as ProposedItem
+      return { ...m, proposals: newProposals }
+    }))
+
+    setEditingCell(null)
+  }
+
+  if (!isOpenAIConfigured()) return null
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+
+  return (
+    <>
+      {/* Floating button */}
+      {!open && (
+        <button
+          onClick={() => setOpen(true)}
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-2 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 px-4 py-3 sm:px-5 sm:py-3.5"
+        >
+          <Sparkles className="h-5 w-5" />
+          <span className="text-sm font-semibold hidden sm:inline">Talk to Lina</span>
+        </button>
+      )}
+
+      {/* Chat panel */}
+      {open && (
+        <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[420px] sm:h-[600px] sm:max-h-[80vh] z-50 flex flex-col bg-background sm:rounded-2xl sm:border sm:border-border sm:shadow-2xl overflow-hidden">
+          {/* Header */}
+          <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-border bg-background">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <span className="font-semibold text-foreground">Lina</span>
+              <span className="text-xs text-muted-foreground">AI Assistant</span>
+            </div>
+            <button
+              onClick={() => setOpen(false)}
+              className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-accent transition-colors text-muted-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+            {messages.length === 0 && (
+              <div className="text-center py-8">
+                <Sparkles className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">
+                  Hi! I'm Lina. Tell me about events, lanes, or timelines you'd like to add.
+                </p>
+                <p className="text-xs text-muted-foreground/60 mt-2">
+                  Try: "I moved to Berlin in March 2020"
+                </p>
+              </div>
+            )}
+
+            {messages.map((msg, msgIdx) => (
+              <div key={msgIdx} className={cn('flex', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+                <div className={cn(
+                  'max-w-[85%] rounded-2xl px-4 py-2.5 text-sm',
+                  msg.role === 'user'
+                    ? 'bg-primary text-primary-foreground rounded-br-md'
+                    : 'bg-accent text-accent-foreground rounded-bl-md',
+                )}>
+                  {/* Message text */}
+                  {msg.content && <p className="whitespace-pre-wrap">{msg.content}</p>}
+
+                  {/* Proposal table */}
+                  {msg.proposals && msg.proposalStatus && (
+                    <div className="mt-3 space-y-2">
+                      {msg.proposals.map((item, itemIdx) => {
+                        const status = msg.proposalStatus![itemIdx]
+                        return (
+                          <div
+                            key={itemIdx}
+                            className={cn(
+                              'rounded-lg border text-xs overflow-hidden transition-all',
+                              status === 'accepted' ? 'border-green-300 bg-green-50' :
+                              status === 'rejected' ? 'border-red-200 bg-red-50 opacity-50' :
+                              'border-border bg-background',
+                            )}
+                          >
+                            {/* Item header */}
+                            <div className="flex items-center justify-between px-3 py-1.5 border-b border-border/50">
+                              <span className={cn(
+                                'font-semibold uppercase tracking-wide text-[10px]',
+                                item.type === 'event' ? 'text-blue-600' :
+                                item.type === 'lane' ? 'text-purple-600' : 'text-green-600',
+                              )}>
+                                {item.type}
+                              </span>
+                              {status === 'accepted' && <span className="text-green-600 text-[10px] font-medium flex items-center gap-1"><Check className="h-3 w-3" />Added</span>}
+                              {status === 'rejected' && <span className="text-red-500 text-[10px] font-medium">Rejected</span>}
+                            </div>
+
+                            {/* Item fields */}
+                            <div className="px-3 py-2 space-y-1">
+                              {item.type === 'event' && (
+                                <>
+                                  <FieldRow label="Title" value={item.title} msgIdx={msgIdx} itemIdx={itemIdx} field="title" editingCell={editingCell} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} commitEdit={commitEdit} status={status} />
+                                  <FieldRow label="Lane" value={item.lane} msgIdx={msgIdx} itemIdx={itemIdx} field="lane" editingCell={editingCell} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} commitEdit={commitEdit} status={status} />
+                                  <FieldRow label="Type" value={item.eventType} msgIdx={msgIdx} itemIdx={itemIdx} field="eventType" editingCell={editingCell} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} commitEdit={commitEdit} status={status} />
+                                  <div className="flex gap-2">
+                                    <div className="flex-1">
+                                      <FieldRow label="Start" value={formatYear(item.startYear)} msgIdx={msgIdx} itemIdx={itemIdx} field="startYear" editingCell={editingCell} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} commitEdit={commitEdit} status={status} />
+                                    </div>
+                                    {item.endYear && (
+                                      <div className="flex-1">
+                                        <FieldRow label="End" value={formatYear(item.endYear)} msgIdx={msgIdx} itemIdx={itemIdx} field="endYear" editingCell={editingCell} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} commitEdit={commitEdit} status={status} />
+                                      </div>
+                                    )}
+                                  </div>
+                                  {item.description && <FieldRow label="Desc" value={item.description} msgIdx={msgIdx} itemIdx={itemIdx} field="description" editingCell={editingCell} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} commitEdit={commitEdit} status={status} />}
+                                  {item.location && <FieldRow label="Location" value={item.location} msgIdx={msgIdx} itemIdx={itemIdx} field="location" editingCell={editingCell} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} commitEdit={commitEdit} status={status} />}
+                                </>
+                              )}
+                              {item.type === 'lane' && (
+                                <>
+                                  <FieldRow label="Name" value={item.name} msgIdx={msgIdx} itemIdx={itemIdx} field="name" editingCell={editingCell} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} commitEdit={commitEdit} status={status} />
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-muted-foreground w-14 shrink-0">Color</span>
+                                    <span className="h-4 w-4 rounded-sm border" style={{ background: item.color }} />
+                                    <span className="text-foreground">{item.color}</span>
+                                  </div>
+                                  {item.emoji && <FieldRow label="Emoji" value={item.emoji} msgIdx={msgIdx} itemIdx={itemIdx} field="emoji" editingCell={editingCell} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} commitEdit={commitEdit} status={status} />}
+                                </>
+                              )}
+                              {item.type === 'timeline' && (
+                                <FieldRow label="Name" value={item.name} msgIdx={msgIdx} itemIdx={itemIdx} field="name" editingCell={editingCell} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} commitEdit={commitEdit} status={status} />
+                              )}
+                            </div>
+
+                            {/* Actions */}
+                            {status === 'pending' && (
+                              <div className="flex border-t border-border/50">
+                                <button
+                                  onClick={() => handleAcceptItem(msgIdx, itemIdx)}
+                                  className="flex-1 flex items-center justify-center gap-1 py-2 text-green-600 hover:bg-green-50 transition-colors font-medium"
+                                >
+                                  <Check className="h-3 w-3" /> Accept
+                                </button>
+                                <button
+                                  onClick={() => handleRejectItem(msgIdx, itemIdx)}
+                                  className="flex-1 flex items-center justify-center gap-1 py-2 text-red-500 hover:bg-red-50 transition-colors font-medium border-l border-border/50"
+                                >
+                                  <Trash2 className="h-3 w-3" /> Reject
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+
+                      {/* Accept All button */}
+                      {msg.proposalStatus.some(s => s === 'pending') && msg.proposals.length > 1 && (
+                        <button
+                          onClick={() => handleAcceptAll(msgIdx)}
+                          className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border border-green-300 text-green-700 hover:bg-green-50 transition-colors text-xs font-semibold"
+                        >
+                          <CheckCheck className="h-3.5 w-3.5" /> Accept All
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {/* Sending indicator */}
+            {sending && (
+              <div className="flex justify-start">
+                <div className="bg-accent rounded-2xl rounded-bl-md px-4 py-3">
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input area */}
+          <div className="shrink-0 border-t border-border bg-background px-3 py-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+            {/* Recording indicator */}
+            {recording && (
+              <div className="flex items-center gap-2 mb-2 px-2">
+                <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="text-xs text-red-600 font-medium">
+                  Recording {Math.floor(elapsed / 60)}:{(elapsed % 60).toString().padStart(2, '0')}
+                </span>
+              </div>
+            )}
+            {transcribing && (
+              <div className="flex items-center gap-2 mb-2 px-2">
+                <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">Transcribing...</span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2">
+              {/* Mic button */}
+              <button
+                onClick={recording ? stopRecording : startRecording}
+                disabled={sending || transcribing}
+                className={cn(
+                  'h-10 w-10 shrink-0 flex items-center justify-center rounded-full transition-all',
+                  recording
+                    ? 'bg-red-500 text-white hover:bg-red-600'
+                    : 'bg-accent text-muted-foreground hover:bg-accent/80',
+                  (sending || transcribing) && 'opacity-50 pointer-events-none',
+                )}
+              >
+                {recording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              </button>
+
+              {/* Text input */}
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input) } }}
+                placeholder="Tell Lina what to add..."
+                disabled={sending || recording || transcribing}
+                className="flex-1 h-10 rounded-full border border-input bg-background px-4 text-sm outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+              />
+
+              {/* Send button */}
+              <button
+                onClick={() => sendMessage(input)}
+                disabled={!input.trim() || sending || recording || transcribing}
+                className="h-10 w-10 shrink-0 flex items-center justify-center rounded-full bg-primary text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <Send className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+// ── Inline editable field row ────────────────────────────────────────────────
+
+function FieldRow({
+  label,
+  value,
+  msgIdx,
+  itemIdx,
+  field,
+  editingCell,
+  editValue,
+  setEditValue,
+  startEdit,
+  commitEdit,
+  status,
+}: {
+  label: string
+  value: string
+  msgIdx: number
+  itemIdx: number
+  field: string
+  editingCell: { msgIdx: number; itemIdx: number; field: string } | null
+  editValue: string
+  setEditValue: (v: string) => void
+  startEdit: (msgIdx: number, itemIdx: number, field: string, currentValue: string) => void
+  commitEdit: () => void
+  status: string
+}) {
+  const isEditing = editingCell?.msgIdx === msgIdx && editingCell?.itemIdx === itemIdx && editingCell?.field === field
+  const canEdit = status === 'pending'
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="text-muted-foreground w-14 shrink-0">{label}</span>
+        <input
+          autoFocus
+          value={editValue}
+          onChange={e => setEditValue(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') commitEdit() }}
+          onBlur={commitEdit}
+          className="flex-1 h-6 rounded border border-input bg-background px-2 text-xs outline-none focus:ring-1 focus:ring-ring"
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-2 group">
+      <span className="text-muted-foreground w-14 shrink-0">{label}</span>
+      <span className="text-foreground flex-1 truncate">{value}</span>
+      {canEdit && (
+        <button
+          onClick={() => startEdit(msgIdx, itemIdx, field, value)}
+          className="opacity-0 group-hover:opacity-100 transition-opacity h-5 w-5 flex items-center justify-center rounded hover:bg-accent"
+        >
+          <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+        </button>
+      )}
+    </div>
+  )
+}
