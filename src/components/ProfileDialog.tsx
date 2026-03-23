@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useProfile } from '@/hooks/useProfile'
 import { isUsernameAvailable } from '@/lib/api'
-import { iso2dmy, dmy2iso, formatDMYInput } from '@/lib/constants'
 
 const USERNAME_RE = /^[a-z0-9_]{3,32}$/
 import {
@@ -26,8 +25,6 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
   const { profile, updateProfile, uploadProfileAvatar } = useProfile()
   const [displayName, setDisplayName] = useState('')
   const [bio, setBio] = useState('')
-  const [birthDate, setBirthDate] = useState('')
-  const [endDate, setEndDate] = useState('')
   const [username, setUsername] = useState('')
   const [usernameError, setUsernameError] = useState<string | null>(null)
   const [usernameOk, setUsernameOk] = useState(false)
@@ -43,8 +40,6 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
     if (profile && open) {
       setDisplayName(profile.display_name)
       setBio(profile.bio)
-      setBirthDate(profile.birth_date ? iso2dmy(profile.birth_date) : '')
-      setEndDate(profile.end_date ? iso2dmy(profile.end_date) : '')
       setUsername(profile.username ?? '')
       setUsernameError(null)
       setUsernameOk(false)
@@ -76,14 +71,6 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
     }
   }
 
-  function handleBirthDateChange(value: string) {
-    setBirthDate(formatDMYInput(value))
-  }
-
-  function handleEndDateChange(value: string) {
-    setEndDate(formatDMYInput(value))
-  }
-
   function handleAvatarFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -107,8 +94,6 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
     await updateProfile({
       display_name: displayName.trim(),
       bio: bio.trim(),
-      birth_date: birthDate ? dmy2iso(birthDate) || null : null,
-      end_date: endDate ? dmy2iso(endDate) || null : null,
       username: trimmedUsername,
       ...(avatarUrl !== undefined ? { avatar_url: avatarUrl } : {}),
     })
@@ -187,27 +172,6 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
                 ? <p className="text-xs text-green-600">Your public page: /{username}</p>
                 : <p className="text-xs text-muted-foreground">Public page URL: /{username || '…'}</p>
             }
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="profileBirthDate">Birth (start) Date</Label>
-            <Input
-              id="profileBirthDate"
-              type="text"
-              value={birthDate}
-              placeholder="DD/MM/YYYY"
-              onChange={e => handleBirthDateChange(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">Used to align persona comparisons by age</p>
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="profileEndDate">End Date <span className="text-xs font-normal text-muted-foreground">(optional)</span></Label>
-            <Input
-              id="profileEndDate"
-              type="text"
-              value={endDate}
-              placeholder="DD/MM/YYYY"
-              onChange={e => handleEndDateChange(e.target.value)}
-            />
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor="bio">Bio</Label>

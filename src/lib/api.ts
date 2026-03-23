@@ -46,6 +46,8 @@ export function mapDbEvent(row: DbEvent): TimelineEvent {
   const validProj = proj != null && 'startValue' in proj ? proj as unknown as ValueProjection : null
   const startYear = dbTimeToFracYear(row.start_time)
   const endYear = row.end_time != null ? dbTimeToFracYear(row.end_time) : undefined
+  const fadeInYear = row.fade_in_time != null ? dbTimeToFracYear(row.fade_in_time) : undefined
+  const fadeOutYear = row.fade_out_time != null ? dbTimeToFracYear(row.fade_out_time) : undefined
   const meta = row.metadata != null && typeof row.metadata === 'object' ? row.metadata as EventMetadata : undefined
   return {
     id: row.id,
@@ -55,6 +57,8 @@ export function mapDbEvent(row: DbEvent): TimelineEvent {
     type: endYear !== undefined ? 'range' : 'point',
     startYear,
     ...(endYear !== undefined ? { endYear } : {}),
+    ...(fadeInYear !== undefined ? { fadeInYear } : {}),
+    ...(fadeOutYear !== undefined ? { fadeOutYear } : {}),
     ...(row.color != null ? { color: row.color } : {}),
     ...(row.emoji != null ? { emoji: row.emoji } : {}),
     ...(row.point_value != null ? { pointValue: row.point_value } : {}),
@@ -122,6 +126,12 @@ export async function fetchPublicProfile(username: string): Promise<PublicProfil
   const { data, error } = await supabase.rpc('get_public_profile', { p_username: username })
   if (error || !data) return null
   return data as PublicProfileData
+}
+
+export async function searchUsernames(query: string): Promise<{ username: string; display_name: string; avatar_url: string | null }[]> {
+  const { data, error } = await supabase.rpc('search_usernames', { p_query: query.toLowerCase(), p_limit: 8 })
+  if (error || !data) return []
+  return data as { username: string; display_name: string; avatar_url: string | null }[]
 }
 
 export async function isUsernameAvailable(username: string): Promise<boolean> {
@@ -455,6 +465,8 @@ export async function insertEvent(
     description: string
     start_time: string
     end_time?: string | null
+    fade_in_time?: string | null
+    fade_out_time?: string | null
     color?: string
     emoji?: string
     point_value?: number
@@ -477,6 +489,8 @@ export async function insertEvent(
       description: event.description,
       start_time: event.start_time,
       end_time: event.end_time ?? null,
+      fade_in_time: event.fade_in_time ?? null,
+      fade_out_time: event.fade_out_time ?? null,
       color: event.color ?? null,
       emoji: event.emoji ?? null,
       point_value: event.point_value ?? null,
@@ -506,6 +520,8 @@ export async function updateEventDb(
     description: string
     start_time: string
     end_time: string | null
+    fade_in_time: string | null
+    fade_out_time: string | null
     color: string | null
     emoji: string | null
     point_value: number | null
@@ -556,6 +572,10 @@ export async function fetchPersonas(): Promise<DbPersona[]> {
     return []
   }
   return data ?? []
+}
+
+export async function incrementPersonaView(personaId: string): Promise<void> {
+  await supabase.rpc('increment_persona_view', { p_id: personaId })
 }
 
 export async function fetchPersonaEvents(personaIds: string[]): Promise<DbPersonaEvent[]> {

@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { dmy2iso, formatDMYInput } from '@/lib/constants'
 
 const USERNAME_RE = /^[a-z0-9_]{3,32}$/
 
@@ -15,7 +14,7 @@ interface SignUpFormProps {
   fromDemo?: boolean
 }
 
-export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess, fromDemo }: SignUpFormProps) {
+export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProps) {
   const { signUp, signInWithGoogle } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -23,9 +22,6 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess, fromDemo }: Sign
   const [username, setUsername] = useState('')
   const [usernameError, setUsernameError] = useState<string | null>(null)
   const [usernameOk, setUsernameOk] = useState(false)
-  // Pre-fill with demo person's birth date (Alex Weber, born 1 Jan 1980) when coming from "sign up with this timeline"
-  const [birthDate, setBirthDate] = useState(fromDemo ? '01/01/1980' : '')
-  const [endDate, setEndDate] = useState('')
   const [bio, setBio] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -45,14 +41,6 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess, fromDemo }: Sign
     } else {
       setUsernameError('Username is already taken')
     }
-  }
-
-  function handleBirthDateChange(value: string) {
-    setBirthDate(formatDMYInput(value))
-  }
-
-  function handleEndDateChange(value: string) {
-    setEndDate(formatDMYInput(value))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -88,8 +76,6 @@ setSubmitting(true)
       localStorage.setItem(
         'timeline_pending_profile',
         JSON.stringify({
-          birth_date: dmy2iso(birthDate),
-          end_date: endDate ? dmy2iso(endDate) || null : null,
           bio: bio.trim(),
           username: trimmedUsername,
           email,
@@ -176,27 +162,6 @@ setSubmitting(true)
           onChange={e => setConfirmPassword(e.target.value)}
           required
           minLength={6}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="signupBirthDate">Birth (start) Date</Label>
-        <Input
-          id="signupBirthDate"
-          type="text"
-          value={birthDate}
-          placeholder="DD/MM/YYYY"
-          onChange={e => handleBirthDateChange(e.target.value)}
-        />
-        <p className="text-xs text-muted-foreground">Used to align persona comparisons by age</p>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="signupEndDate">End Date <span className="text-xs font-normal text-muted-foreground">(optional)</span></Label>
-        <Input
-          id="signupEndDate"
-          type="text"
-          value={endDate}
-          placeholder="DD/MM/YYYY"
-          onChange={e => handleEndDateChange(e.target.value)}
         />
       </div>
       <div className="space-y-2">

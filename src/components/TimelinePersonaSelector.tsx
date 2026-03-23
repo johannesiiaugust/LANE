@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import { ChevronDown, Plus, Pencil, Trash2, Layers, LayoutList, Users, Link2, Link2Off, Star, Copy, UserPlus, X, Globe, Search } from 'lucide-react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { ChevronDown, ChevronRight, Plus, Pencil, Trash2, Users, Link2, Link2Off, Star, Copy, UserPlus, X, Globe, Search, ListX } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
+import { DateInput } from '@/components/ui/DateInput'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import type { DbPersona, DbLane, DbTimelineShare, SharedWithMeItem } from '@/types/database'
@@ -29,9 +30,48 @@ import type { PersonaDisplayMode } from '@/hooks/usePersonas'
 import type { OverlayDisplayMode } from '@/hooks/useTimelineOverlays'
 import type { ExternalOverlayInfo } from '@/hooks/useExternalOverlays'
 import { fracYearToMs, msToFracYear } from '@/lib/constants'
-import { fetchLanes, getTimelineShares, addTimelineShare, removeTimelineShare, lookupUserByUsername, fetchPublicProfile } from '@/lib/api'
+import { fetchLanes, getTimelineShares, addTimelineShare, removeTimelineShare, lookupUserByUsername, fetchPublicProfile, searchUsernames, incrementPersonaView } from '@/lib/api'
 
 const DEFAULT_COLOR = '#3b82f6'
+
+function PersonaRow({
+  p,
+  activePersonaIds,
+  alignedPersonaIds,
+  onToggle,
+  onToggleAlignment,
+}: {
+  p: DbPersona
+  activePersonaIds: Set<string>
+  alignedPersonaIds: Set<string>
+  onToggle: (id: string) => void
+  onToggleAlignment: (id: string) => void
+}) {
+  const isActive = activePersonaIds.has(p.id)
+  const aligned = alignedPersonaIds.has(p.id)
+  return (
+    <div className="rounded-md px-2 py-1.5 hover:bg-accent">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-medium truncate">{p.name}</p>
+          <p className="text-xs text-muted-foreground">{p.birth_year}–{p.death_year ?? 'present'}</p>
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {isActive && (
+            <button
+              onClick={() => onToggleAlignment(p.id)}
+              title={aligned ? 'Showing age-aligned — click for real years' : 'Showing real years — click to age-align'}
+              className={cn('p-1 rounded transition-colors', aligned ? 'text-primary bg-primary/10 animate-blink-fast hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted')}
+            >
+              {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
+            </button>
+          )}
+          <Switch checked={isActive} onCheckedChange={() => onToggle(p.id)} />
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function fracYearToDateStr(fy: number): string {
   const d = new Date(fracYearToMs(fy))
@@ -84,23 +124,23 @@ export function TimelinePersonaSelector({
   onTogglePersona,
   alignedPersonaIds,
   onTogglePersonaAlignment,
-  personaDisplayModes,
-  onSetPersonaDisplayMode,
+  personaDisplayModes: _personaDisplayModes,
+  onSetPersonaDisplayMode: _onSetPersonaDisplayMode,
   activeOverlayIds,
   onToggleOverlay,
   overlayAlignedIds,
   onToggleOverlayAlignment,
-  overlayDisplayModes,
-  onSetOverlayDisplayMode,
+  overlayDisplayModes: _overlayDisplayModes,
+  onSetOverlayDisplayMode: _onSetOverlayDisplayMode,
   externalStored = [],
   externalActiveIds = new Set(),
   externalAlignedIds = new Set(),
-  externalDisplayModes = new Map(),
+  externalDisplayModes: _externalDisplayModes = new Map(),
   onAddExternal,
   onRemoveExternal,
   onToggleExternalActive,
   onToggleExternalAlignment,
-  onSetExternalDisplayMode,
+  onSetExternalDisplayMode: _onSetExternalDisplayMode,
   mainStartYear,
   sharedWithMe = [],
   requestCreate,
@@ -158,14 +198,14 @@ export function TimelinePersonaSelector({
   const [userSearchError, setUserSearchError] = useState<string | null>(null)
   const [userSearchResults, setUserSearchResults] = useState<ExternalOverlayInfo[]>([])
   const [userSearchAccess, setUserSearchAccess] = useState<Map<string, 'public' | 'shared' | 'both'>>(new Map())
+  const [usernameSuggestions, setUsernameSuggestions] = useState<{ username: string; display_name: string }[]>([])
+  const userSearchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const handleUserSearch = useCallback(async () => {
-    const username = userSearchInput.trim().toLowerCase()
-    if (!username) return
+  // Load timelines for a specific username (called when suggestion is picked or on exact match)
+  const loadUserTimelines = useCallback(async (username: string) => {
     setUserSearching(true)
     setUserSearchError(null)
-    setUserSearchResults([])
-    setUserSearchAccess(new Map())
+    setUsernameSuggestions([])
 
     const profile = await fetchPublicProfile(username)
     const publicIds = new Set<string>()
@@ -176,23 +216,23 @@ export function TimelinePersonaSelector({
         })
       : []
 
-    const sharedIds = new Set<string>()
-    const sharedResults: ExternalOverlayInfo[] = sharedWithMe
+    const sharedExact = new Set<string>()
+    const sharedExactResults: ExternalOverlayInfo[] = sharedWithMe
       .filter(item => (item.owner.username ?? '').toLowerCase() === username)
       .map(item => {
-        sharedIds.add(item.timeline.id)
+        sharedExact.add(item.timeline.id)
         return { username: item.owner.username ?? '', timelineId: item.timeline.id, timelineName: item.timeline.name, displayName: item.owner.display_name || item.owner.username || '', startYear: item.timeline.start_year ?? null }
       })
 
     const seen = new Set<string>()
     const results: ExternalOverlayInfo[] = []
-    for (const r of [...publicResults, ...sharedResults]) {
+    for (const r of [...publicResults, ...sharedExactResults]) {
       if (!seen.has(r.timelineId)) { seen.add(r.timelineId); results.push(r) }
     }
 
     const access = new Map<string, 'public' | 'shared' | 'both'>()
     for (const id of seen) {
-      if (publicIds.has(id) && sharedIds.has(id)) access.set(id, 'both')
+      if (publicIds.has(id) && sharedExact.has(id)) access.set(id, 'both')
       else if (publicIds.has(id)) access.set(id, 'public')
       else access.set(id, 'shared')
     }
@@ -200,12 +240,46 @@ export function TimelinePersonaSelector({
     if (results.length === 0) {
       setUserSearchError(profile
         ? `@${username} has no public timelines and hasn't shared any with you`
-        : `No profile found for @${username}`)
+        : `No user found for @${username}`)
+      setUserSearchResults([])
+      setUserSearchAccess(new Map())
     } else {
       setUserSearchResults(results)
       setUserSearchAccess(access)
+      setUserSearchError(null)
     }
     setUserSearching(false)
+  }, [sharedWithMe])
+
+  // Debounced prefix search → suggestions
+  useEffect(() => {
+    const query = userSearchInput.trim().toLowerCase()
+
+    if (!query) {
+      setUsernameSuggestions([])
+      setUserSearchResults([])
+      setUserSearchError(null)
+      setUserSearching(false)
+      if (userSearchDebounce.current) clearTimeout(userSearchDebounce.current)
+      return
+    }
+
+    // Instant suggestions from sharedWithMe
+    const sharedSuggestions = sharedWithMe
+      .filter(item => (item.owner.username ?? '').toLowerCase().startsWith(query))
+      .map(item => ({ username: item.owner.username ?? '', display_name: item.owner.display_name || item.owner.username || '' }))
+    setUsernameSuggestions(sharedSuggestions)
+
+    if (userSearchDebounce.current) clearTimeout(userSearchDebounce.current)
+    userSearchDebounce.current = setTimeout(async () => {
+      const suggestions = await searchUsernames(query)
+      // Merge with sharedWithMe suggestions (dedupe by username)
+      const seen = new Set(suggestions.map(s => s.username))
+      const merged = [...suggestions, ...sharedSuggestions.filter(s => !seen.has(s.username))]
+      setUsernameSuggestions(merged)
+    }, 200)
+
+    return () => { if (userSearchDebounce.current) clearTimeout(userSearchDebounce.current) }
   }, [userSearchInput, sharedWithMe])
 
   const isRealSource = (id: string) => id !== COPY_DEFAULTS && id !== COPY_EMPTY
@@ -381,6 +455,48 @@ export function TimelinePersonaSelector({
     setDeleteConfirmId(null)
   }
 
+  // ── Section collapse state (persisted) ────────────────────────────────────
+  const [timelinesOpen, setTimelinesOpen] = useState(() => localStorage.getItem('tl_section_timelines') !== 'closed')
+  const [otherUsersOpen, setOtherUsersOpen] = useState(() => localStorage.getItem('tl_section_users') !== 'closed')
+  const [personasOpen, setPersonasOpen] = useState(() => localStorage.getItem('tl_section_personas') !== 'closed')
+
+  function toggleSection(key: string, open: boolean, setter: (v: boolean) => void) {
+    setter(!open)
+    localStorage.setItem(key, open ? 'closed' : 'open')
+  }
+
+  // ── Persona search + recently viewed ──────────────────────────────────────
+  const [personaSearch, setPersonaSearch] = useState('')
+  const [recentPersonaIds, setRecentPersonaIds] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('persona_recently_viewed') ?? '[]') } catch { return [] }
+  })
+
+  function handleTogglePersona(id: string) {
+    if (!activePersonaIds.has(id)) {
+      // Record as recently viewed
+      incrementPersonaView(id)
+      setRecentPersonaIds(prev => {
+        const next = [id, ...prev.filter(x => x !== id)].slice(0, 5)
+        localStorage.setItem('persona_recently_viewed', JSON.stringify(next))
+        return next
+      })
+    }
+    onTogglePersona(id)
+  }
+
+  const top5Personas = [...personas]
+    .sort((a, b) => (b.view_count ?? 0) - (a.view_count ?? 0))
+    .slice(0, 5)
+
+  const recentPersonas = recentPersonaIds
+    .map(id => personas.find(p => p.id === id))
+    .filter((p): p is DbPersona => !!p)
+
+  const searchTrimmed = personaSearch.trim().toLowerCase()
+  const searchResults = searchTrimmed.length > 0
+    ? personas.filter(p => p.name.toLowerCase().includes(searchTrimmed)).slice(0, 20)
+    : []
+
   const buttonLabel = currentTimeline?.name ?? 'Timeline'
 
   return (
@@ -394,10 +510,25 @@ export function TimelinePersonaSelector({
         </PopoverTrigger>
         <PopoverContent align="start" className="w-72 p-0 max-h-[85vh] overflow-y-auto">
           {/* ── Timelines ── */}
-          <div className="px-3 pt-2 pb-1">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Timelines</p>
+          <div className="flex items-center hover:bg-accent/50 transition-colors">
+            <button
+              className="flex items-center gap-1.5 px-3 pt-2 pb-1 text-left flex-1 min-w-0"
+              onClick={() => toggleSection('tl_section_timelines', timelinesOpen, setTimelinesOpen)}
+            >
+              {timelinesOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex-1">Timelines</p>
+            </button>
+            {otherTimelines.some(t => activeOverlayIds.has(t.id)) && (
+              <button
+                className="pr-3 pt-2 pb-1 text-[10px] text-muted-foreground hover:text-foreground shrink-0"
+                title="Deselect all"
+                onClick={() => otherTimelines.filter(t => activeOverlayIds.has(t.id)).forEach(t => onToggleOverlay(t.id))}
+              >
+                <ListX className="h-3 w-3" />
+              </button>
+            )}
           </div>
-          <div className="px-1 pb-1">
+          {timelinesOpen && <div className="px-1 pb-1">
             {/* Main (selected) timeline */}
             {currentTimeline && (
               <div
@@ -430,7 +561,6 @@ export function TimelinePersonaSelector({
             {otherTimelines.map(t => {
               const isActive = activeOverlayIds.has(t.id)
               const aligned = overlayAlignedIds.has(t.id)
-              const mode = overlayDisplayModes.get(t.id) ?? 'integrated'
               return (
                 <div key={t.id} className="rounded-md px-2 py-1.5 hover:bg-accent group">
                   <div className="flex items-center justify-between gap-2">
@@ -456,32 +586,6 @@ export function TimelinePersonaSelector({
                           >
                             {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
                           </button>
-                          <div className="flex items-center rounded border overflow-hidden">
-                            <button
-                              onClick={() => onSetOverlayDisplayMode(t.id, 'integrated')}
-                              title="Blend into timeline lanes"
-                              className={cn(
-                                'p-1 transition-colors',
-                                mode === 'integrated'
-                                  ? 'bg-primary text-primary-foreground'
-                                  : 'text-muted-foreground hover:bg-muted',
-                              )}
-                            >
-                              <Layers className="h-3 w-3" />
-                            </button>
-                            <button
-                              onClick={() => onSetOverlayDisplayMode(t.id, 'separate')}
-                              title="Show as separate section below"
-                              className={cn(
-                                'p-1 transition-colors',
-                                mode === 'separate'
-                                  ? 'bg-primary text-primary-foreground'
-                                  : 'text-muted-foreground hover:bg-muted',
-                              )}
-                            >
-                              <LayoutList className="h-3 w-3" />
-                            </button>
-                          </div>
                         </>
                       )}
                       <div className="flex items-center gap-1">
@@ -513,19 +617,34 @@ export function TimelinePersonaSelector({
               <Plus className="h-4 w-4" />
               New Timeline…
             </button>
-          </div>
+          </div>}
 
-          {/* ── Users (external overlays) ── */}
-          <div className="border-t px-3 pt-2 pb-1">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
-              <Globe className="h-3 w-3" />
-              Users
-              {externalActiveIds.size > 0 && (
-                <span className="ml-auto rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{externalActiveIds.size}</span>
-              )}
-            </p>
+          {/* ── Other Users (external overlays) ── */}
+          <div className="flex items-center border-t hover:bg-accent/50 transition-colors">
+            <button
+              className="flex items-center gap-1.5 px-3 pt-2 pb-1 text-left flex-1 min-w-0"
+              onClick={() => toggleSection('tl_section_users', otherUsersOpen, setOtherUsersOpen)}
+            >
+              {otherUsersOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 flex-1">
+                <Globe className="h-3 w-3" />
+                Other Users
+                {externalActiveIds.size > 0 && (
+                  <span className="ml-1 rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{externalActiveIds.size}</span>
+                )}
+              </p>
+            </button>
+            {externalActiveIds.size > 0 && (
+              <button
+                className="pr-3 pt-2 pb-1 text-[10px] text-muted-foreground hover:text-foreground shrink-0"
+                title="Deselect all"
+                onClick={() => externalStored.filter(s => externalActiveIds.has(s.timelineId)).forEach(s => onToggleExternalActive?.(s.timelineId))}
+              >
+                <ListX className="h-3 w-3" />
+              </button>
+            )}
           </div>
-          <div className="px-1 pb-1">
+          {otherUsersOpen && <div className="px-1 pb-1">
             {/* Shared with you */}
             {sharedWithMe.length > 0 && (
               <div className="px-2 pb-1 space-y-0.5">
@@ -556,7 +675,6 @@ export function TimelinePersonaSelector({
                 {externalStored.map(info => {
                   const isActive = externalActiveIds.has(info.timelineId)
                   const aligned = externalAlignedIds.has(info.timelineId)
-                  const mode = externalDisplayModes.get(info.timelineId) ?? 'separate'
                   const canAlign = info.startYear != null && mainStartYear != null
                   return (
                     <div key={info.timelineId} className="rounded-md px-1 py-1.5 hover:bg-accent">
@@ -575,16 +693,6 @@ export function TimelinePersonaSelector({
                                   {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
                                 </button>
                               )}
-                              <div className="flex items-center rounded border overflow-hidden">
-                                <button onClick={() => onSetExternalDisplayMode?.(info.timelineId, 'integrated')} title="Blend into my lanes"
-                                  className={cn('p-1 transition-colors', mode === 'integrated' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted')}>
-                                  <Layers className="h-3 w-3" />
-                                </button>
-                                <button onClick={() => onSetExternalDisplayMode?.(info.timelineId, 'separate')} title="Show as separate section"
-                                  className={cn('p-1 transition-colors', mode === 'separate' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted')}>
-                                  <LayoutList className="h-3 w-3" />
-                                </button>
-                              </div>
                             </>
                           )}
                           <Switch checked={isActive} onCheckedChange={() => onToggleExternalActive?.(info.timelineId)} />
@@ -603,18 +711,40 @@ export function TimelinePersonaSelector({
             {/* Search for user timelines */}
             <div className={cn('px-2 py-1.5 space-y-1.5', (sharedWithMe.length > 0 || externalStored.length > 0) && 'border-t mt-1 pt-2')}>
               <p className="text-[10px] font-medium text-muted-foreground">Find timelines by username</p>
-              <div className="flex gap-1.5">
+              <div className="relative flex items-center">
+                <Search className="absolute left-2 h-3 w-3 text-muted-foreground pointer-events-none" />
                 <Input
                   value={userSearchInput}
-                  onChange={e => { setUserSearchInput(e.target.value); setUserSearchError(null); setUserSearchResults([]) }}
-                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleUserSearch())}
-                  placeholder="username"
-                  className="h-7 text-xs flex-1"
+                  onChange={e => { setUserSearchInput(e.target.value); setUserSearchResults([]); setUserSearchError(null) }}
+                  placeholder="Search by username…"
+                  className="h-7 text-xs pl-6 pr-6"
+                  autoComplete="off"
                 />
-                <Button type="button" size="sm" className="h-7 px-2 shrink-0" onClick={handleUserSearch} disabled={userSearching || !userSearchInput.trim()}>
-                  <Search className="h-3.5 w-3.5" />
-                </Button>
+                {userSearchInput && (
+                  <button type="button" onClick={() => { setUserSearchInput(''); setUsernameSuggestions([]); setUserSearchResults([]); setUserSearchError(null) }} className="absolute right-1.5 text-muted-foreground hover:text-foreground">
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
               </div>
+              {/* Username suggestions (prefix match) */}
+              {usernameSuggestions.length > 0 && userSearchResults.length === 0 && (
+                <div className="space-y-0.5">
+                  {usernameSuggestions.map(s => (
+                    <button
+                      key={s.username}
+                      type="button"
+                      className="w-full flex items-center gap-2 rounded px-2 py-1 hover:bg-accent text-left"
+                      onClick={() => { setUserSearchInput(s.username); loadUserTimelines(s.username) }}
+                    >
+                      <Users className="h-3 w-3 shrink-0 text-muted-foreground" />
+                      <span className="text-xs font-medium">@{s.username}</span>
+                      {s.display_name && s.display_name !== s.username && (
+                        <span className="text-[10px] text-muted-foreground truncate">{s.display_name}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
               {userSearching && <p className="text-[10px] text-muted-foreground">Searching…</p>}
               {userSearchError && <p className="text-[10px] text-destructive">{userSearchError}</p>}
               {userSearchResults.length > 0 && (
@@ -639,83 +769,79 @@ export function TimelinePersonaSelector({
                 </div>
               )}
             </div>
-          </div>
+          </div>}
 
           {/* ── Personas ── */}
-          <div className="border-t px-3 pt-2 pb-1">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
-              <Users className="h-3 w-3" />
-              Persona Overlays
-            </p>
+          <div className="flex items-center border-t hover:bg-accent/50 transition-colors">
+            <button
+              className="flex items-center gap-1.5 px-3 pt-2 pb-1 text-left flex-1 min-w-0"
+              onClick={() => toggleSection('tl_section_personas', personasOpen, setPersonasOpen)}
+            >
+              {personasOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 flex-1">
+                <Users className="h-3 w-3" />
+                Personas
+                {activePersonaIds.size > 0 && (
+                  <span className="ml-1 rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{activePersonaIds.size}</span>
+                )}
+              </p>
+            </button>
+            {activePersonaIds.size > 0 && (
+              <button
+                className="pr-3 pt-2 pb-1 text-[10px] text-muted-foreground hover:text-foreground shrink-0"
+                title="Deselect all"
+                onClick={() => [...activePersonaIds].forEach(id => onTogglePersona(id))}
+              >
+                <ListX className="h-3 w-3" />
+              </button>
+            )}
           </div>
-          <div className="px-1 pb-2">
+          {personasOpen && <div className="px-1 pb-2">
             {personas.length === 0 ? (
               <p className="px-2 py-2 text-xs text-muted-foreground text-center">No personas available</p>
             ) : (
-              personas.map(p => {
-                const isActive = activePersonaIds.has(p.id)
-                const aligned = alignedPersonaIds.has(p.id)
-                const mode = personaDisplayModes.get(p.id) ?? 'separate'
-                return (
-                  <div key={p.id} className="rounded-md px-2 py-1.5 hover:bg-accent">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{p.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {p.birth_year}–{p.death_year ?? 'present'}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {isActive && (
-                          <>
-                            <button
-                              onClick={() => onTogglePersonaAlignment(p.id)}
-                              title={aligned ? 'Showing age-aligned — click for real years' : 'Showing real years — click to age-align'}
-                              className={cn(
-                                'p-1 rounded transition-colors',
-                                aligned
-                                  ? 'text-primary bg-primary/10 animate-blink-fast hover:bg-primary/20'
-                                  : 'text-muted-foreground hover:bg-muted',
-                              )}
-                            >
-                              {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
-                            </button>
-                            <div className="flex items-center rounded border overflow-hidden">
-                              <button
-                                onClick={() => onSetPersonaDisplayMode(p.id, 'integrated')}
-                                title="Blend into my timeline lanes"
-                                className={cn(
-                                  'p-1 transition-colors',
-                                  mode === 'integrated'
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'text-muted-foreground hover:bg-muted',
-                                )}
-                              >
-                                <Layers className="h-3 w-3" />
-                              </button>
-                              <button
-                                onClick={() => onSetPersonaDisplayMode(p.id, 'separate')}
-                                title="Show as separate timeline below"
-                                className={cn(
-                                  'p-1 transition-colors',
-                                  mode === 'separate'
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'text-muted-foreground hover:bg-muted',
-                                )}
-                              >
-                                <LayoutList className="h-3 w-3" />
-                              </button>
-                            </div>
-                          </>
-                        )}
-                        <Switch checked={isActive} onCheckedChange={() => onTogglePersona(p.id)} />
-                      </div>
-                    </div>
+              <>
+                {/* Top 5 most popular */}
+                <div className="px-2 pb-1">
+                  <p className="text-[10px] font-medium text-muted-foreground mb-1">Popular</p>
+                  {top5Personas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
+                </div>
+
+                {/* Search field */}
+                <div className="px-2 py-1.5 border-t">
+                  <div className="flex gap-1.5">
+                    <Input
+                      value={personaSearch}
+                      onChange={e => setPersonaSearch(e.target.value)}
+                      placeholder="Search personas…"
+                      className="h-7 text-xs flex-1"
+                    />
+                    {personaSearch && (
+                      <button type="button" onClick={() => setPersonaSearch('')} className="shrink-0 text-muted-foreground hover:text-foreground">
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
-                )
-              })
+                  {searchResults.length > 0 && (
+                    <div className="mt-1 space-y-0.5">
+                      {searchResults.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
+                    </div>
+                  )}
+                  {searchTrimmed.length > 0 && searchResults.length === 0 && (
+                    <p className="text-[10px] text-muted-foreground mt-1">No results</p>
+                  )}
+                </div>
+
+                {/* Recently viewed */}
+                {recentPersonas.length > 0 && searchTrimmed.length === 0 && (
+                  <div className="px-2 pt-1.5 border-t">
+                    <p className="text-[10px] font-medium text-muted-foreground mb-1">Recently viewed</p>
+                    {recentPersonas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
+                  </div>
+                )}
+              </>
             )}
-          </div>
+          </div>}
         </PopoverContent>
       </Popover>
 
@@ -766,14 +892,14 @@ export function TimelinePersonaSelector({
             <div className="grid gap-1.5">
               <Label>Start <span className="text-muted-foreground text-xs">(optional)</span></Label>
               <div className="flex gap-2">
-                <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="flex-1" />
+                <DateInput value={startDate} onChange={setStartDate} className="flex-1" />
                 <Input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="w-28" disabled={!startDate} />
               </div>
             </div>
             <div className="grid gap-1.5">
               <Label>End <span className="text-muted-foreground text-xs">(optional)</span></Label>
               <div className="flex gap-2">
-                <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="flex-1" />
+                <DateInput value={endDate} onChange={setEndDate} className="flex-1" />
                 <Input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="w-28" disabled={!endDate} />
               </div>
             </div>
