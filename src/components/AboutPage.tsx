@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Footer } from '@/components/Footer'
 import { useTitle } from '@/hooks/useTitle'
-import { useTranslation, SUPPORTED_LANGS, localizedPath as lp, type Lang } from '@/i18n'
-import { TranslateDropdown } from '@/components/TranslateMenu'
+import { useTranslation } from '@/i18n'
+import { LanguageSwitcherDropdown } from '@/components/LanguageSwitcher'
 
 /* ── Tiny hook: triggers once when element enters viewport ── */
 function useInView(threshold = 0.15) {
@@ -169,26 +169,6 @@ export function AboutPage() {
   const { t, navigate } = useTranslation()
   useTitle(`LifeLANE — ${t('about.yourEntireLife')} ${t('about.inOneView')}`)
 
-  // Language switcher for about page
-  const LanguageSwitcher = () => (
-    <div className="flex items-center gap-1">
-      {SUPPORTED_LANGS.map(l => (
-        <a
-          key={l}
-          href={lp('/about', l as Lang)}
-          onClick={e => {
-            e.preventDefault()
-            window.history.pushState(null, '', lp('/about', l as Lang))
-            window.dispatchEvent(new PopStateEvent('popstate'))
-          }}
-          className="px-1.5 py-0.5 text-xs rounded hover:bg-muted transition-colors uppercase"
-        >
-          {l}
-        </a>
-      ))}
-    </div>
-  )
-
   return (
     <div className="flex flex-col min-h-screen bg-background overflow-x-hidden">
 
@@ -198,8 +178,7 @@ export function AboutPage() {
           LifeLANE
         </button>
         <div className="flex items-center gap-4">
-          <LanguageSwitcher />
-          <TranslateDropdown />
+          <LanguageSwitcherDropdown />
           <button onClick={() => navigate('/terms')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('about.terms')}</button>
           <button
             onClick={() => navigate('/demo')}

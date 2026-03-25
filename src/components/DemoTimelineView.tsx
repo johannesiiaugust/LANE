@@ -15,7 +15,8 @@ import { SkinDialog } from '@/components/SkinDialog'
 import { ImportDialog, type ImportTab } from '@/components/ImportDialog'
 import { SearchDialog } from '@/components/SearchDialog'
 import { GuideOverlay } from '@/components/GuideOverlay'
-import { useGoogleTranslate, TranslateMenuContent } from '@/components/TranslateMenu'
+import { useGoogleTranslate } from '@/components/TranslateMenu'
+import { LanguageSwitcherInline } from '@/components/LanguageSwitcher'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
@@ -578,7 +579,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
                 Import Calendar File, Google or text/voice with AI
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <TranslateMenuContent />
+              <LanguageSwitcherInline />
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
