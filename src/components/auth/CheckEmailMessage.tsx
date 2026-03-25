@@ -1,4 +1,5 @@
 import { Mail } from 'lucide-react'
+import { useTranslation } from '@/i18n'
 import { Button } from '@/components/ui/button'
 
 interface CheckEmailMessageProps {
@@ -6,15 +7,16 @@ interface CheckEmailMessageProps {
 }
 
 export function CheckEmailMessage({ onBackToSignIn }: CheckEmailMessageProps) {
+  const { t } = useTranslation()
   return (
     <div className="space-y-4 text-center">
       <Mail className="mx-auto h-12 w-12 text-muted-foreground" />
-      <h3 className="text-lg font-medium">Check your email</h3>
+      <h3 className="text-lg font-medium">{t('auth.checkYourEmail')}</h3>
       <p className="text-sm text-muted-foreground">
-        We've sent you a link. Please check your inbox and follow the instructions.
+        {t('auth.sentLink')}
       </p>
       <Button variant="outline" className="w-full" onClick={onBackToSignIn}>
-        Back to sign in
+        {t('auth.backToSignIn')}
       </Button>
     </div>
   )

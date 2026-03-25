@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { Lane } from '@/types/timeline'
+import { useTranslation } from '@/i18n'
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,7 @@ interface LaneDialogProps {
 }
 
 export function LaneDialog({ open, onOpenChange, editingLane, onSave }: LaneDialogProps) {
+  const { t } = useTranslation()
   const [name, setName] = useState('')
   const [color, setColor] = useState('#3b82f6')
   const [emoji, setEmoji] = useState('')
@@ -49,30 +51,30 @@ export function LaneDialog({ open, onOpenChange, editingLane, onSave }: LaneDial
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>{editingLane ? 'Edit Lane' : 'Add Lane'}</DialogTitle>
+          <DialogTitle>{editingLane ? t('lane.editLane') : t('lane.addLane')}</DialogTitle>
           <DialogDescription>
-            {editingLane ? 'Modify the lane name, emoji, and color.' : 'Create a new swim lane.'}
+            {editingLane ? t('lane.modifyLane') : t('lane.createNewSwimLane')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-3">
           <div className="grid gap-1.5">
-            <Label htmlFor="lane-name">Name</Label>
-            <Input id="lane-name" value={name} onChange={e => setName(e.target.value)} placeholder="Lane name" />
+            <Label htmlFor="lane-name">{t('common.name')}</Label>
+            <Input id="lane-name" value={name} onChange={e => setName(e.target.value)} placeholder={t('lane.laneName')} />
           </div>
           {/* Color + Emoji on the same row */}
           <div className="flex items-end gap-4">
             <div className="flex-1 grid gap-1.5">
-              <Label>Color</Label>
+              <Label>{t('common.color')}</Label>
               <ColorPicker value={color} onChange={setColor} />
             </div>
             <div className="grid gap-1.5">
-              <Label>Emoji</Label>
+              <Label>{t('common.emoji')}</Label>
               <EmojiField value={emoji} onChange={setEmoji} />
             </div>
           </div>
           <DialogFooter className="mt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit">{editingLane ? 'Save Changes' : 'Add Lane'}</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>
+            <Button type="submit">{editingLane ? t('lane.saveChanges') : t('lane.addLane')}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

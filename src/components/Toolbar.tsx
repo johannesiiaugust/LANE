@@ -1,5 +1,6 @@
 import { useMemo, useCallback, useState } from 'react'
 import { useGoogleTranslate, TranslateMenuContent } from '@/components/TranslateMenu'
+import { useTranslation } from '@/i18n'
 import { Plus, ZoomIn, ZoomOut, MoreHorizontal, CalendarSearch, Search, LogOut, UserPen, BarChart3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TimelinePersonaSelector } from '@/components/TimelinePersonaSelector'
@@ -74,7 +75,7 @@ interface ToolbarProps {
   extraActions?: React.ReactNode
 }
 
-const SIZE_NAMES: Record<UiSize, string> = { small: 'Small', medium: 'Medium', large: 'Large', fitscreen: 'Fit Screen' }
+// SIZE_NAMES will be generated dynamically using t() in the component
 
 function SkinSwatch({ bg, accent, size = 14 }: { bg: string; accent: string; size?: number }) {
   return (
@@ -132,6 +133,8 @@ export function Toolbar({
   extraActions,
 }: ToolbarProps) {
   useGoogleTranslate()
+  const { t } = useTranslation()
+  const SIZE_NAMES: Record<UiSize, string> = { small: t('toolbar.small'), medium: t('toolbar.medium'), large: t('toolbar.large'), fitscreen: t('toolbar.fitScreen') }
   const { size, setSize } = useSizeConfig()
   const { skinId, setSkinId, customInput } = useSkin()
   const { user, signOut } = useAuth()
@@ -231,13 +234,13 @@ export function Toolbar({
                   onClick={onScrollToToday}
                   className="fixed top-14 left-1/2 -translate-x-1/2 whitespace-nowrap flex items-center gap-1 px-3 py-1.5 rounded text-xs font-semibold border-2 border-red-500 bg-red-500 text-white hover:bg-red-600 hover:border-red-600 transition-colors z-50 shadow-md"
                 >
-                  {todayOffScreen.direction === 'left' ? '← ' : '→ '}Back to Today
+                  {todayOffScreen.direction === 'left' ? '← ' : '→ '}{t('toolbar.backToToday')}
                 </button>
               )}
-              <Button variant="outline" size="sm" onClick={() => stepZoom(1 / 1.69)} title="Zoom out">
+              <Button variant="outline" size="sm" onClick={() => stepZoom(1 / 1.69)} title={t('toolbar.zoomOut')}>
                 <ZoomOut className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm" onClick={() => stepZoom(1.69)} title="Zoom in">
+              <Button variant="outline" size="sm" onClick={() => stepZoom(1.69)} title={t('toolbar.zoomIn')}>
                 <ZoomIn className="h-4 w-4" />
               </Button>
             </>
@@ -246,22 +249,22 @@ export function Toolbar({
           {/* ── + dropdown: Event / Lane / Timeline ── */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="sm" className="px-2.5" title="Add…">
+              <Button size="sm" className="px-2.5" title={t('toolbar.add')}>
                 <Plus className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuItem onClick={onAddEvent}>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Event
+                {t('toolbar.addEvent')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onAddLane}>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Lane
+                {t('toolbar.addLane')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onAddTimeline}>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Timeline
+                {t('toolbar.addTimeline')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -279,7 +282,7 @@ export function Toolbar({
                 {/* Search */}
                 <DropdownMenuItem onClick={() => setSearchOpen(true)}>
                   <Search className="h-4 w-4 mr-2" />
-                  Search Events
+                  {t('toolbar.searchEvents')}
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
@@ -302,7 +305,7 @@ export function Toolbar({
 
                 {/* Max events */}
                 <div className="px-2 py-1.5 flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">Max events:</span>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">{t('toolbar.maxEvents')}</span>
                   <input
                     type="number"
                     min={1}
@@ -311,7 +314,7 @@ export function Toolbar({
                     onChange={e => { const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1) onMaxEventsChange(v) }}
                     onClick={e => e.stopPropagation()}
                     className="w-16 h-7 rounded-md border border-input bg-background px-2 text-xs text-center ml-auto"
-                    title="Maximum number of events to display (longest first)"
+                    title={t('toolbar.maxEventsTooltip')}
                   />
                 </div>
 
@@ -343,7 +346,7 @@ export function Toolbar({
                 ))}
                 <DropdownMenuItem onClick={() => handleSelectSkin('custom')} className={`gap-2 ${skinId === 'custom' ? 'font-semibold' : ''}`}>
                   <SkinSwatch bg={swatchBg} accent={swatchAccent} />
-                  {skinId === 'custom' ? skinLabel : 'Custom…'}
+                  {skinId === 'custom' ? skinLabel : t('toolbar.custom')}
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
@@ -351,7 +354,7 @@ export function Toolbar({
                 {/* Import */}
                 <DropdownMenuItem onClick={() => openImport('calendar-file')}>
                   <CalendarSearch className="h-4 w-4 mr-2" />
-                  Import Calendar File, Google or text/voice with AI
+                  {t('toolbar.importCalendar')}
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
@@ -359,7 +362,7 @@ export function Toolbar({
                 {/* Analytics */}
                 <DropdownMenuItem onClick={() => _onSetActiveView('anal')}>
                   <BarChart3 className="h-4 w-4 mr-2" />
-                  Analytics
+                  {t('toolbar.analytics')}
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
@@ -377,11 +380,11 @@ export function Toolbar({
                     </div>
                     <DropdownMenuItem onClick={() => setProfileOpen(true)}>
                       <UserPen className="h-4 w-4 mr-2" />
-                      Edit Profile
+                      {t('toolbar.editProfile')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={signOut}>
                       <LogOut className="h-4 w-4 mr-2" />
-                      Sign out
+                      {t('auth.signOut')}
                     </DropdownMenuItem>
                   </>
                 )}

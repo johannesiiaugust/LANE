@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTranslation } from '@/i18n'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +12,7 @@ interface ForgotPasswordFormProps {
 
 export function ForgotPasswordForm({ onSwitchToSignIn, onResetSuccess }: ForgotPasswordFormProps) {
   const { resetPassword } = useAuth()
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -31,10 +33,10 @@ export function ForgotPasswordForm({ onSwitchToSignIn, onResetSuccess }: ForgotP
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Enter your email and we'll send you a link to reset your password.
+        {t('auth.enterEmailResetPassword')}
       </p>
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t('common.email')}</Label>
         <Input
           id="email"
           type="email"
@@ -46,11 +48,11 @@ export function ForgotPasswordForm({ onSwitchToSignIn, onResetSuccess }: ForgotP
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <Button type="submit" className="w-full" disabled={submitting}>
-        {submitting ? 'Sending...' : 'Send Reset Link'}
+        {submitting ? t('auth.sending') : t('auth.sendResetLink')}
       </Button>
       <p className="text-center text-sm text-muted-foreground">
         <button type="button" className="hover:underline" onClick={onSwitchToSignIn}>
-          Back to sign in
+          {t('auth.backToSignIn')}
         </button>
       </p>
     </form>

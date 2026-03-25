@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Pencil, Trash2, X, ExternalLink, MapPin, Star } from 'lucide-react'
+import { useTranslation } from '@/i18n'
 import { Button } from '@/components/ui/button'
 import type { TimelineEvent } from '@/types/timeline'
 import { fracYearToDMY, fracYearToTimeStr } from '@/lib/constants'
@@ -18,6 +19,7 @@ interface EventPopoverProps {
 }
 
 export function EventPopover({ event, anchorEl, anchorX, anchorY, laneName, laneEmoji, onEdit, onDelete, onClose }: EventPopoverProps) {
+  const { t } = useTranslation()
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -57,13 +59,13 @@ export function EventPopover({ event, anchorEl, anchorX, anchorY, laneName, lane
               const st = fracYearToTimeStr(event.startYear)
               const et = event.endYear != null ? fracYearToTimeStr(event.endYear) : null
               const startStr = st !== '00:00' ? `${fracYearToDMY(event.startYear)} ${st}` : fracYearToDMY(event.startYear)
-              const endStr = event.endYear != null ? (et !== '00:00' ? `${fracYearToDMY(event.endYear)} ${et}` : fracYearToDMY(event.endYear)) : 'ongoing'
+              const endStr = event.endYear != null ? (et !== '00:00' ? `${fracYearToDMY(event.endYear)} ${et}` : fracYearToDMY(event.endYear)) : t('popover.ongoing')
               return `${startStr} — ${endStr}`
             })()}
       </p>
       {event.pointValue != null && (
         <p className="text-xs text-muted-foreground mb-1">
-          Value: <span className="font-medium text-foreground">{formatValue(event.pointValue)}</span>
+          {t('popover.value')} <span className="font-medium text-foreground">{formatValue(event.pointValue)}</span>
         </p>
       )}
       {/* Enrichment fields */}
@@ -108,10 +110,10 @@ export function EventPopover({ event, anchorEl, anchorX, anchorY, laneName, lane
       )}
       <div className="flex gap-1">
         <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => onEdit(event)}>
-          <Pencil className="h-3 w-3 mr-1" /> Edit
+          <Pencil className="h-3 w-3 mr-1" /> {t('common.edit')}
         </Button>
         <Button variant="outline" size="sm" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => onDelete(event)}>
-          <Trash2 className="h-3 w-3 mr-1" /> Delete
+          <Trash2 className="h-3 w-3 mr-1" /> {t('common.delete')}
         </Button>
       </div>
     </div>

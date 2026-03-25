@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTranslation } from '@/i18n'
 import { isUsernameAvailable } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,6 +17,7 @@ interface SignUpFormProps {
 
 export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProps) {
   const { signUp, signInWithGoogle } = useAuth()
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -31,7 +33,7 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProp
     setUsernameOk(false)
     if (!val) return
     if (!USERNAME_RE.test(val)) {
-      setUsernameError('3–32 chars, lowercase letters, numbers, underscores only')
+      setUsernameError(t('auth.usernameChars'))
       return
     }
     const available = await isUsernameAvailable(val)
@@ -39,7 +41,7 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProp
       setUsernameError(null)
       setUsernameOk(true)
     } else {
-      setUsernameError('Username is already taken')
+      setUsernameError(t('auth.usernameAlreadyTaken'))
     }
   }
 
@@ -48,26 +50,26 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProp
     setError(null)
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
+      setError(t('auth.passwordsDoNotMatch'))
       return
     }
 
     const trimmedUsername = username.trim().toLowerCase()
     if (!trimmedUsername) {
-      setError('Please choose a username')
+      setError(t('auth.pleaseChooseUsername'))
       return
     }
     if (!USERNAME_RE.test(trimmedUsername)) {
-      setError('Username: 3–32 chars, lowercase letters, numbers, underscores only')
+      setError(t('auth.resetPasswordError'))
       return
     }
     const available = await isUsernameAvailable(trimmedUsername)
     if (!available) {
-      setError('Username is already taken')
+      setError(t('auth.usernameAlreadyTaken'))
       return
     }
 
-setSubmitting(true)
+    setSubmitting(true)
     const { error } = await signUp(email, password)
     if (error) {
       setError(error)
@@ -101,7 +103,7 @@ setSubmitting(true)
           <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
         </svg>
-        Continue with Google
+        {t('auth.continueWithGoogle')}
       </Button>
 
       <div className="relative">
@@ -109,12 +111,12 @@ setSubmitting(true)
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-popover px-2 text-muted-foreground">or</span>
+          <span className="bg-popover px-2 text-muted-foreground">{t('common.or')}</span>
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="signupUsername">Username <span className="text-red-500">*</span></Label>
+        <Label htmlFor="signupUsername">{t('auth.username')} <span className="text-red-500">*</span></Label>
         <Input
           id="signupUsername"
           type="text"
@@ -127,12 +129,12 @@ setSubmitting(true)
         {usernameError
           ? <p className="text-xs text-red-600">{usernameError}</p>
           : usernameOk
-            ? <p className="text-xs text-green-600">Available — your page will be at /{username}</p>
-            : <p className="text-xs text-muted-foreground">Your public page will be at /{username || 'username'}</p>
+            ? <p className="text-xs text-green-600">{t('auth.usernameAvailableAt')} /{username}</p>
+            : <p className="text-xs text-muted-foreground">{t('auth.publicPageAt')} /{username || 'username'}</p>
         }
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
+        <Label htmlFor="email">{t('common.email')} <span className="text-red-500">*</span></Label>
         <Input
           id="email"
           type="email"
@@ -143,7 +145,7 @@ setSubmitting(true)
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Password <span className="text-red-500">*</span></Label>
+        <Label htmlFor="password">{t('common.password')} <span className="text-red-500">*</span></Label>
         <Input
           id="password"
           type="password"
@@ -154,7 +156,7 @@ setSubmitting(true)
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Confirm Password <span className="text-red-500">*</span></Label>
+        <Label htmlFor="confirmPassword">{t('auth.confirmPassword')} <span className="text-red-500">*</span></Label>
         <Input
           id="confirmPassword"
           type="password"
@@ -165,10 +167,10 @@ setSubmitting(true)
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="signupBio">About You</Label>
+        <Label htmlFor="signupBio">{t('auth.aboutYou')}</Label>
         <Textarea
           id="signupBio"
-          placeholder="Tell us about yourself..."
+          placeholder={t('auth.tellUsAboutYourself')}
           value={bio}
           onChange={e => setBio(e.target.value)}
           rows={3}
@@ -176,12 +178,12 @@ setSubmitting(true)
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <Button type="submit" className="w-full" disabled={submitting}>
-        {submitting ? 'Creating account...' : 'Sign Up'}
+        {submitting ? t('auth.creatingAccount') : t('auth.signUp')}
       </Button>
       <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{' '}
+        {t('auth.alreadyHaveAccount')}{' '}
         <button type="button" className="hover:underline" onClick={onSwitchToSignIn}>
-          Sign in
+          {t('auth.signIn')}
         </button>
       </p>
     </form>

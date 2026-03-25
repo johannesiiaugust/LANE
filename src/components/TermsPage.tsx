@@ -1,13 +1,10 @@
 import { Footer } from '@/components/Footer'
 import { useTitle } from '@/hooks/useTitle'
-
-function navigate(path: string) {
-  window.history.pushState(null, '', path)
-  window.dispatchEvent(new PopStateEvent('popstate'))
-}
+import { useTranslation } from '@/i18n'
 
 export function TermsPage() {
-  useTitle('LifeLANE — Terms & Conditions')
+  const { t, navigate } = useTranslation()
+  useTitle(`LifeLANE — ${t('terms.title')}`)
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <div className="border-b bg-background px-6 py-3 flex items-center justify-between">
@@ -15,14 +12,14 @@ export function TermsPage() {
           LifeLANE
         </button>
         <button onClick={() => navigate('/about')} className="text-sm text-muted-foreground hover:underline">
-          ← Back
+          {t('terms.back')}
         </button>
       </div>
 
       <div className="flex-1 max-w-3xl mx-auto w-full px-6 py-10 space-y-8">
         <div>
-          <h1 className="text-3xl font-bold mb-1">Terms & Conditions</h1>
-          <p className="text-xs text-muted-foreground italic">Last updated March 2026</p>
+          <h1 className="text-3xl font-bold mb-1">{t('terms.title')}</h1>
+          <p className="text-xs text-muted-foreground italic">{t('terms.lastUpdated')}</p>
         </div>
 
         <div className="space-y-6 text-sm text-muted-foreground leading-relaxed">

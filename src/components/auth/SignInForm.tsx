@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTranslation } from '@/i18n'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +12,7 @@ interface SignInFormProps {
 
 export function SignInForm({ onSwitchToSignUp, onSwitchToForgotPassword }: SignInFormProps) {
   const { signIn, signInWithGoogle } = useAuth()
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -42,7 +44,7 @@ export function SignInForm({ onSwitchToSignUp, onSwitchToForgotPassword }: SignI
           <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
         </svg>
-        Continue with Google
+        {t('auth.continueWithGoogle')}
       </Button>
 
       <div className="relative">
@@ -50,12 +52,12 @@ export function SignInForm({ onSwitchToSignUp, onSwitchToForgotPassword }: SignI
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-popover px-2 text-muted-foreground">or</span>
+          <span className="bg-popover px-2 text-muted-foreground">{t('common.or')}</span>
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t('common.email')}</Label>
         <Input
           id="email"
           type="email"
@@ -66,7 +68,7 @@ export function SignInForm({ onSwitchToSignUp, onSwitchToForgotPassword }: SignI
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{t('common.password')}</Label>
         <Input
           id="password"
           type="password"
@@ -77,14 +79,14 @@ export function SignInForm({ onSwitchToSignUp, onSwitchToForgotPassword }: SignI
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <Button type="submit" className="w-full" disabled={submitting}>
-        {submitting ? 'Signing in...' : 'Sign In'}
+        {submitting ? t('auth.signingIn') : t('auth.signIn')}
       </Button>
       <div className="flex items-center justify-between text-sm">
         <button type="button" className="text-muted-foreground hover:underline" onClick={onSwitchToForgotPassword}>
-          Forgot password?
+          {t('auth.forgotPassword')}
         </button>
         <button type="button" className="text-muted-foreground hover:underline" onClick={onSwitchToSignUp}>
-          Create account
+          {t('auth.createAccount')}
         </button>
       </div>
     </form>
