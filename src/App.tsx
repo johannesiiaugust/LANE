@@ -31,11 +31,24 @@ import { SkinProvider } from '@/contexts/SkinContext'
 import { PublicProfilePage } from '@/components/PublicProfilePage'
 import { AboutPage } from '@/components/AboutPage'
 import { TermsPage } from '@/components/TermsPage'
+import { TestI18nPage } from '@/components/TestI18nPage'
 import { Footer } from '@/components/Footer'
+import {
+  LanguageProvider,
+  useUrlLang,
+  useTranslation,
+  stripLangPrefix,
+  localizedPath,
+  loadTranslation,
+  en,
+  type Lang,
+  type Translations,
+  SUPPORTED_LANGS,
+} from '@/i18n'
 
 // ── Top-level route detection ─────────────────────────────────────────────────
 
-const RESERVED_PATHS = new Set(['/', '/kanban', '/overview', '/about', '/terms', '/demo', '/anal'])
+const RESERVED_PATHS = new Set(['/', '/kanban', '/overview', '/about', '/terms', '/demo', '/anal', '/test-i18n'])
 const USERNAME_PATH_RE = /^\/([a-z0-9_]{3,32})$/
 const USERNAME_TIMELINE_PATH_RE = /^\/([a-z0-9_]{3,32})\/(\d+)$/
 
@@ -44,19 +57,21 @@ type TopLevelRoute =
   | { type: 'about' }
   | { type: 'terms' }
   | { type: 'demo' }
+  | { type: 'test-i18n' }
   | { type: 'public'; username: string; timelineIndex?: number }
 
 // Returns a string (primitive) so useSyncExternalStore can compare with Object.is
 function getTopLevelRouteKey(): string {
-  const p = window.location.pathname
+  const p = stripLangPrefix(window.location.pathname)
   if (p === '/about') return 'about'
   if (p === '/terms') return 'terms'
   if (p === '/demo') return 'demo'
+  if (p === '/test-i18n') return 'test-i18n'
   if (RESERVED_PATHS.has(p)) return 'app'
   const matchWithIndex = p.match(USERNAME_TIMELINE_PATH_RE)
   if (matchWithIndex) return `public:${matchWithIndex[1]}:${matchWithIndex[2]}`
   const match = p.match(USERNAME_PATH_RE)
-  if (match) return `public:${match[1]}`
+  if (match && !SUPPORTED_LANGS.includes(match[1] as Lang)) return `public:${match[1]}`
   return 'app'
 }
 
@@ -71,6 +86,7 @@ function useTopLevelRoute(): TopLevelRoute {
   if (key === 'about') return { type: 'about' }
   if (key === 'terms') return { type: 'terms' }
   if (key === 'demo') return { type: 'demo' }
+  if (key === 'test-i18n') return { type: 'test-i18n' }
   if (key.startsWith('public:')) {
     const parts = key.slice(7).split(':')
     const username = parts[0]
@@ -82,7 +98,7 @@ function useTopLevelRoute(): TopLevelRoute {
 
 // Lightweight URL-based routing (no dependency needed)
 function getViewFromPath(): AppView {
-  const p = window.location.pathname
+  const p = stripLangPrefix(window.location.pathname)
   if (p === '/kanban') return 'kanban'
   if (p === '/overview') return 'overview'
   if (p === '/anal') return 'anal'
@@ -90,6 +106,7 @@ function getViewFromPath(): AppView {
 }
 
 function useAppView(): [AppView, (view: AppView) => void] {
+  const lang = useUrlLang()
   const view = useSyncExternalStore(
     (cb) => {
       window.addEventListener('popstate', cb)
@@ -99,13 +116,14 @@ function useAppView(): [AppView, (view: AppView) => void] {
   )
 
   const setView = useCallback((v: AppView) => {
-    const path = v === 'kanban' ? '/kanban' : v === 'overview' ? '/overview' : v === 'anal' ? '/anal' : '/'
+    const base = v === 'kanban' ? '/kanban' : v === 'overview' ? '/overview' : v === 'anal' ? '/anal' : '/'
+    const path = localizedPath(base, lang)
     if (window.location.pathname !== path) {
       window.history.pushState(null, '', path)
       // Trigger re-render via popstate
       window.dispatchEvent(new PopStateEvent('popstate'))
     }
-  }, [])
+  }, [lang])
 
   return [view, setView]
 }
@@ -136,6 +154,7 @@ function TimelineView() {
   } = useTimelineContext()
 
   const selectedTimeline = timelines.find(t => t.id === selectedTimelineId)
+  const { t } = useTranslation()
 
   useTitle(selectedTimeline ? `LifeLANE — ${selectedTimeline.name}` : 'LifeLANE')
 
@@ -346,14 +365,14 @@ function TimelineView() {
     setPopover(null)
     setDeleteDialog({
       open: true,
-      title: 'Delete Event',
-      description: `Are you sure you want to delete "${event.title}"? This action cannot be undone.`,
+      title: t('deleteConfirm.deleteEvent'),
+      description: t('deleteConfirm.deleteEventDesc', { title: event.title }),
       onConfirm: () => {
         deleteEvent(event.id)
         setDeleteDialog(prev => ({ ...prev, open: false }))
       },
     })
-  }, [deleteEvent])
+  }, [deleteEvent, t])
 
   // Sidebar -> Edit Lane
   const handleEditLane = useCallback((lane: Lane) => {
@@ -365,14 +384,14 @@ function TimelineView() {
   const handleDeleteLane = useCallback((lane: Lane) => {
     setDeleteDialog({
       open: true,
-      title: 'Delete Lane',
-      description: `Are you sure you want to delete "${lane.name}" and all its events? This action cannot be undone.`,
+      title: t('deleteConfirm.deleteLane'),
+      description: t('deleteConfirm.deleteLaneDesc', { name: lane.name }),
       onConfirm: () => {
         deleteLane(lane.id)
         setDeleteDialog(prev => ({ ...prev, open: false }))
       },
     })
-  }, [deleteLane])
+  }, [deleteLane, t])
 
   // Save event (add or update)
   const handleSaveEvent = useCallback((data: Omit<TimelineEvent, 'id'>) => {
@@ -552,9 +571,10 @@ function TimelineView() {
   )
 }
 
-function App() {
+function AppRouter() {
   const route = useTopLevelRoute()
   const { user, loading, isRecovery } = useAuth()
+  const { navigate: nav } = useTranslation()
 
   if (route.type === 'about') {
     return <AboutPage />
@@ -564,10 +584,13 @@ function App() {
     return <TermsPage />
   }
 
+  if (route.type === 'test-i18n') {
+    return <TestI18nPage />
+  }
+
   if (route.type === 'demo') {
     if (!loading && user) {
-      window.history.replaceState(null, '', '/')
-      window.dispatchEvent(new PopStateEvent('popstate'))
+      nav('/')
       return null
     }
     return <AuthPage />
@@ -602,6 +625,25 @@ function App() {
         </TimelineProvider>
       </UiSizeProvider>
     </SkinProvider>
+  )
+}
+
+function App() {
+  const lang = useUrlLang()
+  const [translations, setTranslations] = useState<Translations>(lang === 'en' ? en : en)
+
+  useEffect(() => {
+    if (lang === 'en') {
+      setTranslations(en)
+    } else {
+      loadTranslation(lang).then(setTranslations)
+    }
+  }, [lang])
+
+  return (
+    <LanguageProvider lang={lang} translations={translations}>
+      <AppRouter />
+    </LanguageProvider>
   )
 }
 

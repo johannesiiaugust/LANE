@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTitle } from '@/hooks/useTitle'
+import { useTranslation } from '@/i18n'
 import { SignInForm } from './SignInForm'
 import { SignUpForm } from './SignUpForm'
 import { ForgotPasswordForm } from './ForgotPasswordForm'
@@ -14,7 +15,8 @@ import { Footer } from '@/components/Footer'
 type AuthMode = 'landing' | 'sign-in' | 'sign-up' | 'forgot-password' | 'check-email'
 
 export function AuthPage() {
-  useTitle('LifeLANE — Start your life')
+  const { t } = useTranslation()
+  useTitle(`LifeLANE — ${t('auth.startYourLife')}`)
   const [mode, setMode] = useState<AuthMode>('landing')
   const [authOpen, setAuthOpen] = useState(false)
   const [fromDemo, setFromDemo] = useState(false)
@@ -39,32 +41,32 @@ export function AuthPage() {
         {/* Brand + tagline */}
         <div className="shrink-0">
           <div className="text-xl font-bold leading-tight">LifeLANE</div>
-          <div className="text-xs text-muted-foreground italic">The operating system for your life</div>
+          <div className="text-xs text-muted-foreground italic">{t('auth.theOSForYourLife')}</div>
         </div>
 
         {/* Short description — hidden on small screens */}
         <p className="hidden sm:block text-sm text-muted-foreground text-center flex-1 max-w-md leading-snug">
-          Visualize lives. Compare with others. Shape your future.
+          {t('auth.visualizeLives')}
         </p>
 
         {/* Auth popover anchored top-right */}
         <Popover open={authOpen} onOpenChange={setAuthOpen}>
           <PopoverTrigger asChild>
-            <Button size="sm" onClick={openLanding}>Start your life</Button>
+            <Button size="sm" onClick={openLanding}>{t('auth.startYourLife')}</Button>
           </PopoverTrigger>
           <PopoverContent align="end" sideOffset={8} className="w-80 p-4 max-h-[85vh] overflow-y-auto">
             {mode === 'landing' && (
               <div className="space-y-3">
-                <p className="text-sm font-semibold">Get started</p>
+                <p className="text-sm font-semibold">{t('auth.getStarted')}</p>
                 <Button className="w-full" onClick={() => { setFromDemo(true); localStorage.setItem('timeline_import_demo', '1'); setMode('sign-up') }}>
-                  Continue with this timeline
+                  {t('auth.continueWithTimeline')}
                 </Button>
                 <Button variant="outline" className="w-full" onClick={() => { setFromDemo(false); setMode('sign-up') }}>
-                  Create account (blank timeline)
+                  {t('auth.createAccountBlank')}
                 </Button>
                 <p className="text-center text-xs text-muted-foreground pt-1">
-                  Already have an account?{' '}
-                  <button className="underline hover:text-foreground" onClick={() => setMode('sign-in')}>Sign in</button>
+                  {t('auth.alreadyHaveAccount')}{' '}
+                  <button className="underline hover:text-foreground" onClick={() => setMode('sign-in')}>{t('auth.signIn')}</button>
                 </p>
               </div>
             )}

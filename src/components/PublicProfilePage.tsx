@@ -20,6 +20,7 @@ import { Footer } from '@/components/Footer'
 import { useAuth } from '@/contexts/AuthContext'
 import { useProfile } from '@/hooks/useProfile'
 import { ProfileDialog } from '@/components/ProfileDialog'
+import { useTranslation } from '@/i18n'
 import { Pencil, Lock } from 'lucide-react'
 
 interface PublicProfilePageProps {
@@ -35,6 +36,7 @@ function navigate(path: string) {
 }
 
 export function PublicProfilePage({ username, timelineIndex }: PublicProfilePageProps) {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const { profile: myProfile } = useProfile()
 
@@ -175,12 +177,12 @@ export function PublicProfilePage({ username, timelineIndex }: PublicProfilePage
   if (state === 'not_found' || !data) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 text-center px-4">
-        <p className="text-lg text-muted-foreground">This profile is private or does not exist.</p>
+        <p className="text-lg text-muted-foreground">{t('publicProfile.profilePrivateOrNotExist')}</p>
         <button
           className="mt-2 text-sm text-primary underline underline-offset-2"
           onClick={() => { window.history.pushState(null, '', '/'); window.dispatchEvent(new PopStateEvent('popstate')) }}
         >
-          Go home
+          {t('publicProfile.goHome')}
         </button>
       </div>
     )
@@ -224,7 +226,7 @@ export function PublicProfilePage({ username, timelineIndex }: PublicProfilePage
                       title="Edit profile"
                     >
                       <Pencil className="h-3.5 w-3.5" />
-                      <span>Edit</span>
+                      <span>{t('common.edit')}</span>
                     </button>
                   )}
                 </div>
@@ -265,7 +267,7 @@ export function PublicProfilePage({ username, timelineIndex }: PublicProfilePage
             {!isOwnProfile && sharedItems.length > 0 && (
               <div className="border-b bg-muted/20 px-6 py-3">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                  Shared with you
+                  {t('publicProfile.sharedWithYou')}
                 </p>
                 <div className="flex gap-2 flex-wrap">
                   {sharedItems.map(item => {
@@ -292,7 +294,7 @@ export function PublicProfilePage({ username, timelineIndex }: PublicProfilePage
             {/* ── Empty state ── */}
             {displayTimelines.length === 0 && sharedItems.length === 0 && state === 'loaded' && (
               <div className="flex flex-1 items-center justify-center text-muted-foreground">
-                No timelines to show.
+                {t('publicProfile.noTimelines')}
               </div>
             )}
 
@@ -338,7 +340,7 @@ export function PublicProfilePage({ username, timelineIndex }: PublicProfilePage
             {/* ── No events empty canvas ── */}
             {!canvasLoading && activeCanvasId && canvasLanes.length === 0 && (
               <div className="flex flex-1 items-center justify-center text-muted-foreground text-sm">
-                {isOwnProfile ? 'This timeline has no lanes yet.' : 'No visible events.'}
+                {isOwnProfile ? t('publicProfile.noLanesYet') : t('publicProfile.noVisibleEvents')}
               </div>
             )}
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useProfile } from '@/hooks/useProfile'
+import { useTranslation } from '@/i18n'
 import { isUsernameAvailable } from '@/lib/api'
 
 const USERNAME_RE = /^[a-z0-9_]{3,32}$/
@@ -22,6 +23,7 @@ interface ProfileDialogProps {
 }
 
 export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
+  const { t } = useTranslation()
   const { profile, updateProfile, uploadProfileAvatar } = useProfile()
   const [displayName, setDisplayName] = useState('')
   const [bio, setBio] = useState('')
@@ -53,7 +55,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
     setUsernameOk(false)
     if (!val) return
     if (!USERNAME_RE.test(val)) {
-      setUsernameError('3–32 chars, lowercase letters, numbers, underscores only')
+      setUsernameError(t('auth.usernameChars'))
       return
     }
     // Skip availability check if unchanged
@@ -67,7 +69,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
       setUsernameError(null)
       setUsernameOk(true)
     } else {
-      setUsernameError('Username is already taken')
+      setUsernameError(t('auth.usernameAlreadyTaken'))
     }
   }
 
@@ -108,8 +110,8 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
-          <DialogDescription>Update your display name and bio.</DialogDescription>
+          <DialogTitle>{t('profile.editProfile')}</DialogTitle>
+          <DialogDescription>{t('profile.updateDisplayNameBio')}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-3">
           {/* Avatar */}
@@ -118,7 +120,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               className="relative group w-20 h-20 rounded-full overflow-hidden border-2 border-border focus:outline-none focus:ring-2 focus:ring-ring"
-              title="Change profile photo"
+              title={t('profile.changeProfilePhoto')}
             >
               {currentAvatar ? (
                 <img
@@ -132,7 +134,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
                 </div>
               )}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <span className="text-white text-xs font-medium">Change</span>
+                <span className="text-white text-xs font-medium">{t('common.change')}</span>
               </div>
             </button>
             <input
@@ -148,16 +150,16 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
           </div>
 
           <div className="grid gap-1.5">
-            <Label htmlFor="displayName">Display Name</Label>
+            <Label htmlFor="displayName">{t('profile.displayName')}</Label>
             <Input
               id="displayName"
               value={displayName}
               onChange={e => setDisplayName(e.target.value)}
-              placeholder="Your name"
+              placeholder={t('profile.yourName')}
             />
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="profileUsername">Username</Label>
+            <Label htmlFor="profileUsername">{t('auth.username')}</Label>
             <Input
               id="profileUsername"
               type="text"
@@ -169,26 +171,26 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
             {usernameError
               ? <p className="text-xs text-red-600">{usernameError}</p>
               : usernameOk
-                ? <p className="text-xs text-green-600">Your public page: /{username}</p>
-                : <p className="text-xs text-muted-foreground">Public page URL: /{username || '…'}</p>
+                ? <p className="text-xs text-green-600">{t('profile.yourPublicPage')}: /{username}</p>
+                : <p className="text-xs text-muted-foreground">{t('profile.publicPageUrl')} /{username || '…'}</p>
             }
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="bio">Bio</Label>
+            <Label htmlFor="bio">{t('profile.bio')}</Label>
             <Textarea
               id="bio"
               value={bio}
               onChange={e => setBio(e.target.value)}
-              placeholder="A short bio..."
+              placeholder={t('profile.shortBio')}
               rows={3}
             />
           </div>
           <DialogFooter className="mt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={saving}>
-              {uploadingAvatar ? 'Uploading...' : saving ? 'Saving...' : 'Save'}
+              {uploadingAvatar ? t('profile.uploading') : saving ? t('profile.saving') : t('common.save')}
             </Button>
           </DialogFooter>
         </form>

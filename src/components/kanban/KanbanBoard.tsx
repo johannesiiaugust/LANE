@@ -35,16 +35,11 @@ import {
   updateKanbanCard,
   deleteKanbanCard,
 } from '@/lib/api'
+import { useTranslation } from '@/i18n'
 import { supabase } from '@/lib/supabase'
 
 const STATUSES = ['todo', 'in_progress', 'done'] as const
 type Status = (typeof STATUSES)[number]
-
-const STATUS_LABELS: Record<Status, string> = {
-  todo: 'To Do',
-  in_progress: 'In Progress',
-  done: 'Done',
-}
 
 const customCollisionDetection: CollisionDetection = (args) => {
   const pointerCollisions = pointerWithin(args)
@@ -53,6 +48,12 @@ const customCollisionDetection: CollisionDetection = (args) => {
 }
 
 export function KanbanBoard() {
+  const { t } = useTranslation()
+  const STATUS_LABELS: Record<Status, string> = {
+    todo: t('kanban.toDo'),
+    in_progress: t('kanban.inProgress'),
+    done: t('common.done'),
+  }
   const [cards, setCards] = useState<KanbanCardData[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCard, setActiveCard] = useState<KanbanCardData | null>(null)
@@ -234,38 +235,38 @@ export function KanbanBoard() {
       <div className="max-w-6xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Kanban Board</h2>
-            <p className="text-xs text-muted-foreground">Manage your tasks</p>
+            <h2 className="text-lg font-semibold text-gray-900">{t('kanban.kanbanBoard')}</h2>
+            <p className="text-xs text-muted-foreground">{t('kanban.manageTasks')}</p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm">
                 <Plus className="w-4 h-4 mr-1" />
-                New Card
+                {t('kanban.newCard')}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>New Card</DialogTitle>
-                <DialogDescription>Add a new task to the Kanban board.</DialogDescription>
+                <DialogTitle>{t('kanban.newCard')}</DialogTitle>
+                <DialogDescription>{t('kanban.addNewTask')}</DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-gray-700 block mb-1.5">
-                    Title *
+                    {t('common.title')} *
                   </label>
                   <Input
-                    placeholder="Enter title"
+                    placeholder={t('kanban.enterTitle')}
                     value={newCard.title}
                     onChange={(e) => setNewCard(prev => ({ ...prev, title: e.target.value }))}
                   />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-700 block mb-1.5">
-                    Description
+                    {t('common.description')}
                   </label>
                   <Textarea
-                    placeholder="Optional description"
+                    placeholder={t('kanban.optionalDescription')}
                     value={newCard.description}
                     onChange={(e) => setNewCard(prev => ({ ...prev, description: e.target.value }))}
                     rows={3}
@@ -273,7 +274,7 @@ export function KanbanBoard() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-700 block mb-1.5">
-                    Column
+                    {t('kanban.column')}
                   </label>
                   <select
                     className="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-300"
@@ -287,10 +288,10 @@ export function KanbanBoard() {
                 </div>
                 <div className="flex gap-2 pt-2">
                   <Button onClick={handleCreateCard} className="flex-1">
-                    Create
+                    {t('common.create')}
                   </Button>
                   <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="flex-1">
-                    Cancel
+                    {t('common.cancel')}
                   </Button>
                 </div>
               </div>

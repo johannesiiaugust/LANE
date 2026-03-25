@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { useTranslation } from '@/i18n'
 import { Plus, X, Link2, ChevronDown, ChevronUp, Star, Upload, ImageIcon } from 'lucide-react'
 import { uploadEventImage } from '@/lib/imageUpload'
 import type {
@@ -77,6 +78,7 @@ export function EventDialog({
   defaultEndYear,
   userId,
 }: EventDialogProps) {
+  const { t } = useTranslation()
   const [laneId, setLaneId] = useState('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -479,16 +481,16 @@ export function EventDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{editingEvent ? 'Edit Event' : 'Add Event'}</DialogTitle>
+          <DialogTitle>{editingEvent ? t('event.editEvent') : t('event.addEvent')}</DialogTitle>
           <DialogDescription>
-            {editingEvent ? 'Modify the event details below.' : 'Fill in the details for the new event.'}
+            {editingEvent ? t('event.modifyDetails') : t('event.fillDetails')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-3">
           <div className="grid gap-1.5">
-            <Label htmlFor="lane">Lane</Label>
+            <Label htmlFor="lane">{t('event.lane')}</Label>
             <Select value={laneId} onValueChange={setLaneId}>
-              <SelectTrigger id="lane"><SelectValue placeholder="Select lane" /></SelectTrigger>
+              <SelectTrigger id="lane"><SelectValue placeholder={t('event.selectLane')} /></SelectTrigger>
               <SelectContent>
                 {lanes.map(l => <SelectItem key={l.id} value={l.id}>{l.emoji ? `${l.emoji} ${l.name}` : l.name}</SelectItem>)}
               </SelectContent>
@@ -496,25 +498,25 @@ export function EventDialog({
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor="title" className={submitAttempted && !title.trim() ? 'text-destructive' : ''}>
-              Title <span className="text-destructive">*</span>
+              {t('common.title')} <span className="text-destructive">*</span>
             </Label>
             <Input
-              id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder="Event title"
+              id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder={t('event.eventTitle')}
               className={submitAttempted && !title.trim() ? 'border-destructive focus-visible:ring-destructive text-destructive placeholder:text-destructive/50' : ''}
             />
           </div>
           {/* Color + Emoji in one row */}
           <div className="flex items-end gap-3">
             <div className="flex-1 grid gap-1.5">
-              <Label>Color</Label>
-              <ColorPicker value={color || '#3b82f6'} onChange={setColor} allowNone noneLabel="Lane default" />
+              <Label>{t('common.color')}</Label>
+              <ColorPicker value={color || '#3b82f6'} onChange={setColor} allowNone noneLabel={t('event.laneDefault')} />
             </div>
             <div className="grid gap-1.5">
-              <Label>Emoji</Label>
+              <Label>{t('common.emoji')}</Label>
               <div className="flex items-center gap-1.5">
                 <EmojiPickerPopover value={emoji} onChange={em => setEmoji(em)} />
                 {emoji && (
-                  <button type="button" className="text-muted-foreground hover:text-foreground" onClick={() => setEmoji('')} title="Clear">
+                  <button type="button" className="text-muted-foreground hover:text-foreground" onClick={() => setEmoji('')} title={t('event.clear')}>
                     <X className="h-4 w-4" />
                   </button>
                 )}
@@ -524,12 +526,12 @@ export function EventDialog({
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">
               <Label htmlFor="start" className={submitAttempted && !startDate && !linkEnabled ? 'text-destructive' : ''}>
-                Start Date <span className="text-destructive">*</span>
+                {t('event.startDate')} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="start" type="text"
                 value={linkEnabled && computedLink ? fracYearToDMY(computedLink.startYear) : startDate}
-                placeholder={linkEnabled ? '(computed)' : 'DD/MM/YYYY'}
+                placeholder={linkEnabled ? t('event.computed') : 'DD/MM/YYYY'}
                 onChange={e => !linkEnabled && setStartDate(formatDMYInput(e.target.value))}
                 disabled={linkEnabled}
                 required={!linkEnabled}
@@ -537,7 +539,7 @@ export function EventDialog({
               />
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor="end">End Date <span className="text-muted-foreground font-normal">(optional)</span></Label>
+              <Label htmlFor="end">{t('event.endDate')} <span className="text-muted-foreground font-normal">({t('common.optional')})</span></Label>
               <Input
                 id="end" type="text"
                 value={linkEnabled && computedLink?.endYear != null ? fracYearToDMY(computedLink.endYear) : endDate}
@@ -556,7 +558,7 @@ export function EventDialog({
               className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium hover:bg-muted/40 transition-colors rounded-md"
             >
               <span className="flex items-center gap-2">
-                More time options
+                {t('event.moreTimeOptions')}
                 {(fadeInDate || fadeOutDate || linkEnabled) && (
                   <span className="h-1.5 w-1.5 rounded-full bg-primary" title="Has values" />
                 )}
@@ -1228,8 +1230,8 @@ export function EventDialog({
           </div>
 
           <DialogFooter className="mt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit">{editingEvent ? 'Save Changes' : 'Add Event'}</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>
+            <Button type="submit">{editingEvent ? t('event.saveChanges') : t('event.addEvent')}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

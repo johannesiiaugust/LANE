@@ -1,12 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Footer } from '@/components/Footer'
 import { useTitle } from '@/hooks/useTitle'
+import { useTranslation, SUPPORTED_LANGS, localizedPath as lp, type Lang } from '@/i18n'
 import { TranslateDropdown } from '@/components/TranslateMenu'
-
-function navigate(path: string) {
-  window.history.pushState(null, '', path)
-  window.dispatchEvent(new PopStateEvent('popstate'))
-}
 
 /* ── Tiny hook: triggers once when element enters viewport ── */
 function useInView(threshold = 0.15) {
@@ -113,14 +109,16 @@ function StatPill({ value, label }: { value: string; label: string }) {
 }
 
 /* ── Scrolling ticker ── */
-const TICKER_ITEMS = [
-  '📍 Track where you\'ve lived', '💼 Map your career arc', '❤️ Visualise relationships',
-  '📈 Project future wealth', '🧠 Compare with Einstein', '🌍 Overlay any timeline',
-  '📅 Import from Google Calendar', '🏠 Track homes & assets', '🚀 Plan your next chapter',
-  '🎯 See the whole picture', '⏳ Past, present & future', '🔒 Your data, private by default',
-]
+// Ticker items are now computed dynamically using translations
 
 function Ticker() {
+  const { t } = useTranslation()
+  const TICKER_ITEMS = [
+    `📍 ${t('ticker.trackWhereLived')}`, `💼 ${t('ticker.mapCareerArc')}`, `❤️ ${t('ticker.visualizeRelationships')}`,
+    `📈 ${t('ticker.projectFutureWealth')}`, `🧠 ${t('ticker.compareWithEinstein')}`, `🌍 ${t('ticker.overlayAnyTimeline')}`,
+    `📅 ${t('ticker.importGoogleCalendar')}`, `🏠 ${t('ticker.trackHomesAssets')}`, `🚀 ${t('ticker.planNextChapter')}`,
+    `🎯 ${t('ticker.seeWholePicture')}`, `⏳ ${t('ticker.pastPresentFuture')}`, `🔒 ${t('ticker.yourDataPrivate')}`,
+  ]
   const items = [...TICKER_ITEMS, ...TICKER_ITEMS]
   return (
     <div className="overflow-hidden relative">
@@ -168,7 +166,29 @@ function ComparePreview() {
 }
 
 export function AboutPage() {
-  useTitle('LifeLANE — Your entire life, in one view')
+  const { t, navigate } = useTranslation()
+  useTitle(`LifeLANE — ${t('about.yourEntireLife')} ${t('about.inOneView')}`)
+
+  // Language switcher for about page
+  const LanguageSwitcher = () => (
+    <div className="flex items-center gap-1">
+      {SUPPORTED_LANGS.map(l => (
+        <a
+          key={l}
+          href={lp('/about', l as Lang)}
+          onClick={e => {
+            e.preventDefault()
+            window.history.pushState(null, '', lp('/about', l as Lang))
+            window.dispatchEvent(new PopStateEvent('popstate'))
+          }}
+          className="px-1.5 py-0.5 text-xs rounded hover:bg-muted transition-colors uppercase"
+        >
+          {l}
+        </a>
+      ))}
+    </div>
+  )
+
   return (
     <div className="flex flex-col min-h-screen bg-background overflow-x-hidden">
 
@@ -178,13 +198,14 @@ export function AboutPage() {
           LifeLANE
         </button>
         <div className="flex items-center gap-4">
+          <LanguageSwitcher />
           <TranslateDropdown />
-          <button onClick={() => navigate('/terms')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Terms</button>
+          <button onClick={() => navigate('/terms')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('about.terms')}</button>
           <button
             onClick={() => navigate('/demo')}
             className="text-sm px-4 py-1.5 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity font-medium"
           >
-            Open App →
+            {t('about.openApp')}
           </button>
         </div>
       </div>
@@ -201,14 +222,14 @@ export function AboutPage() {
             className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-tight hover:opacity-80 transition-opacity"
             style={{ animation: 'fadeDown 0.6s ease 0.1s both' }}
           >
-            Your entire life,<br />
-            <span className="text-primary">in one view.</span>
+            {t('about.yourEntireLife')}<br />
+            <span className="text-primary">{t('about.inOneView')}</span>
           </button>
           <p
             className="text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed"
             style={{ animation: 'fadeDown 0.6s ease 0.2s both' }}
           >
-            Most people live reactively. LifeLANE lets you step back, see the full arc — past, present, and the future you're building — and make decisions with real perspective.
+            {t('about.heroDescription')}
           </p>
           <div
             className="flex flex-col sm:flex-row gap-3 justify-center"
@@ -218,13 +239,13 @@ export function AboutPage() {
               onClick={() => navigate('/demo')}
               className="px-7 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 text-sm"
             >
-              Start mapping your life →
+              {t('about.startMappingLife')}
             </button>
             <a
               href="mailto:hello@lifelane.space"
               className="px-7 py-3 rounded-full border border-border/60 text-sm font-medium hover:bg-muted/50 transition-colors"
             >
-              Get in touch
+              {t('about.getInTouch')}
             </a>
           </div>
         </div>
@@ -251,9 +272,9 @@ export function AboutPage() {
       <section className="py-20 px-6">
         <FadeIn>
           <div className="max-w-2xl mx-auto grid grid-cols-3 gap-8 text-center">
-            <StatPill value="7" label="default life dimensions" />
-            <StatPill value="∞" label="years of perspective" />
-            <StatPill value="1" label="place to see it all" />
+            <StatPill value="7" label={t('about.defaultLifeDimensions')} />
+            <StatPill value="∞" label={t('about.yearsOfPerspective')} />
+            <StatPill value="1" label={t('about.placeToSeeItAll')} />
           </div>
         </FadeIn>
       </section>
@@ -262,17 +283,17 @@ export function AboutPage() {
       <section className="py-20 px-6 max-w-5xl mx-auto w-full">
         <FadeIn>
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold tracking-tight">Built for clarity. Designed for life.</h2>
-            <p className="text-muted-foreground mt-3 max-w-md mx-auto">Seven swim lanes. One canvas. Every chapter of your life, finally organised.</p>
+            <h2 className="text-3xl font-bold tracking-tight">{t('about.builtForClarity')}</h2>
+            <p className="text-muted-foreground mt-3 max-w-md mx-auto">{t('about.sevenSwimLanes')}</p>
           </div>
         </FadeIn>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <FeatureCard delay={0}   emoji="🗺️" title="Place & Travel" body="See every city, country, and home you've called yours — and where you're heading next." />
-          <FeatureCard delay={80}  emoji="💼" title="Work & Career" body="Plot jobs, promotions, side projects. See the shape of your professional life at a glance." />
-          <FeatureCard delay={160} emoji="❤️" title="Relations" body="Relationships are the backbone of life. Visualise who's been with you and when." />
-          <FeatureCard delay={240} emoji="💰" title="Wealth projection" body="Attach value curves to assets, income, and ventures. Watch your future financial picture unfold." />
-          <FeatureCard delay={320} emoji="🧬" title="Health timeline" body="Track periods, milestones, treatments. See the full health arc — not just isolated records." />
-          <FeatureCard delay={400} emoji="📅" title="Import in seconds" body="Connect Google Calendar or drag in an ICS file. Your past, imported instantly." />
+          <FeatureCard delay={0}   emoji="🗺️" title={t('about.placeAndTravel')} body={t('about.placeAndTravelDesc')} />
+          <FeatureCard delay={80}  emoji="💼" title={t('about.workAndCareer')} body={t('about.workAndCareerDesc')} />
+          <FeatureCard delay={160} emoji="❤️" title={t('about.relations')} body={t('about.relationsDesc')} />
+          <FeatureCard delay={240} emoji="💰" title={t('about.wealthProjection')} body={t('about.wealthProjectionDesc')} />
+          <FeatureCard delay={320} emoji="🧬" title={t('about.healthTimeline')} body={t('about.healthTimelineDesc')} />
+          <FeatureCard delay={400} emoji="📅" title={t('about.importInSeconds')} body={t('about.importInSecondsDesc')} />
         </div>
       </section>
 
@@ -281,13 +302,13 @@ export function AboutPage() {
         <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <FadeIn>
             <div className="space-y-5">
-              <div className="text-xs font-semibold tracking-widest uppercase text-primary/70">Perspective mode</div>
-              <h2 className="text-3xl font-bold tracking-tight">How does your life compare?</h2>
+              <div className="text-xs font-semibold tracking-widest uppercase text-primary/70">{t('about.perspectiveMode')}</div>
+              <h2 className="text-3xl font-bold tracking-tight">{t('about.howDoesYourLifeCompare')}</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Overlay Einstein's career on yours, age-aligned. See what da Vinci was creating at 30. Compare your timeline with a friend's, a partner's, or the person you aspire to be.
+                {t('about.perspectiveDesc1')}
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                Perspective is the most underrated life tool. LifeLANE makes it visual, instant, and genuinely illuminating.
+                {t('about.perspectiveDesc2')}
               </p>
             </div>
           </FadeIn>
@@ -305,10 +326,10 @@ export function AboutPage() {
           <FadeIn delay={150}>
             <div className="rounded-2xl border border-border/40 bg-card/60 p-6 shadow-xl space-y-3">
               {[
-                { emoji: '🏠', label: 'Buy apartment in Lisbon', year: '2027', color: '#6366f1' },
-                { emoji: '🚀', label: 'Launch startup', year: '2026', color: '#f59e0b' },
-                { emoji: '✈️', label: 'Sabbatical year', year: '2028–2029', color: '#10b981' },
-                { emoji: '📚', label: 'Write a book', year: '2030', color: '#ec4899' },
+                { emoji: '🏠', label: t('about.buyApartment'), year: '2027', color: '#6366f1' },
+                { emoji: '🚀', label: t('about.launchStartup'), year: '2026', color: '#f59e0b' },
+                { emoji: '✈️', label: t('about.sabbaticalYear'), year: '2028–2029', color: '#10b981' },
+                { emoji: '📚', label: t('about.writeABook'), year: '2030', color: '#ec4899' },
               ].map((item, i) => (
                 <FadeIn key={item.label} delay={i * 80}>
                   <div className="flex items-center gap-3 rounded-xl border border-border/30 bg-background/60 px-4 py-2.5">
@@ -321,18 +342,18 @@ export function AboutPage() {
                   </div>
                 </FadeIn>
               ))}
-              <p className="text-xs text-muted-foreground text-center pt-1">Future events, planned on your timeline</p>
+              <p className="text-xs text-muted-foreground text-center pt-1">{t('about.futureEventsPlanned')}</p>
             </div>
           </FadeIn>
           <FadeIn>
             <div className="space-y-5">
-              <div className="text-xs font-semibold tracking-widest uppercase text-primary/70">Future planning</div>
-              <h2 className="text-3xl font-bold tracking-tight">Your life isn't just the past.</h2>
+              <div className="text-xs font-semibold tracking-widest uppercase text-primary/70">{t('about.futurePlanning')}</div>
+              <h2 className="text-3xl font-bold tracking-tight">{t('about.yourLifeIsntJustThePast')}</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Add future events alongside your history. A planned move, a career pivot, a goal. See how it all fits — and whether the timing actually makes sense.
+                {t('about.futurePlanningDesc1')}
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                Most tools record what happened. LifeLANE lets you design what's next, on the same canvas.
+                {t('about.futurePlanningDesc2')}
               </p>
             </div>
           </FadeIn>
@@ -348,18 +369,18 @@ export function AboutPage() {
           <div className="relative max-w-xl mx-auto space-y-6">
             <div className="text-4xl">⚡</div>
             <button onClick={() => navigate('/demo')} className="text-3xl font-bold tracking-tight hover:opacity-80 transition-opacity">
-              The earlier you start,<br />the more you have to look back on.
+              {t('about.theEarlierYouStart')}<br />{t('about.theMoreYouHaveTo')}
             </button>
             <p className="text-muted-foreground leading-relaxed">
-              LifeLANE is early. The people joining now are shaping what it becomes. There's no better time to plant your flag.
+              {t('about.earlyDescription')}
             </p>
             <button
               onClick={() => navigate('/')}
               className="px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity shadow-xl shadow-primary/20 text-sm"
             >
-              Open LifeLANE — it's free →
+              {t('about.openLifelane')}
             </button>
-            <p className="text-xs text-muted-foreground">No credit card. No commitment. Just your life, finally visible.</p>
+            <p className="text-xs text-muted-foreground">{t('about.noCreditCard')}</p>
           </div>
         </FadeIn>
       </section>
@@ -368,8 +389,8 @@ export function AboutPage() {
       <div className="border-t border-border/30 px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground max-w-5xl mx-auto w-full">
         <span>© {new Date().getFullYear()} LifeLANE</span>
         <div className="flex gap-5">
-          <button onClick={() => navigate('/terms')} className="hover:text-foreground transition-colors">Terms & Conditions</button>
-          <a href="mailto:hello@lifelane.space" className="hover:text-foreground transition-colors">Contact</a>
+          <button onClick={() => navigate('/terms')} className="hover:text-foreground transition-colors">{t('about.termsAndConditions')}</button>
+          <a href="mailto:hello@lifelane.space" className="hover:text-foreground transition-colors">{t('about.contact')}</a>
         </div>
       </div>
 

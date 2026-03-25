@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { Search } from 'lucide-react'
+import { useTranslation } from '@/i18n'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import type { Lane, TimelineEvent } from '@/types/timeline'
@@ -21,6 +22,7 @@ function formatYears(event: TimelineEvent): string {
 }
 
 export function SearchDialog({ open, onOpenChange, events, lanes, onNavigate }: Props) {
+  const { t } = useTranslation()
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -53,7 +55,7 @@ export function SearchDialog({ open, onOpenChange, events, lanes, onNavigate }: 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Search Events</DialogTitle>
+          <DialogTitle>{t('search.searchEvents')}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-3">
           <div className="relative">
@@ -61,7 +63,7 @@ export function SearchDialog({ open, onOpenChange, events, lanes, onNavigate }: 
             <Input
               ref={inputRef}
               autoFocus
-              placeholder="Search by title, description, or lane…"
+              placeholder={t('search.searchPlaceholder')}
               value={query}
               onChange={e => setQuery(e.target.value)}
               className="pl-8"
@@ -71,7 +73,7 @@ export function SearchDialog({ open, onOpenChange, events, lanes, onNavigate }: 
           {query.trim() && (
             <div className="max-h-72 overflow-y-auto rounded-md border divide-y">
               {results.length === 0 ? (
-                <div className="px-3 py-4 text-center text-sm text-muted-foreground">No events found</div>
+                <div className="px-3 py-4 text-center text-sm text-muted-foreground">{t('search.noEventsFound')}</div>
               ) : (
                 results.map(event => {
                   const lane = laneMap.get(event.laneId)

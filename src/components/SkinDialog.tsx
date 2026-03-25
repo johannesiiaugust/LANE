@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { useTranslation } from '@/i18n'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -15,6 +16,7 @@ interface SkinDialogProps {
 }
 
 export function SkinDialog({ open, onOpenChange }: SkinDialogProps) {
+  const { t } = useTranslation()
   const { customInput, setCustomInput } = useSkin()
 
   const update =
@@ -26,30 +28,30 @@ export function SkinDialog({ open, onOpenChange }: SkinDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xs">
         <DialogHeader>
-          <DialogTitle>Custom Theme</DialogTitle>
+          <DialogTitle>{t('skin.customTheme')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 pt-1">
           <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-            <ColorField label="Background" value={customInput.background} onChange={update('background')} />
-            <ColorField label="Text" value={customInput.foreground} onChange={update('foreground')} />
-            <ColorField label="Accent" value={customInput.primary} onChange={update('primary')} />
-            <ColorField label="Surface" value={customInput.surface} onChange={update('surface')} />
-            <ColorField label="Border" value={customInput.border} onChange={update('border')} />
+            <ColorField label={t('skin.background')} value={customInput.background} onChange={update('background')} />
+            <ColorField label={t('skin.text')} value={customInput.foreground} onChange={update('foreground')} />
+            <ColorField label={t('skin.accent')} value={customInput.primary} onChange={update('primary')} />
+            <ColorField label={t('skin.surface')} value={customInput.surface} onChange={update('surface')} />
+            <ColorField label={t('skin.border')} value={customInput.border} onChange={update('border')} />
           </div>
           <div>
-            <Label className="text-xs text-muted-foreground mb-1 block">Font</Label>
+            <Label className="text-xs text-muted-foreground mb-1 block">{t('skin.font')}</Label>
             <Select value={customInput.fontFamily} onValueChange={update('fontFamily')}>
               <SelectTrigger className="h-8 text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="system">System (sans-serif)</SelectItem>
-                <SelectItem value="serif">Serif (Georgia)</SelectItem>
-                <SelectItem value="mono">Monospace</SelectItem>
+                <SelectItem value="system">{t('skin.systemSansSerif')}</SelectItem>
+                <SelectItem value="serif">{t('skin.serifGeorgia')}</SelectItem>
+                <SelectItem value="mono">{t('skin.monospace')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <p className="text-xs text-muted-foreground">Changes apply live as you pick.</p>
+          <p className="text-xs text-muted-foreground">{t('skin.changesApplyLive')}</p>
         </div>
       </DialogContent>
     </Dialog>
