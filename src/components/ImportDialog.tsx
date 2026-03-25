@@ -1207,7 +1207,7 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
         <FileText className="h-10 w-10 text-muted-foreground/40" />
         <p className="text-sm text-muted-foreground text-center">
           Text import requires an OpenAI API key.<br />
-          Set <code className="text-xs bg-muted px-1 py-0.5 rounded">VITE_OPENAI_API_KEY</code> in your .env file.
+          Set <code className="text-xs bg-muted px-1 py-0.5 rounded">OPENAI_API_KEY</code> in your .env file.
         </p>
       </div>
     )
@@ -1633,7 +1633,7 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
         <Mic className="h-10 w-10 text-muted-foreground/40" />
         <p className="text-sm text-muted-foreground text-center">
           Voice import requires an OpenAI API key.<br />
-          Set <code className="text-xs bg-muted px-1 py-0.5 rounded">VITE_OPENAI_API_KEY</code> in your .env file.
+          Set <code className="text-xs bg-muted px-1 py-0.5 rounded">OPENAI_API_KEY</code> in your .env file.
         </p>
       </div>
     )

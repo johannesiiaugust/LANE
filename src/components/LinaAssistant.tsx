@@ -60,11 +60,6 @@ interface LinaAssistantProps {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const OPENAI_API_URL = 'https://api.openai.com/v1'
-
-function getApiKey(): string {
-  return import.meta.env.VITE_OPENAI_API_KEY as string
-}
 
 function formatYear(y: number): string {
   const year = Math.floor(y)
@@ -248,12 +243,9 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
         ...newMessages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
       ]
 
-      const res = await fetch(`${OPENAI_API_URL}/chat/completions`, {
+      const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${getApiKey()}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages: apiMessages,

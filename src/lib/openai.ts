@@ -5,14 +5,9 @@
 
 import type { ParsedCalendarEvent } from './calendarParser'
 
-const OPENAI_API_URL = 'https://api.openai.com/v1'
-
 export function isOpenAIConfigured(): boolean {
-  return !!import.meta.env.VITE_OPENAI_API_KEY
-}
-
-function getApiKey(): string {
-  return import.meta.env.VITE_OPENAI_API_KEY as string
+  // Key is held server-side via OPENAI_API_KEY; always available in production.
+  return true
 }
 
 /**
@@ -22,9 +17,6 @@ export async function parseTextToEvents(
   text: string,
   laneNames: string[],
 ): Promise<ParsedCalendarEvent[]> {
-  const apiKey = getApiKey()
-  if (!apiKey) throw new Error('OpenAI API key not configured')
-
   const systemPrompt = `You extract life events from text and return them as a JSON array.
 
 Each event object has these fields:
@@ -42,12 +34,9 @@ Rules:
 - Choose the most appropriate category from the provided lane names
 - Return ONLY the JSON array, no other text`
 
-  const res = await fetch(`${OPENAI_API_URL}/chat/completions`, {
+  const res = await fetch('/api/chat', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       response_format: { type: 'json_object' },
@@ -96,9 +85,6 @@ export async function generateQuestionnaireEvents(
   birthYear: number,
   laneNames: string[],
 ): Promise<QuestionnaireParsedEvent[]> {
-  const apiKey = getApiKey()
-  if (!apiKey) throw new Error('OpenAI API key not configured')
-
   const answersText = answers
     .map(a => `Q: ${a.question}\nA: ${a.answer}`)
     .join('\n\n')
@@ -127,12 +113,9 @@ Rules:
 - Choose the most appropriate category from the provided lane names
 - Return ONLY the JSON object with "events" array`
 
-  const res = await fetch(`${OPENAI_API_URL}/chat/completions`, {
+  const res = await fetch('/api/chat', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       response_format: { type: 'json_object' },
@@ -173,11 +156,7 @@ Rules:
  * Transcribe audio using OpenAI Whisper API.
  */
 export async function transcribeAudio(audioBlob: Blob): Promise<string> {
-  const apiKey = getApiKey()
-  if (!apiKey) throw new Error('OpenAI API key not configured')
-
   const formData = new FormData()
-  // Determine extension from MIME type
   const ext = audioBlob.type.includes('webm') ? 'webm'
     : audioBlob.type.includes('ogg') ? 'ogg'
     : audioBlob.type.includes('mp4') ? 'mp4'
@@ -185,17 +164,14 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
   formData.append('file', audioBlob, `recording.${ext}`)
   formData.append('model', 'whisper-1')
 
-  const res = await fetch(`${OPENAI_API_URL}/audio/transcriptions`, {
+  const res = await fetch('/api/transcribe', {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-    },
     body: formData,
   })
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    throw new Error(err.error?.message || `Whisper API error: ${res.status}`)
+    throw new Error(err.error || `Whisper API error: ${res.status}`)
   }
 
   const data = await res.json()
