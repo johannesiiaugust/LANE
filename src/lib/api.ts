@@ -565,13 +565,14 @@ export async function deleteEventDb(eventId: string): Promise<boolean> {
 export async function fetchPersonas(): Promise<DbPersona[]> {
   const { data, error } = await supabase
     .from('personas')
-    .select('*')
+    .select('id, name, bio, birth_year, death_year, view_count, persona_events!inner(id)')
     .order('birth_year', { ascending: true })
   if (error) {
     console.error('fetchPersonas error:', error)
     return []
   }
-  return data ?? []
+  // Strip the joined persona_events array — it was only used to filter out personas with no events
+  return (data ?? []).map(({ persona_events: _ignored, ...p }) => p as DbPersona)
 }
 
 export async function incrementPersonaView(personaId: string): Promise<void> {

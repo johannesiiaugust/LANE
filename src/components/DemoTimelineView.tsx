@@ -195,9 +195,12 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
   useGoogleTranslate()
   const guideWasOpenRef = useRef(false)
 
-  // Auto-open guide after 3.5 seconds — skip if user already completed onboarding
+  // Auto-open guide after 3.5 seconds — only for the first 2 visits, or if user completed onboarding
   useEffect(() => {
     if (localStorage.getItem('timeline_guide_completed')) return
+    const count = parseInt(localStorage.getItem('timeline_guide_auto_count') ?? '0', 10)
+    if (count >= 2) return
+    localStorage.setItem('timeline_guide_auto_count', String(count + 1))
     const t = setTimeout(() => setGuideOpen(true), 3500)
     return () => clearTimeout(t)
   }, [])
