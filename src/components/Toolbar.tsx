@@ -1,5 +1,6 @@
 import { useMemo, useCallback, useState } from 'react'
-import { useGoogleTranslate, TranslateMenuContent } from '@/components/TranslateMenu'
+import { useGoogleTranslate } from '@/components/TranslateMenu'
+import { LanguageSwitcherInline } from '@/components/LanguageSwitcher'
 import { useTranslation } from '@/i18n'
 import { Plus, ZoomIn, ZoomOut, MoreHorizontal, CalendarSearch, Search, LogOut, UserPen, BarChart3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -366,7 +367,7 @@ export function Toolbar({
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
-                <TranslateMenuContent />
+                <LanguageSwitcherInline />
 
                 {/* User section */}
                 {showUserMenu && user && (
