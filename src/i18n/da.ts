@@ -454,6 +454,16 @@ const da: Translations = {
     refresh: 'Opdater',
   },
 
+  lanes: {
+    place: 'Sted & Rejser',
+    work: 'Arbejde & Uddannelse',
+    health: 'Helbred',
+    relations: 'Relationer & Familie',
+    activities: 'Aktiviteter',
+    assets: 'Aktiver',
+    items: 'Genstande',
+  },
+
   guide: {
     step1Title: 'Sammenlign dit liv med hvem som helst',
     step1Text: 'Berømte mennesker, venner og andre. Se som om du startede på samme tid.',

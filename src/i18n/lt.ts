@@ -482,6 +482,16 @@ const lt: Translations = {
   },
 
   // ── Demo ──
+  lanes: {
+    place: 'Vieta & Kelionės',
+    work: 'Darbas & Išsilavinimas',
+    health: 'Sveikata',
+    relations: 'Santykiai & Šeima',
+    activities: 'Veiklos',
+    assets: 'Turtas',
+    items: 'Daiktai',
+  },
+
   guide: {
     step1Title: 'Palyginkite savo gyvenimą su bet kuo',
     step1Text: 'Garsiomis asmenybėmis, draugais ir kitais. Matykite tarsi pradėjote tuo pačiu metu.',

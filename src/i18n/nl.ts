@@ -484,6 +484,16 @@ const nl: Translations = {
   },
 
   // ── Demo ──
+  lanes: {
+    place: 'Plaats & Reizen',
+    work: 'Werk & Opleiding',
+    health: 'Gezondheid',
+    relations: 'Relaties & Familie',
+    activities: 'Activiteiten',
+    assets: 'Bezittingen',
+    items: 'Voorwerpen',
+  },
+
   guide: {
     step1Title: 'Vergelijk je leven met iedereen',
     step1Text: 'Beroemde mensen, vrienden en anderen. Zie alsof je tegelijkertijd begon.',

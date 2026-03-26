@@ -478,6 +478,16 @@ const it: Translations = {
   },
 
   // ── Demo ──
+  lanes: {
+    place: 'Luogo & Viaggi',
+    work: 'Lavoro & Istruzione',
+    health: 'Salute',
+    relations: 'Relazioni & Famiglia',
+    activities: 'Attività',
+    assets: 'Patrimonio',
+    items: 'Oggetti',
+  },
+
   guide: {
     step1Title: 'Confronta la tua vita con chiunque',
     step1Text: 'Persone famose, amici e altri. Guarda come se avessi iniziato nello stesso momento.',

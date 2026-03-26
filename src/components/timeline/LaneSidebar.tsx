@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
+import { useTranslateLaneName } from '@/i18n'
 
 export interface PersonaSidebarSection {
   personaId: string
@@ -82,6 +83,7 @@ export function LaneSidebar({
 }: LaneSidebarProps) {
   const [showHidden, setShowHidden] = useState(false)
   const { sc } = useSizeConfig()
+  const translateLaneName = useTranslateLaneName()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, SIDEBAR_WIDTH, HEADER_HEIGHT, SIDEBAR_FONT, ICON_SIZE } = sc
 
   // Compress sidebar on narrow viewports so more horizontal space goes to the timeline
@@ -153,7 +155,7 @@ export function LaneSidebar({
                   WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
                 }}
               >
-                {lane.emoji && <span className="mr-1">{lane.emoji}</span>}{lane.name}
+                {lane.emoji && <span className="mr-1">{lane.emoji}</span>}{translateLaneName(lane.name)}
               </span>
 
               {/* Action buttons — absolute overlay on hover, no layout cost when hidden */}
@@ -243,7 +245,7 @@ export function LaneSidebar({
                     </button>
                   )}
                   <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>
-                    {pl.name}
+                    {translateLaneName(pl.name)}
                   </span>
                 </div>
               )
@@ -278,7 +280,7 @@ export function LaneSidebar({
                     </button>
                   )}
                   <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>
-                    {ol.name}
+                    {translateLaneName(ol.name)}
                   </span>
                 </div>
               )
@@ -354,7 +356,7 @@ export function LaneSidebar({
                     {isRowExpanded ? <ChevronDown size={ICON_SIZE} /> : <ChevronRight size={ICON_SIZE} />}
                   </button>
                 )}
-                <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>{row.name}</span>
+                <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>{translateLaneName(row.name)}</span>
               </div>
             )
           })}
@@ -402,7 +404,7 @@ export function LaneSidebar({
                     {isRowExpanded ? <ChevronDown size={ICON_SIZE} /> : <ChevronRight size={ICON_SIZE} />}
                   </button>
                 )}
-                <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>{row.name}</span>
+                <span className="truncate" style={{ fontSize: SIDEBAR_FONT }}>{translateLaneName(row.name)}</span>
               </div>
             )
           })}
@@ -451,7 +453,7 @@ export function LaneSidebar({
                       WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 90%)',
                     }}
                   >
-                    {lane.emoji && <span className="mr-1">{lane.emoji}</span>}{lane.name}
+                    {lane.emoji && <span className="mr-1">{lane.emoji}</span>}{translateLaneName(lane.name)}
                   </span>
                   <button
                     onClick={() => onToggleVisibility(lane.id)}

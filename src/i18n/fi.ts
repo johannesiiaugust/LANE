@@ -482,6 +482,16 @@ const fi: Translations = {
   },
 
   // ── Demo ──
+  lanes: {
+    place: 'Paikka & Matkailu',
+    work: 'Työ & Koulutus',
+    health: 'Terveys',
+    relations: 'Suhteet & Perhe',
+    activities: 'Aktiviteetit',
+    assets: 'Varat',
+    items: 'Esineet',
+  },
+
   guide: {
     step1Title: 'Vertaa elämääsi kenen tahansa kanssa',
     step1Text: 'Kuuluisat henkilöt, ystävät ja muut. Näe kuin olisit aloittanut samaan aikaan.',

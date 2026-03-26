@@ -484,6 +484,16 @@ const sv: Translations = {
   },
 
   // ── Demo ──
+  lanes: {
+    place: 'Plats & Resor',
+    work: 'Arbete & Utbildning',
+    health: 'Hälsa',
+    relations: 'Relationer & Familj',
+    activities: 'Aktiviteter',
+    assets: 'Tillgångar',
+    items: 'Föremål',
+  },
+
   guide: {
     step1Title: 'Jämför ditt liv med vem som helst',
     step1Text: 'Kända personer, vänner och andra. Se som om du börjat samtidigt.',
