@@ -484,6 +484,25 @@ const nl: Translations = {
   },
 
   // ── Demo ──
+  guide: {
+    step1Title: 'Vergelijk je leven met iedereen',
+    step1Text: 'Beroemde mensen, vrienden en anderen. Zie alsof je tegelijkertijd begon.',
+    step2Title: 'Door de tijd navigeren',
+    step2Text: 'Zoom in en uit in de tijd — glijdt naar je toekomst en verleden. Zie hoe je vermogen zich ontwikkelt met alternatieve tijdlijnpaden.',
+    step3Title: 'Tijdlijnen beheren',
+    step3Text: 'Maak en wijzig tijdlijnen voor familie, vrienden en anderen. Importeer uit cv’s, sociale netwerken, kalenders en andere bronnen — plak gewoon tekst met onze AI, of met je stem.',
+    step4Title: 'Levensgebeurtenissen toevoegen & plannen met AI',
+    step4Text: 'Voeg gebeurtenissen toe in alle LANE-gebieden van het leven — werk, waar je woonde, gezondheid en meer. Beschrijf een toekomst die je wilt en onze AI geeft je concrete manieren om die te bereiken.',
+    startYourOwnStory: 'Begin je eigen verhaal',
+    addFewEvents: 'Voeg een paar gebeurtenissen toe en we bouwen je persoonlijke tijdlijn.',
+    birthDate: 'Geboortedatum',
+    yourLifeEvents: 'Jouw levensgebeurtenissen',
+    placeholderPlace: 'bijv. Amsterdam',
+    placeholderWork: 'bijv. Software Engineer bij Google',
+    addAnotherEvent: 'Nog een gebeurtenis toevoegen',
+    continueWithExample: 'Doorgaan met voorbeeld →',
+    next: 'Volgende',
+  },
   demo: {
     comparingYouVs: 'Vergelijking \u2014 Jij vs. Albert Einstein',
     yourTimeline: 'JOUW TIJDLIJN',

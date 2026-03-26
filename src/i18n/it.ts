@@ -478,6 +478,25 @@ const it: Translations = {
   },
 
   // ── Demo ──
+  guide: {
+    step1Title: 'Confronta la tua vita con chiunque',
+    step1Text: 'Persone famose, amici e altri. Guarda come se avessi iniziato nello stesso momento.',
+    step2Title: 'Navigare nel tempo',
+    step2Text: 'Ingrandisci e rimpicciolisci nel tempo — scorri verso il tuo futuro e passato. Guarda come si sviluppa il tuo patrimonio con percorsi alternativi della linea temporale.',
+    step3Title: 'Gestire le linee temporali',
+    step3Text: 'Crea e modifica linee temporali per famiglia, amici e altri. Importa da CV, social network, calendari e altre fonti — incolla semplicemente qualsiasi testo con la nostra IA o con la voce.',
+    step4Title: 'Aggiungere eventi di vita e pianificare con IA',
+    step4Text: "Aggiungi eventi in tutte le aree LANE della vita — lavoro, dove hai vissuto, salute e altro. Descrivi un futuro che desideri e la nostra IA ti darà modi concreti per raggiungerlo.",
+    startYourOwnStory: 'Inizia la tua storia',
+    addFewEvents: 'Aggiungi alcuni eventi e costruiremo la tua linea temporale personale.',
+    birthDate: 'Data di nascita',
+    yourLifeEvents: 'I tuoi eventi di vita',
+    placeholderPlace: 'es. Roma',
+    placeholderWork: 'es. Ingegnere software presso Google',
+    addAnotherEvent: 'Aggiungi un altro evento',
+    continueWithExample: "Continua con l'esempio →",
+    next: 'Avanti',
+  },
   demo: {
     comparingYouVs: 'Confronto \u2014 Tu vs. Albert Einstein',
     yourTimeline: 'LA TUA TIMELINE',

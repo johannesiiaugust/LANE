@@ -6,6 +6,7 @@ import { DateInput } from '@/components/ui/DateInput'
 import { DEMO_LANES } from '@/data/demoData'
 import { dateStrToFracYear } from '@/lib/constants'
 import type { TimelineEvent } from '@/types/timeline'
+import { useTranslation } from '@/i18n/context'
 
 // ─── Step definitions ────────────────────────────────────────────────────────
 
@@ -18,44 +19,6 @@ interface Step {
   isOnboarding?: true   // last step — renders the full-screen form instead
 }
 
-const STEPS: Step[] = [
-  {
-    target: 'compare',
-    title: 'Compare your life with anyone',
-    text: 'Famous people, friends and others. See as if you started at the same time.',
-    side: 'bottom',
-    align: 'start',
-  },
-  {
-    target: 'zoom',
-    title: 'Navigate time',
-    text: 'Zoom in and out in time — slide to your future and past. See your wealth develop with alternative timeline paths.',
-    side: 'bottom',
-    align: 'end',
-  },
-  {
-    target: 'compare',
-    title: 'Manage timelines',
-    text: 'Create and modify timelines for family, friends and others. Import from CVs, social networks, calendars and other sources — simply copy-paste any text with our AI, or by voice.',
-    side: 'bottom',
-    align: 'start',
-  },
-  {
-    target: 'add-events',
-    title: 'Add life events & plan with AI',
-    text: 'Add events across all LANEs of life — work, where you lived, health, and more. Describe a future you want and our AI gives you concrete ways to reach it.',
-    side: 'bottom',
-    align: 'end',
-  },
-  {
-    target: '__onboarding__',
-    title: 'Start with your own story',
-    text: '',
-    side: 'bottom',
-    align: 'center',
-    isOnboarding: true,
-  },
-]
 
 const PADDING = 8
 const TIP_W  = 288
@@ -86,6 +49,47 @@ interface GuideOverlayProps {
 interface TargetRect { top: number; left: number; width: number; height: number }
 
 export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
+  const { t } = useTranslation()
+
+  const STEPS: Step[] = [
+    {
+      target: 'compare',
+      title: t('guide.step1Title'),
+      text: t('guide.step1Text'),
+      side: 'bottom',
+      align: 'start',
+    },
+    {
+      target: 'zoom',
+      title: t('guide.step2Title'),
+      text: t('guide.step2Text'),
+      side: 'bottom',
+      align: 'end',
+    },
+    {
+      target: 'compare',
+      title: t('guide.step3Title'),
+      text: t('guide.step3Text'),
+      side: 'bottom',
+      align: 'start',
+    },
+    {
+      target: 'add-events',
+      title: t('guide.step4Title'),
+      text: t('guide.step4Text'),
+      side: 'bottom',
+      align: 'end',
+    },
+    {
+      target: '__onboarding__',
+      title: t('guide.startYourOwnStory'),
+      text: '',
+      side: 'bottom',
+      align: 'center',
+      isOnboarding: true,
+    },
+  ]
+
   const [step, setStep] = useState(0)
   const [rect, setRect] = useState<TargetRect | null>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
@@ -243,8 +247,8 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
           <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b">
             <div>
               <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">{step + 1} / {total}</div>
-              <h2 className="text-xl font-semibold">Start your own story</h2>
-              <p className="text-sm text-muted-foreground mt-1">Add a few events and we'll build your personal timeline.</p>
+              <h2 className="text-xl font-semibold">{t('guide.startYourOwnStory')}</h2>
+              <p className="text-sm text-muted-foreground mt-1">{t('guide.addFewEvents')}</p>
             </div>
             <button onClick={onClose} className="text-muted-foreground hover:text-foreground ml-4 mt-0.5"><X className="h-5 w-5" /></button>
           </div>
@@ -253,13 +257,13 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
 
             {/* Birth date */}
             <div className="flex items-center gap-3">
-              <label className="text-sm font-medium shrink-0 w-24">Birth date</label>
+              <label className="text-sm font-medium shrink-0 w-24">{t('guide.birthDate')}</label>
               <DateInput value={birthDate} onChange={setBirthDate} minIso="1900-01-01" maxIso="2020-12-31" className="w-56" />
             </div>
 
             {/* Event rows */}
             <div className="space-y-3">
-              <p className="text-sm font-medium">Your life events</p>
+              <p className="text-sm font-medium">{t('guide.yourLifeEvents')}</p>
               {rows.map((row, idx) => (
                 <div key={row.id} className="flex flex-wrap gap-2 items-start p-3 rounded-lg border bg-muted/30">
                   {/* Lane selector */}
@@ -277,7 +281,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
                   <Input
                     value={row.title}
                     onChange={e => updateRow(row.id, { title: e.target.value })}
-                    placeholder={idx === 0 ? 'e.g. New York' : 'e.g. Software Engineer at Google'}
+                    placeholder={idx === 0 ? t('guide.placeholderPlace') : t('guide.placeholderWork')}
                     className="h-8 text-sm flex-1 min-w-[140px]"
                   />
 
@@ -304,7 +308,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
                 className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <Plus className="h-4 w-4" />
-                Add another event
+                {t('guide.addAnotherEvent')}
               </button>
             </div>
           </div>
@@ -324,10 +328,10 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
               onClick={onClose}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Continue with example →
+              {t('guide.continueWithExample')}
             </button>
             <Button onClick={handleStartOwn} className="min-w-[140px]">
-              Get started
+              {t('auth.getStarted')}
               <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
@@ -382,10 +386,10 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
 
         <div className="flex justify-between items-center px-4 pb-4 pt-1 border-t border-border/50">
           <Button variant="ghost" size="sm" onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0} className="gap-1 text-xs">
-            <ChevronLeft className="h-3.5 w-3.5" />Back
+            <ChevronLeft className="h-3.5 w-3.5" />{t('common.back')}
           </Button>
           <Button size="sm" onClick={() => setStep(s => s + 1)} className="gap-1 text-xs">
-            Next<ChevronRight className="h-3.5 w-3.5" />
+            {t('guide.next')}<ChevronRight className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>

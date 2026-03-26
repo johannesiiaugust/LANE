@@ -482,6 +482,25 @@ const lt: Translations = {
   },
 
   // ── Demo ──
+  guide: {
+    step1Title: 'Palyginkite savo gyvenimą su bet kuo',
+    step1Text: 'Garsiomis asmenybėmis, draugais ir kitais. Matykite tarsi pradėjote tuo pačiu metu.',
+    step2Title: 'Naršykite laike',
+    step2Text: 'Priartinkite ir nutolinkite laiką — slinkite į savo ateitį ir praeitį. Stebėkite, kaip jūsų turtas vystosi su alternatyviais laiko juostos keliais.',
+    step3Title: 'Tvarkykite laiko juostas',
+    step3Text: 'Kurkite ir keiskite laiko juostas šeimai, draugams ir kitiems. Importuokite iš CV, socialinių tinklų, kalendorių ir kitų šaltinių — tiesiog įklijuokite bet kokį tekstą su mūsų AI arba balsu.',
+    step4Title: 'Pridėkite gyvenimo įvykius ir planuokite su AI',
+    step4Text: 'Pridėkite įvykius visuose gyvenimo LANE srityse — darbas, kur gyvenote, sveikata ir daugiau. Aprašykite norimą ateitį ir mūsų AI suteiks jums konkrečius būdus ją pasiekti.',
+    startYourOwnStory: 'Pradėkite savo istoriją',
+    addFewEvents: 'Pridėkite keletą įvykių ir mes sukursime jūsų asmeninę laiko juostą.',
+    birthDate: 'Gimimo data',
+    yourLifeEvents: 'Jūsų gyvenimo įvykiai',
+    placeholderPlace: 'pvz. Vilnius',
+    placeholderWork: 'pvz. Programinės įrangos inžinierius Google',
+    addAnotherEvent: 'Pridėti dar vieną įvykį',
+    continueWithExample: 'Tęsti su pavyzdžiu →',
+    next: 'Kitas',
+  },
   demo: {
     comparingYouVs: 'Palyginimas — Jūs ir Albertas Einšteinas',
     yourTimeline: 'JŪSŲ LAIKO JUOSTA',
