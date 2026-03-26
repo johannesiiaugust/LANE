@@ -532,6 +532,8 @@ const sv: Translations = {
     activities: 'Aktiviteter',
     assets: 'Tillgångar',
     items: 'Föremål',
+    totalWealth: 'Total förmögenhet',
+    total: 'Totalt',
   },
 
   guide: {

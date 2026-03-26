@@ -530,6 +530,8 @@ const no: Translations = {
     activities: 'Aktiviteter',
     assets: 'Eiendeler',
     items: 'Gjenstander',
+    totalWealth: 'Total formue',
+    total: 'Totalt',
   },
 
   guide: {

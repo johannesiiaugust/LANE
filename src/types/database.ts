@@ -108,6 +108,21 @@ export interface DbPersona {
   view_count?: number
 }
 
+export interface DbPersonaTranslation {
+  persona_id: string
+  language: string
+  name: string | null
+  bio: string | null
+}
+
+export interface DbPersonaEventTranslation {
+  persona_id: string
+  title_en: string
+  language: string
+  title: string | null
+  description: string | null
+}
+
 export interface DbTimelineShare {
   share_id: string
   user_id: string

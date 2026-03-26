@@ -532,6 +532,8 @@ const lv: Translations = {
     activities: 'Aktivitātes',
     assets: 'Aktīvi',
     items: 'Priekšmeti',
+    totalWealth: 'Kopējais īpašums',
+    total: 'Kopā',
   },
 
   guide: {

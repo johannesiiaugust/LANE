@@ -7,6 +7,8 @@ import type {
   DbEvent,
   DbPersona,
   DbPersonaEvent,
+  DbPersonaTranslation,
+  DbPersonaEventTranslation,
   PublicProfileData,
   DbTimelineShare,
   SharedWithMeItem,
@@ -573,6 +575,32 @@ export async function fetchPersonas(): Promise<DbPersona[]> {
   }
   // Strip the joined persona_events array — it was only used to filter out personas with no events
   return (data ?? []).map(({ persona_events: _ignored, ...p }) => p as DbPersona)
+}
+
+export async function fetchPersonaTranslations(language: string): Promise<DbPersonaTranslation[]> {
+  if (!language || language === 'en') return []
+  const { data, error } = await supabase
+    .from('persona_translations')
+    .select('persona_id, language, name, bio')
+    .eq('language', language)
+  if (error) {
+    console.error('fetchPersonaTranslations error:', error)
+    return []
+  }
+  return data ?? []
+}
+
+export async function fetchPersonaEventTranslations(language: string): Promise<DbPersonaEventTranslation[]> {
+  if (!language || language === 'en') return []
+  const { data, error } = await supabase
+    .from('persona_event_translations')
+    .select('persona_id, title_en, language, title, description')
+    .eq('language', language)
+  if (error) {
+    console.error('fetchPersonaEventTranslations error:', error)
+    return []
+  }
+  return data ?? []
 }
 
 export async function incrementPersonaView(personaId: string): Promise<void> {

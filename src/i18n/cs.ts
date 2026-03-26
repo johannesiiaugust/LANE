@@ -502,6 +502,8 @@ const cs: Translations = {
     activities: 'Aktivity',
     assets: 'Aktiva',
     items: 'Předměty',
+    totalWealth: 'Celkový majetek',
+    total: 'Celkem',
   },
 
   guide: {
