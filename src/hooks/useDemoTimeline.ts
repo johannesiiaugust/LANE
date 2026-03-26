@@ -21,7 +21,6 @@ interface DemoTimelineMeta {
 
 interface DemoState {
   lanes: Lane[]
-  events: TimelineEvent[]
   meta?: DemoTimelineMeta
 }
 
@@ -37,9 +36,9 @@ function loadSavedState(): DemoState | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
-      const parsed = JSON.parse(raw) as DemoState
-      if (Array.isArray(parsed.lanes) && Array.isArray(parsed.events)) {
-        return parsed
+      const parsed = JSON.parse(raw) as DemoState & { events?: unknown }
+      if (Array.isArray(parsed.lanes)) {
+        return { lanes: parsed.lanes, meta: parsed.meta }
       }
     }
   } catch {
@@ -50,7 +49,7 @@ function loadSavedState(): DemoState | null {
 
 function saveState(state: DemoState) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ lanes: state.lanes, meta: state.meta }))
   } catch {
     // ignore
   }
@@ -61,8 +60,13 @@ export function useDemoTimeline() {
   const translatedEvents = useMemo(() => buildDemoEvents(t), [t])
   const savedState = useMemo(() => loadSavedState(), [])
   const [lanes, setLanes] = useState<Lane[]>(savedState?.lanes ?? DEMO_LANES)
-  const [events, setEvents] = useState<TimelineEvent[]>(savedState?.events ?? translatedEvents)
+  const [events, setEvents] = useState<TimelineEvent[]>(translatedEvents)
   const [meta, setMeta] = useState<DemoTimelineMeta>(savedState?.meta ?? DEFAULT_META)
+
+  // Reset events to current language whenever language changes
+  useEffect(() => {
+    setEvents(translatedEvents)
+  }, [translatedEvents])
   const [pixelsPerYear, setPixelsPerYear] = useState(MIN_PIXELS_PER_YEAR)
 
   const demoTimeline: DbTimeline = {
@@ -81,10 +85,10 @@ export function useDemoTimeline() {
   const yearStart = TIMELINE_YEAR_MIN
   const yearEnd = TIMELINE_YEAR_MAX
 
-  // Persist to localStorage on every change
+  // Persist lanes and meta to localStorage (events are always derived from translations)
   useEffect(() => {
-    saveState({ lanes, events, meta })
-  }, [lanes, events, meta])
+    saveState({ lanes, meta })
+  }, [lanes, meta])
 
   const allYears = events.flatMap(e =>
     e.endYear != null ? [e.startYear, e.endYear] : [e.startYear],
