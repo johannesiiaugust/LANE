@@ -11,8 +11,8 @@ export const SIDEBAR_WIDTH = 280        // lane sidebar width in px
 export const MIN_PIXELS_PER_YEAR = 2.0
 export const MAX_PIXELS_PER_YEAR = 300_000  // dynamic canvas windowing keeps DOM elements safe
 export const DEFAULT_PIXELS_PER_YEAR = 80
-export const TIMELINE_YEAR_MIN = 1700
-export const TIMELINE_YEAR_MAX = 2300
+export const TIMELINE_YEAR_MIN = -1500
+export const TIMELINE_YEAR_MAX = 3500
 
 /** Which sub-year unit to display based on zoom level. */
 export type ZoomMode = 'year' | 'month' | 'day' | 'hour' | 'minute'
@@ -51,7 +51,9 @@ export function getYearInterval(pixelsPerYear: number): number {
   if (pixelsPerYear >= 6) return 10
   if (pixelsPerYear >= 2) return 25
   if (pixelsPerYear >= 1) return 50
-  return 100
+  if (pixelsPerYear >= 0.5) return 100
+  if (pixelsPerYear >= 0.2) return 250
+  return 500
 }
 
 /**
@@ -63,7 +65,9 @@ export function getGridInterval(pixelsPerYear: number): number {
   if (pixelsPerYear >= 6) return 10
   if (pixelsPerYear >= 2) return 25
   if (pixelsPerYear >= 1) return 50
-  return 100
+  if (pixelsPerYear >= 0.5) return 100
+  if (pixelsPerYear >= 0.2) return 250
+  return 500
 }
 
 /**

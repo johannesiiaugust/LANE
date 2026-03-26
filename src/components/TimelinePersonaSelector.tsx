@@ -619,6 +619,78 @@ export function TimelinePersonaSelector({
             </button>
           </div>}
 
+          {/* ── Personas ── */}
+          <div className="flex items-center border-t hover:bg-accent/50 transition-colors">
+            <button
+              className="flex items-center gap-1.5 px-3 pt-2 pb-1 text-left flex-1 min-w-0"
+              onClick={() => toggleSection('tl_section_personas', personasOpen, setPersonasOpen)}
+            >
+              {personasOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 flex-1">
+                <Users className="h-3 w-3" />
+                Personas
+                {activePersonaIds.size > 0 && (
+                  <span className="ml-1 rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{activePersonaIds.size}</span>
+                )}
+              </p>
+            </button>
+            {activePersonaIds.size > 0 && (
+              <button
+                className="pr-3 pt-2 pb-1 text-[10px] text-muted-foreground hover:text-foreground shrink-0"
+                title="Deselect all"
+                onClick={() => [...activePersonaIds].forEach(id => onTogglePersona(id))}
+              >
+                <ListX className="h-3 w-3" />
+              </button>
+            )}
+          </div>
+          {personasOpen && <div className="px-1 pb-2">
+            {personas.length === 0 ? (
+              <p className="px-2 py-2 text-xs text-muted-foreground text-center">No personas available</p>
+            ) : (
+              <>
+                {/* Top 5 most popular */}
+                <div className="px-2 pb-1">
+                  <p className="text-[10px] font-medium text-muted-foreground mb-1">Popular</p>
+                  {top5Personas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
+                </div>
+
+                {/* Search field */}
+                <div className="px-2 py-1.5 border-t">
+                  <div className="flex gap-1.5">
+                    <Input
+                      value={personaSearch}
+                      onChange={e => setPersonaSearch(e.target.value)}
+                      placeholder="Search personas…"
+                      className="h-7 text-xs flex-1"
+                    />
+                    {personaSearch && (
+                      <button type="button" onClick={() => setPersonaSearch('')} className="shrink-0 text-muted-foreground hover:text-foreground">
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                  {searchResults.length > 0 && (
+                    <div className="mt-1 space-y-0.5">
+                      {searchResults.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
+                    </div>
+                  )}
+                  {searchTrimmed.length > 0 && searchResults.length === 0 && (
+                    <p className="text-[10px] text-muted-foreground mt-1">No results</p>
+                  )}
+                </div>
+
+                {/* Recently viewed */}
+                {recentPersonas.length > 0 && searchTrimmed.length === 0 && (
+                  <div className="px-2 pt-1.5 border-t">
+                    <p className="text-[10px] font-medium text-muted-foreground mb-1">Recently viewed</p>
+                    {recentPersonas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
+                  </div>
+                )}
+              </>
+            )}
+          </div>}
+
           {/* ── Other Users (external overlays) ── */}
           <div className="flex items-center border-t hover:bg-accent/50 transition-colors">
             <button
@@ -769,78 +841,6 @@ export function TimelinePersonaSelector({
                 </div>
               )}
             </div>
-          </div>}
-
-          {/* ── Personas ── */}
-          <div className="flex items-center border-t hover:bg-accent/50 transition-colors">
-            <button
-              className="flex items-center gap-1.5 px-3 pt-2 pb-1 text-left flex-1 min-w-0"
-              onClick={() => toggleSection('tl_section_personas', personasOpen, setPersonasOpen)}
-            >
-              {personasOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 flex-1">
-                <Users className="h-3 w-3" />
-                Personas
-                {activePersonaIds.size > 0 && (
-                  <span className="ml-1 rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{activePersonaIds.size}</span>
-                )}
-              </p>
-            </button>
-            {activePersonaIds.size > 0 && (
-              <button
-                className="pr-3 pt-2 pb-1 text-[10px] text-muted-foreground hover:text-foreground shrink-0"
-                title="Deselect all"
-                onClick={() => [...activePersonaIds].forEach(id => onTogglePersona(id))}
-              >
-                <ListX className="h-3 w-3" />
-              </button>
-            )}
-          </div>
-          {personasOpen && <div className="px-1 pb-2">
-            {personas.length === 0 ? (
-              <p className="px-2 py-2 text-xs text-muted-foreground text-center">No personas available</p>
-            ) : (
-              <>
-                {/* Top 5 most popular */}
-                <div className="px-2 pb-1">
-                  <p className="text-[10px] font-medium text-muted-foreground mb-1">Popular</p>
-                  {top5Personas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
-                </div>
-
-                {/* Search field */}
-                <div className="px-2 py-1.5 border-t">
-                  <div className="flex gap-1.5">
-                    <Input
-                      value={personaSearch}
-                      onChange={e => setPersonaSearch(e.target.value)}
-                      placeholder="Search personas…"
-                      className="h-7 text-xs flex-1"
-                    />
-                    {personaSearch && (
-                      <button type="button" onClick={() => setPersonaSearch('')} className="shrink-0 text-muted-foreground hover:text-foreground">
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                  {searchResults.length > 0 && (
-                    <div className="mt-1 space-y-0.5">
-                      {searchResults.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
-                    </div>
-                  )}
-                  {searchTrimmed.length > 0 && searchResults.length === 0 && (
-                    <p className="text-[10px] text-muted-foreground mt-1">No results</p>
-                  )}
-                </div>
-
-                {/* Recently viewed */}
-                {recentPersonas.length > 0 && searchTrimmed.length === 0 && (
-                  <div className="px-2 pt-1.5 border-t">
-                    <p className="text-[10px] font-medium text-muted-foreground mb-1">Recently viewed</p>
-                    {recentPersonas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
-                  </div>
-                )}
-              </>
-            )}
           </div>}
         </PopoverContent>
       </Popover>
