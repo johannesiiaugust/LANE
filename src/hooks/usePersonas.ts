@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { fetchPersonas, fetchPersonaEvents } from '@/lib/api'
-import type { DbPersona, DbPersonaEvent, AlignedPersonaEvent } from '@/types/database'
+import { fetchPersonas, fetchPersonaEvents, fetchPersonaTranslations, fetchPersonaEventTranslations } from '@/lib/api'
+import type { DbPersona, DbPersonaEvent, DbPersonaTranslation, DbPersonaEventTranslation, AlignedPersonaEvent } from '@/types/database'
+import { useTranslation } from '@/i18n'
 
 const ACTIVE_PERSONAS_KEY = 'timeline_active_personas'
 const DISPLAY_MODES_KEY = 'timeline_persona_display_modes'
@@ -51,7 +52,10 @@ function saveAlignedIds(ids: Set<string>) {
 }
 
 export function usePersonas(userBirthYear: number | null = null) {
+  const { lang } = useTranslation()
   const [personas, setPersonas] = useState<DbPersona[]>([])
+  const [translations, setTranslations] = useState<DbPersonaTranslation[]>([])
+  const [eventTranslations, setEventTranslations] = useState<DbPersonaEventTranslation[]>([])
   const [rawPersonaEvents, setRawPersonaEvents] = useState<DbPersonaEvent[]>([])
   const [loadedPersonaIds, setLoadedPersonaIds] = useState<Set<string>>(new Set())
   const [activePersonaIds, setActivePersonaIds] = useState<Set<string>>(loadActiveIds)
@@ -72,6 +76,36 @@ export function usePersonas(userBirthYear: number | null = null) {
     return () => { cancelled = true }
   }, [])
 
+  // Fetch translations whenever language changes (skip for English — base data is already English)
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([
+      fetchPersonaTranslations(lang),
+      fetchPersonaEventTranslations(lang),
+    ]).then(([personaRows, eventRows]) => {
+      if (cancelled) return
+      setTranslations(personaRows)
+      setEventTranslations(eventRows)
+    })
+    return () => { cancelled = true }
+  }, [lang])
+
+  // Build a translated view of personas: overlay translation fields, fall back to English base data
+  const translatedPersonas = useMemo(() => {
+    if (translations.length === 0) return personas
+    const map = new Map<string, DbPersonaTranslation>()
+    for (const t of translations) map.set(t.persona_id, t)
+    return personas.map(p => {
+      const tr = map.get(p.id)
+      if (!tr) return p
+      return {
+        ...p,
+        name: tr.name ?? p.name,
+        bio:  tr.bio  ?? p.bio,
+      }
+    })
+  }, [personas, translations])
+
   // Fetch events lazily — only for active personas not yet loaded
   useEffect(() => {
     const missing = [...activePersonaIds].filter(id => !loadedPersonaIds.has(id))
@@ -90,38 +124,46 @@ export function usePersonas(userBirthYear: number | null = null) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePersonaIds])
 
+  // Build event translation lookup: (persona_id, title_en) → translation row
+  const eventTranslationMap = useMemo(() => {
+    const map = new Map<string, DbPersonaEventTranslation>()
+    for (const tr of eventTranslations) map.set(`${tr.persona_id}::${tr.title_en}`, tr)
+    return map
+  }, [eventTranslations])
+
   // Compute aligned events reactively based on alignment toggles
   const allPersonaEvents = useMemo(() => {
-    if (rawPersonaEvents.length > 0) {
-      console.debug('[usePersonas] alignment calc — userBirthYear:', userBirthYear, 'alignedIds:', [...alignedPersonaIds], 'events:', rawPersonaEvents.length)
-    }
-
     const personaMap = new Map<string, DbPersona>()
-    for (const p of personas) {
+    for (const p of translatedPersonas) {
       personaMap.set(p.id, p)
     }
 
     return rawPersonaEvents.map((e): AlignedPersonaEvent => {
-      const persona = personaMap.get(e.persona_id)
+      // Apply event translation if available, fall back to original English
+      const tr = eventTranslationMap.get(`${e.persona_id}::${e.title}`)
+      const translatedEvent = tr
+        ? { ...e, title: tr.title ?? e.title, description: tr.description ?? e.description }
+        : e
+      const persona = personaMap.get(translatedEvent.persona_id)
       const personaBirth = persona?.birth_year
       const persona_name = persona?.name ?? ''
-      if (userBirthYear != null && personaBirth != null && alignedPersonaIds.has(e.persona_id)) {
+      if (userBirthYear != null && personaBirth != null && alignedPersonaIds.has(translatedEvent.persona_id)) {
         const offset = userBirthYear - personaBirth
         return {
-          ...e,
+          ...translatedEvent,
           persona_name,
-          display_start_year: e.start_year + offset,
-          display_end_year: e.end_year != null ? e.end_year + offset : null,
+          display_start_year: translatedEvent.start_year + offset,
+          display_end_year: translatedEvent.end_year != null ? translatedEvent.end_year + offset : null,
         }
       }
       return {
-        ...e,
+        ...translatedEvent,
         persona_name,
-        display_start_year: e.start_year,
-        display_end_year: e.end_year,
+        display_start_year: translatedEvent.start_year,
+        display_end_year: translatedEvent.end_year,
       }
     })
-  }, [rawPersonaEvents, personas, userBirthYear, alignedPersonaIds])
+  }, [rawPersonaEvents, translatedPersonas, eventTranslationMap, userBirthYear, alignedPersonaIds])
 
   const togglePersona = useCallback((personaId: string) => {
     setActivePersonaIds(prev => {
@@ -180,7 +222,7 @@ export function usePersonas(userBirthYear: number | null = null) {
   )
 
   return {
-    personas,
+    personas: translatedPersonas,
     activePersonaEvents,
     activePersonaIds,
     togglePersona,

@@ -502,6 +502,8 @@ const da: Translations = {
     activities: 'Aktiviteter',
     assets: 'Aktiver',
     items: 'Genstande',
+    totalWealth: 'Samlet formue',
+    total: 'I alt',
   },
 
   guide: {

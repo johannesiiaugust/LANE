@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import type { TimelineEvent } from '@/types/timeline'
 import { computeValueAtYear, formatValue, getDiscreteDepositYears } from '@/lib/valueCompute'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
+import { useTranslation } from '@/i18n'
 
 const TEAL = '#14b8a6'
 const RED  = '#ef4444'
@@ -37,6 +38,7 @@ export function TotalAssetsLane({
   pixelsPerYear,
 }: TotalAssetsLaneProps) {
   const { sc } = useSizeConfig()
+  const { t } = useTranslation()
   const { TOTAL_ASSETS_HEIGHT, TOTAL_LABEL_HEIGHT: LABEL_HEIGHT, TOTAL_PAD_V: PAD_V } = sc
   const CHART_H = TOTAL_ASSETS_HEIGHT - LABEL_HEIGHT - PAD_V * 2
 
@@ -289,7 +291,7 @@ export function TotalAssetsLane({
             <div className="flex justify-between gap-2 text-[10px] leading-4 opacity-50 mb-0.5">
               <span className="flex-1" />
               {showYearCol && <span className="w-14 text-right">{yearFloor}</span>}
-              <span className="w-14 text-right">Total</span>
+              <span className="w-14 text-right">{t('lanes.total')}</span>
             </div>
             {/* Per-event rows */}
             {tooltip.items.map((item, i) => (
@@ -307,7 +309,7 @@ export function TotalAssetsLane({
             ))}
             {/* Total row */}
             <div className="flex justify-between gap-2 text-xs leading-5 font-bold border-t border-white/30 mt-1 pt-1">
-              <span className="flex-1">Total</span>
+              <span className="flex-1">{t('lanes.total')}</span>
               {showYearCol && (
                 <span className="w-14 text-right" style={{ color: tooltip.totalNow < 0 ? '#fca5a5' : 'inherit' }}>
                   {formatValue(tooltip.totalNow)}

@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
-import { useTranslateLaneName } from '@/i18n'
+import { useTranslateLaneName, useTranslation } from '@/i18n'
 
 export interface PersonaSidebarSection {
   personaId: string
@@ -84,6 +84,7 @@ export function LaneSidebar({
   const [showHidden, setShowHidden] = useState(false)
   const { sc } = useSizeConfig()
   const translateLaneName = useTranslateLaneName()
+  const { t } = useTranslation()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, SIDEBAR_WIDTH, HEADER_HEIGHT, SIDEBAR_FONT, ICON_SIZE } = sc
 
   // Compress sidebar on narrow viewports so more horizontal space goes to the timeline
@@ -302,7 +303,7 @@ export function LaneSidebar({
         >
           <TrendingUp size={ICON_SIZE} className="shrink-0 text-teal-500" />
           <span className="font-medium truncate flex-1 text-teal-600" style={{ fontSize: SIDEBAR_FONT }}>
-            Total Wealth
+            {t('lanes.totalWealth')}
           </span>
         </div>
       )}

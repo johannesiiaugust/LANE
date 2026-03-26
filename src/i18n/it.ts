@@ -526,6 +526,8 @@ const it: Translations = {
     activities: 'Attività',
     assets: 'Patrimonio',
     items: 'Oggetti',
+    totalWealth: 'Patrimonio totale',
+    total: 'Totale',
   },
 
   guide: {

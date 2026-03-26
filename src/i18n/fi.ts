@@ -530,6 +530,8 @@ const fi: Translations = {
     activities: 'Aktiviteetit',
     assets: 'Varat',
     items: 'Esineet',
+    totalWealth: 'Kokonaisvarallisuus',
+    total: 'Yhteensä',
   },
 
   guide: {

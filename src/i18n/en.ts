@@ -588,6 +588,8 @@ const en = {
     activities: 'Activities',
     assets: 'Assets',
     items: 'Items',
+    totalWealth: 'Total Wealth',
+    total: 'Total',
   },
 
   // ── Guide Overlay ──

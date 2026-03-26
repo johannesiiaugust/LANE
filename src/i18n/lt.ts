@@ -530,6 +530,8 @@ const lt: Translations = {
     activities: 'Veiklos',
     assets: 'Turtas',
     items: 'Daiktai',
+    totalWealth: 'Bendrasis turtas',
+    total: 'Iš viso',
   },
 
   guide: {

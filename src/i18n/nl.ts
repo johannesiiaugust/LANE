@@ -532,6 +532,8 @@ const nl: Translations = {
     activities: 'Activiteiten',
     assets: 'Bezittingen',
     items: 'Voorwerpen',
+    totalWealth: 'Totaal vermogen',
+    total: 'Totaal',
   },
 
   guide: {
