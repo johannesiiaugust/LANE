@@ -1,23 +1,16 @@
-import { useTranslation, SUPPORTED_LANGS, localizedPath, stripLangPrefix, type Lang } from '@/i18n'
+import { useTranslation, localizedPath, stripLangPrefix, type Lang } from '@/i18n'
 
 const LANG_FLAGS: Record<string, { flag: string; name: string }> = {
   en: { flag: '🇬🇧', name: 'English' },
-  sv: { flag: '🇸🇪', name: 'Svenska' },
-  no: { flag: '🇳🇴', name: 'Norsk' },
-  fi: { flag: '🇫🇮', name: 'Suomi' },
-  lv: { flag: '🇱🇻', name: 'Latviešu' },
-  lt: { flag: '🇱🇹', name: 'Lietuvių' },
   de: { flag: '🇩🇪', name: 'Deutsch' },
-  nl: { flag: '🇳🇱', name: 'Nederlands' },
   fr: { flag: '🇫🇷', name: 'Français' },
   es: { flag: '🇪🇸', name: 'Español' },
   it: { flag: '🇮🇹', name: 'Italiano' },
-  da: { flag: '🇩🇰', name: 'Dansk' },
-  pl: { flag: '🇵🇱', name: 'Polski' },
-  cs: { flag: '🇨🇿', name: 'Čeština' },
+  nl: { flag: '🇳🇱', name: 'Nederlands' },
+  sv: { flag: '🇸🇪', name: 'Svenska' },
 }
 
-const ALL_LANG_KEYS = SUPPORTED_LANGS
+const ALL_LANG_KEYS = Object.keys(LANG_FLAGS)
 
 function switchLang(lang: string) {
   const currentPath = stripLangPrefix(window.location.pathname)

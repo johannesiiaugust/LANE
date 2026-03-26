@@ -632,9 +632,28 @@ function AppRouter() {
   )
 }
 
+// Languages shown in the switcher + eligible for auto-detection
+const DISPLAY_LANGS = ['de', 'fr', 'es', 'it', 'nl', 'sv'] as const
+export type DisplayLang = (typeof DISPLAY_LANGS)[number] | 'en'
+
 function App() {
   const lang = useUrlLang()
   const [translations, setTranslations] = useState<Translations>(lang === 'en' ? en : en)
+
+  // Auto-detect language from browser locale on first visit
+  useEffect(() => {
+    if (localStorage.getItem('lang_detected')) return
+    localStorage.setItem('lang_detected', '1')
+    if (lang !== 'en') return // URL already has a lang prefix
+    const browserCode = navigator.language?.split('-')[0].toLowerCase()
+    const detected = DISPLAY_LANGS.find(l => l === browserCode)
+    if (detected) {
+      const currentPath = stripLangPrefix(window.location.pathname)
+      const target = localizedPath(currentPath, detected as Lang)
+      window.history.replaceState(null, '', target)
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (lang === 'en') {
