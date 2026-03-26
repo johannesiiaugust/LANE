@@ -484,6 +484,16 @@ const lv: Translations = {
   },
 
   // ── Demo ──
+  lanes: {
+    place: 'Vieta & Ceļojumi',
+    work: 'Darbs & Izglītība',
+    health: 'Veselība',
+    relations: 'Attiecības & Ģimene',
+    activities: 'Aktivitātes',
+    assets: 'Aktīvi',
+    items: 'Priekšmeti',
+  },
+
   guide: {
     step1Title: 'Salīdzini savu dzīvi ar jebkuru',
     step1Text: 'Slavenība, draugi un citi. Skaties kā tu sāki tajā pašā laikā.',

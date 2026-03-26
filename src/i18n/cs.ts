@@ -454,6 +454,16 @@ const cs: Translations = {
     refresh: 'Obnovit',
   },
 
+  lanes: {
+    place: 'Místo & Cestování',
+    work: 'Práce & Vzdělání',
+    health: 'Zdraví',
+    relations: 'Vztahy & Rodina',
+    activities: 'Aktivity',
+    assets: 'Aktiva',
+    items: 'Předměty',
+  },
+
   guide: {
     step1Title: 'Porovnejte svůj život s kýmkoli',
     step1Text: 'Slavné osobnosti, přátelé a další. Viděte, jako byste začali ve stejnou dobu.',

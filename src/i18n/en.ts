@@ -482,6 +482,17 @@ const en = {
     refresh: 'Refresh',
   },
 
+  // ── Default lane names ──
+  lanes: {
+    place: 'Place & Travel',
+    work: 'Work & Education',
+    health: 'Health',
+    relations: 'Relations & Family',
+    activities: 'Activities',
+    assets: 'Assets',
+    items: 'Items',
+  },
+
   // ── Guide Overlay ──
   guide: {
     step1Title: 'Compare your life with anyone',

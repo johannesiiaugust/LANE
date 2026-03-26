@@ -454,6 +454,16 @@ const pl: Translations = {
     refresh: 'Odśwież',
   },
 
+  lanes: {
+    place: 'Miejsce & Podróże',
+    work: 'Praca & Edukacja',
+    health: 'Zdrowie',
+    relations: 'Relacje & Rodzina',
+    activities: 'Aktywności',
+    assets: 'Aktywa',
+    items: 'Przedmioty',
+  },
+
   guide: {
     step1Title: 'Porównaj swoje życie z kimkolwiek',
     step1Text: 'Sławne osoby, przyjaciół i inni. Zobacz, jakbyś zaczął w tym samym czasie.',

@@ -11,5 +11,7 @@ export {
   navigateLocalized,
   loadTranslation,
   SUPPORTED_LANGS,
+  DEFAULT_LANE_NAME_TO_ID,
+  useTranslateLaneName,
   type Lang,
 } from './context'

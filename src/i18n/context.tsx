@@ -147,6 +147,27 @@ export function useLanguage(): Lang {
   return useContext(LanguageContext).lang
 }
 
+// ── Default lane name translation ────────────────────────────────────────────
+/** Maps English default lane names → lane id keys used in translations */
+export const DEFAULT_LANE_NAME_TO_ID: Record<string, string> = {
+  'Place & Travel': 'place',
+  'Work & Education': 'work',
+  'Health': 'health',
+  'Relations & Family': 'relations',
+  'Activities': 'activities',
+  'Assets': 'assets',
+  'Items': 'items',
+}
+
+/** Returns a function that translates a lane name if it matches a default lane, otherwise returns it unchanged */
+export function useTranslateLaneName(): (name: string) => string {
+  const { t } = useTranslation()
+  return (name: string) => {
+    const id = DEFAULT_LANE_NAME_TO_ID[name]
+    return id ? t(`lanes.${id}`) : name
+  }
+}
+
 // ── Hook to detect lang from URL reactively ──────────────────────────────────
 export function useUrlLang(): Lang {
   return useSyncExternalStore(

@@ -482,6 +482,16 @@ const no: Translations = {
   },
 
   // ── Demo ──
+  lanes: {
+    place: 'Sted & Reiser',
+    work: 'Arbeid & Utdanning',
+    health: 'Helse',
+    relations: 'Relasjoner & Familie',
+    activities: 'Aktiviteter',
+    assets: 'Eiendeler',
+    items: 'Gjenstander',
+  },
+
   guide: {
     step1Title: 'Sammenlign livet ditt med hvem som helst',
     step1Text: 'Berømte personer, venner og andre. Se som om du startet på samme tid.',

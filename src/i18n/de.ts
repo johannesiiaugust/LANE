@@ -484,6 +484,16 @@ const de: Translations = {
   },
 
   // ── Demo ──
+  lanes: {
+    place: 'Ort & Reisen',
+    work: 'Arbeit & Bildung',
+    health: 'Gesundheit',
+    relations: 'Beziehungen & Familie',
+    activities: 'Aktivitäten',
+    assets: 'Vermögen',
+    items: 'Gegenstände',
+  },
+
   guide: {
     step1Title: 'Vergleiche dein Leben mit jedem',
     step1Text: 'Berühmte Personen, Freunde und andere. Sieh, als hättest du zur gleichen Zeit begonnen.',
