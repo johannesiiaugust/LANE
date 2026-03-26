@@ -383,7 +383,7 @@ export function TimelineEventBar({
           )}
           {/* Label — offset by OVERLAP so it stays in the visible solid region */}
           {mainBarWidth > EVENT_FONT * 2 && (
-            <span className="absolute text-white font-medium whitespace-nowrap drop-shadow-[0_0_2px_rgba(0,0,0,0.6)]" style={{ left: textLeft, fontSize: EVENT_FONT, lineHeight: `${EVENT_LINE_HEIGHT}px` }}>
+            <span className="absolute text-white font-bold whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]" style={{ left: textLeft, fontSize: EVENT_FONT, lineHeight: `${EVENT_LINE_HEIGHT}px` }}>
               {label}
             </span>
           )}
