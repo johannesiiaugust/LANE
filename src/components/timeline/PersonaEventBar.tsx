@@ -191,7 +191,7 @@ export function PersonaEventBar({
         <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 55%)' }} />
         {width > EVENT_FONT * 5 && (
           <span
-            className="absolute px-1 text-white/80 font-medium truncate drop-shadow-[0_0_2px_rgba(0,0,0,0.5)]"
+            className="absolute px-1 text-white font-bold truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]"
             style={{ fontSize: Math.round(EVENT_FONT * 0.9), lineHeight: `${EVENT_LINE_HEIGHT}px` }}
           >
             {event.title}
