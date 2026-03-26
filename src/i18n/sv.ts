@@ -484,6 +484,25 @@ const sv: Translations = {
   },
 
   // ── Demo ──
+  guide: {
+    step1Title: 'Jämför ditt liv med vem som helst',
+    step1Text: 'Kända personer, vänner och andra. Se som om du börjat samtidigt.',
+    step2Title: 'Navigera i tid',
+    step2Text: 'Zooma in och ut i tid — gländ mot din framtid och dåtid. Se hur din förmögenhet utvecklas med alternativa tidslinjepätgar.',
+    step3Title: 'Hantera tidslinjer',
+    step3Text: 'Skapa och ändra tidslinjer för familj, vänner och andra. Importera från CV’n, sociala nätverk, kalendrar och andra källor — klistra in valfri text med vår AI, eller med rösten.',
+    step4Title: 'Lägg till livshändelser & planera med AI',
+    step4Text: 'Lägg till händelser i alla livets LANE-områden — arbete, var du bott, hälsa med mera. Beskriv en framtid du vill ha och vår AI ger dig konkreta sätt att nå den.',
+    startYourOwnStory: 'Börja din egen historia',
+    addFewEvents: 'Lägg till några händelser så bygger vi din personliga tidslinje.',
+    birthDate: 'Födelsedatum',
+    yourLifeEvents: 'Dina livshändelser',
+    placeholderPlace: 't.ex. Stockholm',
+    placeholderWork: 't.ex. Mjukvaruingeniör på Google',
+    addAnotherEvent: 'Lägg till ytterligare händelse',
+    continueWithExample: 'Fortsätt med exempel →',
+    next: 'Nästa',
+  },
   demo: {
     comparingYouVs: 'Jämförelse \u2014 Du mot Albert Einstein',
     yourTimeline: 'DIN TIDSLINJE',

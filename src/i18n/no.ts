@@ -482,6 +482,25 @@ const no: Translations = {
   },
 
   // ── Demo ──
+  guide: {
+    step1Title: 'Sammenlign livet ditt med hvem som helst',
+    step1Text: 'Berømte personer, venner og andre. Se som om du startet på samme tid.',
+    step2Title: 'Naviger i tid',
+    step2Text: 'Zoom inn og ut i tid — gli mot din fremtid og fortid. Se hvordan formuen din utvikler seg med alternative tidslinjeveier.',
+    step3Title: 'Administrer tidslinjer',
+    step3Text: 'Opprett og endre tidslinjer for familie, venner og andre. Importer fra CV-er, sosiale nettverk, kalendere og andre kilder — bare lim inn tekst med vår AI, eller med stemmen.',
+    step4Title: 'Legg til livshendelser & planlegg med AI',
+    step4Text: 'Legg til hendelser på tvers av alle livets LANE-områder — arbeid, hvor du har bodd, helse og mer. Beskriv en fremtid du ønsker og vår AI gir deg konkrete måter å nå den.',
+    startYourOwnStory: 'Start din egen historie',
+    addFewEvents: 'Legg til noen hendelser så bygger vi din personlige tidslinje.',
+    birthDate: 'Fødselsdato',
+    yourLifeEvents: 'Dine livshendelser',
+    placeholderPlace: 'f.eks. Oslo',
+    placeholderWork: 'f.eks. Programvareutvikler hos Google',
+    addAnotherEvent: 'Legg til en hendelse til',
+    continueWithExample: 'Fortsett med eksempel →',
+    next: 'Neste',
+  },
   demo: {
     comparingYouVs: 'Sammenligner \u2014 Deg vs. Albert Einstein',
     yourTimeline: 'DIN TIDSLINJE',

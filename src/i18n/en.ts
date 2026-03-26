@@ -482,6 +482,27 @@ const en = {
     refresh: 'Refresh',
   },
 
+  // ── Guide Overlay ──
+  guide: {
+    step1Title: 'Compare your life with anyone',
+    step1Text: 'Famous people, friends and others. See as if you started at the same time.',
+    step2Title: 'Navigate time',
+    step2Text: 'Zoom in and out in time \u2014 slide to your future and past. See your wealth develop with alternative timeline paths.',
+    step3Title: 'Manage timelines',
+    step3Text: 'Create and modify timelines for family, friends and others. Import from CVs, social networks, calendars and other sources \u2014 simply copy-paste any text with our AI, or by voice.',
+    step4Title: 'Add life events & plan with AI',
+    step4Text: 'Add events across all LANEs of life \u2014 work, where you lived, health, and more. Describe a future you want and our AI gives you concrete ways to reach it.',
+    startYourOwnStory: 'Start with your own story',
+    addFewEvents: "Add a few events and we'll build your personal timeline.",
+    birthDate: 'Birth date',
+    yourLifeEvents: 'Your life events',
+    placeholderPlace: 'e.g. New York',
+    placeholderWork: 'e.g. Software Engineer at Google',
+    addAnotherEvent: 'Add another event',
+    continueWithExample: 'Continue with example \u2192',
+    next: 'Next',
+  },
+
   // ── Demo ──
   demo: {
     comparingYouVs: 'Comparing \u2014 You vs. Albert Einstein',
