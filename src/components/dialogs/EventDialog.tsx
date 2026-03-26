@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { useTranslation } from '@/i18n'
+import { useTranslation, useTranslateLaneName } from '@/i18n'
 import { Plus, X, Link2, ChevronDown, ChevronUp, Star, Upload, ImageIcon } from 'lucide-react'
 import { uploadEventImage } from '@/lib/imageUpload'
 import type {
@@ -79,6 +79,7 @@ export function EventDialog({
   userId,
 }: EventDialogProps) {
   const { t } = useTranslation()
+  const translateLaneName = useTranslateLaneName()
   const [laneId, setLaneId] = useState('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -492,7 +493,7 @@ export function EventDialog({
             <Select value={laneId} onValueChange={setLaneId}>
               <SelectTrigger id="lane"><SelectValue placeholder={t('event.selectLane')} /></SelectTrigger>
               <SelectContent>
-                {lanes.map(l => <SelectItem key={l.id} value={l.id}>{l.emoji ? `${l.emoji} ${l.name}` : l.name}</SelectItem>)}
+                {lanes.map(l => <SelectItem key={l.id} value={l.id}>{l.emoji ? `${l.emoji} ${translateLaneName(l.name)}` : translateLaneName(l.name)}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
@@ -571,29 +572,27 @@ export function EventDialog({
                 {/* Start / end times */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="grid gap-1.5">
-                    <Label className="text-xs text-muted-foreground">Start Time</Label>
+                    <Label className="text-xs text-muted-foreground">{t('event.startTime')}</Label>
                     <Input id="starttime" type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="h-8 text-xs" />
                   </div>
                   {endDate.trim() ? (
                     <div className="grid gap-1.5">
-                      <Label className="text-xs text-muted-foreground">End Time</Label>
+                      <Label className="text-xs text-muted-foreground">{t('event.endTime')}</Label>
                       <Input id="endtime" type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="h-8 text-xs" />
                     </div>
                   ) : (
                     <div className="grid gap-1.5">
-                      <Label className="text-xs text-muted-foreground">Value (point)</Label>
+                      <Label className="text-xs text-muted-foreground">{t('event.valuePoint')}</Label>
                       <Input id="pointval" type="number" value={startValue} placeholder="e.g. 50000" onChange={e => setStartValue(e.target.value)} className="h-8 text-xs" />
                     </div>
                   )}
                 </div>
 
                 {/* Fade in/out */}
-                <p className="text-[11px] text-muted-foreground leading-snug">
-                  Set a <strong>fade-in</strong> date before the real start, or a <strong>fade-out</strong> date after the real end.
-                </p>
+                <p className="text-[11px] text-muted-foreground leading-snug" dangerouslySetInnerHTML={{ __html: t('event.fadeInDesc') }} />
                 <div className="grid grid-cols-2 gap-3">
                   <div className="grid gap-1.5">
-                    <Label className="text-xs text-muted-foreground">Fade-in start date</Label>
+                    <Label className="text-xs text-muted-foreground">{t('event.fadeInStartDate')}</Label>
                     <Input
                       type="text" value={fadeInDate} placeholder="DD/MM/YYYY"
                       onChange={e => setFadeInDate(formatDMYInput(e.target.value))}
@@ -601,13 +600,13 @@ export function EventDialog({
                     />
                   </div>
                   <div className="grid gap-1.5">
-                    <Label className="text-xs text-muted-foreground">Fade-in start time</Label>
+                    <Label className="text-xs text-muted-foreground">{t('event.fadeInTime')}</Label>
                     <Input type="time" value={fadeInTime} onChange={e => setFadeInTime(e.target.value)} className="h-8 text-xs" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="grid gap-1.5">
-                    <Label className="text-xs text-muted-foreground">Fade-out end date</Label>
+                    <Label className="text-xs text-muted-foreground">{t('event.fadeOutEndDate')}</Label>
                     <Input
                       type="text" value={fadeOutDate} placeholder="DD/MM/YYYY"
                       onChange={e => setFadeOutDate(formatDMYInput(e.target.value))}
@@ -615,7 +614,7 @@ export function EventDialog({
                     />
                   </div>
                   <div className="grid gap-1.5">
-                    <Label className="text-xs text-muted-foreground">Fade-out end time</Label>
+                    <Label className="text-xs text-muted-foreground">{t('event.fadeOutTime')}</Label>
                     <Input type="time" value={fadeOutTime} onChange={e => setFadeOutTime(e.target.value)} className="h-8 text-xs" />
                   </div>
                 </div>
@@ -625,7 +624,7 @@ export function EventDialog({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Link2 className="h-4 w-4 text-muted-foreground" />
-                      <Label className="text-sm font-medium">Dependency</Label>
+                      <Label className="text-sm font-medium">{t('event.dependency')}</Label>
                     </div>
                     <Switch checked={linkEnabled} onCheckedChange={setLinkEnabled} />
                   </div>
@@ -633,23 +632,23 @@ export function EventDialog({
                   {linkEnabled && (
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <Label className="text-xs text-muted-foreground shrink-0 w-20">Anchor to</Label>
+                        <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.anchorTo')}</Label>
                         <select
                           value={linkAnchorType}
                           onChange={e => setLinkAnchorType(e.target.value as 'today' | 'event' | 'start_to_today' | 'today_to_end')}
                           className="h-7 text-xs border rounded-md px-1 bg-background flex-1"
                         >
-                          <option value="today">Today's date</option>
-                          <option value="event">Another event</option>
-                          <option value="start_to_today">Fixed start → today (ongoing)</option>
-                          <option value="today_to_end">Today → fixed end date</option>
+                          <option value="today">{t('event.anchorTodayFull')}</option>
+                          <option value="event">{t('event.anchorEventFull')}</option>
+                          <option value="start_to_today">{t('event.startToToday')}</option>
+                          <option value="today_to_end">{t('event.todayToEnd')}</option>
                         </select>
                       </div>
 
                       {(linkAnchorType === 'start_to_today' || linkAnchorType === 'today_to_end') && (
                         <div className="flex items-center gap-2">
                           <Label className="text-xs text-muted-foreground shrink-0 w-20">
-                            {linkAnchorType === 'start_to_today' ? 'Start date' : 'End date'}
+                            {linkAnchorType === 'start_to_today' ? t('event.startDate') : t('event.endDate')}
                           </Label>
                           <Input
                             type="text" value={linkFixedDate} placeholder="DD/MM/YYYY"
@@ -667,34 +666,34 @@ export function EventDialog({
                       {linkAnchorType === 'event' && (
                         <>
                           <div className="flex items-center gap-2">
-                            <Label className="text-xs text-muted-foreground shrink-0 w-20">Event</Label>
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.anchorEventFull')}</Label>
                             <select
                               value={linkEventId}
                               onChange={e => setLinkEventId(e.target.value)}
                               className="h-7 text-xs border rounded-md px-1 bg-background flex-1 min-w-0"
                             >
-                              <option value="">— select event —</option>
+                              <option value="">— {t('event.selectLane')} —</option>
                               {events
                                 .filter(e => e.id !== editingEvent?.id)
                                 .map(e => {
                                   const lane = lanes.find(l => l.id === e.laneId)
                                   return (
                                     <option key={e.id} value={e.id}>
-                                      {lane ? `[${lane.name}] ` : ''}{e.emoji ? `${e.emoji} ` : ''}{e.title}
+                                      {lane ? `[${translateLaneName(lane.name)}] ` : ''}{e.emoji ? `${e.emoji} ` : ''}{e.title}
                                     </option>
                                   )
                                 })}
                             </select>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Label className="text-xs text-muted-foreground shrink-0 w-20">Anchor at</Label>
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.anchorAt')}</Label>
                             <select
                               value={linkEventAnchor}
                               onChange={e => setLinkEventAnchor(e.target.value as 'start' | 'end')}
                               className="h-7 text-xs border rounded-md px-1 bg-background"
                             >
-                              <option value="start">Start of event</option>
-                              <option value="end">End of event</option>
+                              <option value="start">{t('event.startOfEvent')}</option>
+                              <option value="end">{t('event.endOfEvent')}</option>
                             </select>
                           </div>
                         </>
@@ -703,54 +702,54 @@ export function EventDialog({
                       {linkAnchorType !== 'start_to_today' && linkAnchorType !== 'today_to_end' && (
                         <>
                           <div className="flex items-center gap-2">
-                            <Label className="text-xs text-muted-foreground shrink-0 w-20">Start offset</Label>
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.startOffsetLabel')}</Label>
                             <Input
                               type="number" step="0.01" value={linkStartOffsetStr}
                               onChange={e => setLinkStartOffsetStr(e.target.value)}
                               className="w-24 h-7 text-xs" placeholder="0"
                             />
-                            <span className="text-xs text-muted-foreground">years (− before, + after)</span>
+                            <span className="text-xs text-muted-foreground">{t('event.startOffsetHint')}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Label className="text-xs text-muted-foreground shrink-0 w-20">Duration</Label>
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.durationLabel')}</Label>
                             <Input
                               type="number" step="0.01" min="0" value={linkDurationStr}
                               onChange={e => setLinkDurationStr(e.target.value)}
-                              className="w-24 h-7 text-xs" placeholder="optional"
+                              className="w-24 h-7 text-xs" placeholder={t('common.optional')}
                             />
-                            <span className="text-xs text-muted-foreground">years (sets end date)</span>
+                            <span className="text-xs text-muted-foreground">{t('event.durationHint')}</span>
                           </div>
                         </>
                       )}
 
                       {computedLink ? (
                         <div className="rounded bg-muted/50 px-2 py-1.5 text-xs text-muted-foreground space-y-0.5">
-                          <div>Start → <span className="text-foreground font-medium">{fracYearToDMY(computedLink.startYear)}</span></div>
+                          <div>{t('event.previewStart')} <span className="text-foreground font-medium">{fracYearToDMY(computedLink.startYear)}</span></div>
                           {computedLink.endYear != null && (
-                            <div>End → <span className="text-foreground font-medium">{fracYearToDMY(computedLink.endYear)}</span></div>
+                            <div>{t('event.previewEnd')} <span className="text-foreground font-medium">{fracYearToDMY(computedLink.endYear)}</span></div>
                           )}
                         </div>
                       ) : linkAnchorType === 'event' && !linkEventId ? (
-                        <p className="text-xs text-muted-foreground italic">Select an event to preview computed dates.</p>
+                        <p className="text-xs text-muted-foreground italic">{t('event.selectEventHint')}</p>
                       ) : null}
 
                       {linkAnchorType === 'event' && (
                         <div className="space-y-1 pt-1 border-t">
-                          <Label className="text-xs text-muted-foreground">If linked event is deleted</Label>
+                          <Label className="text-xs text-muted-foreground">{t('event.ifLinkedDeleted')}</Label>
                           <div className="flex gap-2">
                             <button
                               type="button"
                               onClick={() => setLinkOnDelete('freeze')}
                               className={`flex-1 h-7 rounded-md border text-xs transition-colors ${linkOnDelete === 'freeze' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-muted/50'}`}
                             >
-                              Freeze dates
+                              {t('event.freezeDates')}
                             </button>
                             <button
                               type="button"
                               onClick={() => setLinkOnDelete('delete')}
                               className={`flex-1 h-7 rounded-md border text-xs transition-colors ${linkOnDelete === 'delete' ? 'bg-destructive text-destructive-foreground border-destructive' : 'bg-background hover:bg-muted/50'}`}
                             >
-                              Delete this event too
+                              {t('event.deleteEventToo')}
                             </button>
                           </div>
                         </div>
@@ -771,7 +770,7 @@ export function EventDialog({
               className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium hover:bg-muted/40 transition-colors rounded-md"
             >
               <span className="flex items-center gap-2">
-                More details
+                {t('event.moreDetails')}
                 {(url || location || rating > 0 || imageUrl || tags || source) && (
                   <span className="h-1.5 w-1.5 rounded-full bg-primary" title="Has values" />
                 )}
@@ -782,22 +781,22 @@ export function EventDialog({
               <div className="px-3 pb-3 space-y-3 border-t pt-3">
                 {/* Description */}
                 <div className="grid gap-1.5">
-                  <Label htmlFor="desc" className="text-xs">Description</Label>
-                  <Input id="desc" value={description} onChange={e => setDescription(e.target.value)} placeholder="Optional description" className="h-8 text-xs" />
+                  <Label htmlFor="desc" className="text-xs">{t('common.description')}</Label>
+                  <Input id="desc" value={description} onChange={e => setDescription(e.target.value)} placeholder={t('event.optionalDesc')} className="h-8 text-xs" />
                 </div>
                 {/* URL */}
                 <div className="grid gap-1.5">
-                  <Label htmlFor="ev-url" className="text-xs">URL <span className="text-muted-foreground font-normal">(link to article, post, activity…)</span></Label>
+                  <Label htmlFor="ev-url" className="text-xs">{t('event.url')} <span className="text-muted-foreground font-normal">({t('event.urlHint')})</span></Label>
                   <Input id="ev-url" type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="https://…" className="h-8 text-xs" />
                 </div>
                 {/* Location */}
                 <div className="grid gap-1.5">
-                  <Label htmlFor="ev-location" className="text-xs">Location</Label>
-                  <Input id="ev-location" value={location} onChange={e => setLocation(e.target.value)} placeholder="City, venue, address…" className="h-8 text-xs" />
+                  <Label htmlFor="ev-location" className="text-xs">{t('event.location')}</Label>
+                  <Input id="ev-location" value={location} onChange={e => setLocation(e.target.value)} placeholder={t('event.locationPlaceholder')} className="h-8 text-xs" />
                 </div>
                 {/* Rating */}
                 <div className="grid gap-1.5">
-                  <Label className="text-xs">Rating</Label>
+                  <Label className="text-xs">{t('event.rating')}</Label>
                   <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map(n => (
                       <button
@@ -811,13 +810,13 @@ export function EventDialog({
                       </button>
                     ))}
                     {rating > 0 && (
-                      <button type="button" onClick={() => setRating(0)} className="ml-1 text-[10px] text-muted-foreground hover:text-foreground">clear</button>
+                      <button type="button" onClick={() => setRating(0)} className="ml-1 text-[10px] text-muted-foreground hover:text-foreground">{t('event.clear')}</button>
                     )}
                   </div>
                 </div>
                 {/* Image upload */}
                 <div className="grid gap-1.5">
-                  <Label className="text-xs">Image <span className="text-muted-foreground font-normal">(photo, poster, map…)</span></Label>
+                  <Label className="text-xs">{t('event.image')} <span className="text-muted-foreground font-normal">({t('event.imageHint')})</span></Label>
                   {imageUrl ? (
                     <div className="relative rounded-md overflow-hidden">
                       <img
@@ -830,7 +829,7 @@ export function EventDialog({
                         type="button"
                         onClick={() => setImageUrl('')}
                         className="absolute top-1 right-1 bg-black/60 hover:bg-black/80 rounded-full p-0.5 transition-colors"
-                        title="Remove image"
+                        title={t('event.removeImage')}
                       >
                         <X className="h-3 w-3 text-white" />
                       </button>
@@ -849,15 +848,15 @@ export function EventDialog({
                       onClick={() => fileInputRef.current?.click()}
                     >
                       {imageUploading ? (
-                        <p className="text-xs text-muted-foreground">Uploading…</p>
+                        <p className="text-xs text-muted-foreground">{t('event.uploading')}</p>
                       ) : (
                         <div className="flex flex-col items-center gap-1.5 pointer-events-none">
                           <div className="flex gap-2 text-muted-foreground">
                             <Upload className="h-4 w-4" />
                             <ImageIcon className="h-4 w-4" />
                           </div>
-                          <p className="text-xs text-muted-foreground">Drag & drop or click to upload</p>
-                          <p className="text-[10px] text-muted-foreground/60">Large images are compressed automatically</p>
+                          <p className="text-xs text-muted-foreground">{t('event.dragDrop')}</p>
+                          <p className="text-[10px] text-muted-foreground/60">{t('event.imageCompressHint')}</p>
                         </div>
                       )}
                     </div>
@@ -877,14 +876,14 @@ export function EventDialog({
                     type="url"
                     value={imageUrl}
                     onChange={e => setImageUrl(e.target.value)}
-                    placeholder="Or paste image URL…"
+                    placeholder={t('event.pasteImageUrl')}
                     className="h-8 text-xs"
                   />
                 </div>
                 {/* Tags */}
                 <div className="grid gap-1.5">
-                  <Label htmlFor="ev-tags" className="text-xs">Tags <span className="text-muted-foreground font-normal">(comma-separated)</span></Label>
-                  <Input id="ev-tags" value={tags} onChange={e => setTags(e.target.value)} placeholder="travel, work, family…" className="h-8 text-xs" />
+                  <Label htmlFor="ev-tags" className="text-xs">{t('event.tags')} <span className="text-muted-foreground font-normal">({t('event.commaSeparated')})</span></Label>
+                  <Input id="ev-tags" value={tags} onChange={e => setTags(e.target.value)} placeholder={t('event.tagsPlaceholder')} className="h-8 text-xs" />
                   {tags && (
                     <div className="flex flex-wrap gap-1 mt-0.5">
                       {tags.split(',').map(t => t.trim()).filter(Boolean).map(tag => (
@@ -895,7 +894,7 @@ export function EventDialog({
                 </div>
                 {/* Source */}
                 <div className="grid gap-1.5">
-                  <Label htmlFor="ev-source" className="text-xs">Source <span className="text-muted-foreground font-normal">(import provenance)</span></Label>
+                  <Label htmlFor="ev-source" className="text-xs">{t('event.source')} <span className="text-muted-foreground font-normal">({t('event.sourceHint')})</span></Label>
                   <Input id="ev-source" value={source} onChange={e => setSource(e.target.value)} placeholder="strava, outlook, netflix, manual…" className="h-8 text-xs" />
                 </div>
               </div>
@@ -906,7 +905,7 @@ export function EventDialog({
           {endDate.trim() && (
             <div className="rounded-md border p-3 space-y-3">
               <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">Value tracking</Label>
+                <Label className="text-sm font-medium">{t('event.valueTracking')}</Label>
                 <Switch checked={valueEnabled} onCheckedChange={setValueEnabled} />
               </div>
 
@@ -914,13 +913,13 @@ export function EventDialog({
                 <>
                   {/* Starting value */}
                   <div className="flex items-center gap-2">
-                    <Label className="text-xs shrink-0 text-muted-foreground">Starting value</Label>
+                    <Label className="text-xs shrink-0 text-muted-foreground">{t('event.startValue')}</Label>
                     <Input
                       type="number" value={startValue} placeholder="0"
                       onChange={e => setStartValue(e.target.value)}
                       className="w-36 h-7 text-xs"
                     />
-                    <span className="text-[10px] text-muted-foreground shrink-0">grows</span>
+                    <span className="text-[10px] text-muted-foreground shrink-0">{t('event.grows')}</span>
                     <Input
                       type="number" step="0.1" value={startValueGrowthStr} placeholder="0"
                       onChange={e => setStartValueGrowthStr(e.target.value)}
@@ -931,7 +930,7 @@ export function EventDialog({
 
                   {/* Spot changes */}
                   <div className="space-y-1.5 pt-1 border-t">
-                    <Label className="text-xs text-muted-foreground">Spot changes (one-time, within event range)</Label>
+                    <Label className="text-xs text-muted-foreground">{t('event.spotChangesLabel')}</Label>
                     {spotChanges.map((sc, i) => (
                       <div key={sc.id} className="flex gap-1.5 items-center">
                         <Input
@@ -941,16 +940,16 @@ export function EventDialog({
                           title={isOutOfEventRange(sc.dateStr) ? 'Date is outside the event range' : undefined}
                         />
                         <Input
-                          type="number" value={sc.amountStr} placeholder="Amount (+/-)"
+                          type="number" value={sc.amountStr} placeholder={t('event.amount')}
                           onChange={e => updateSpotChange(i, 'amountStr', e.target.value)}
                           className="flex-1 h-7 text-xs"
                         />
                         <Input
-                          value={sc.label} placeholder="Label (opt)"
+                          value={sc.label} placeholder={t('event.labelOpt')}
                           onChange={e => updateSpotChange(i, 'label', e.target.value)}
                           className="flex-1 h-7 text-xs"
                         />
-                        <span className="text-[10px] text-muted-foreground shrink-0">grows</span>
+                        <span className="text-[10px] text-muted-foreground shrink-0">{t('event.grows')}</span>
                         <Input
                           type="number" step="0.1" value={sc.growthStr} placeholder="0"
                           onChange={e => updateSpotChange(i, 'growthStr', e.target.value)}
@@ -963,24 +962,24 @@ export function EventDialog({
                       </div>
                     ))}
                     <Button type="button" variant="outline" size="sm" onClick={addSpotChange} className="h-7 text-xs">
-                      <Plus className="h-3 w-3 mr-1" /> Add spot change
+                      <Plus className="h-3 w-3 mr-1" /> {t('event.addSpotChange')}
                     </Button>
                   </div>
 
                   {/* Recurring changes */}
                   <div className="space-y-1.5 pt-1 border-t">
-                    <Label className="text-xs text-muted-foreground">Recurring changes (within event range)</Label>
+                    <Label className="text-xs text-muted-foreground">{t('event.recurringLabel')}</Label>
                     {deposits.map((dep, i) => (
                       <div key={dep.id} className="rounded border p-2 space-y-1.5">
                         {/* Row 1: label · amount · frequency · X */}
                         <div className="flex gap-1 items-center">
                           <Input
-                            value={dep.label} placeholder="Label (opt)"
+                            value={dep.label} placeholder={t('event.labelOpt')}
                             onChange={e => updateDeposit(i, 'label', e.target.value)}
                             className="flex-1 h-7 text-xs"
                           />
                           <Input
-                            type="number" value={dep.amount} placeholder="Amount (+/-)"
+                            type="number" value={dep.amount} placeholder={t('event.amount')}
                             onChange={e => updateDeposit(i, 'amount', e.target.value)}
                             className="w-24 h-7 text-xs"
                           />
@@ -989,12 +988,12 @@ export function EventDialog({
                             onChange={e => updateDeposit(i, 'frequency', e.target.value)}
                             className="h-7 text-xs border rounded-md px-1 bg-background"
                           >
-                            <option value="daily">Daily</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly">Monthly</option>
-                            <option value="quarterly">Quarterly</option>
-                            <option value="yearly">Yearly</option>
-                            <option value="custom">Each X…</option>
+                            <option value="daily">{t('event.daily')}</option>
+                            <option value="weekly">{t('event.weekly')}</option>
+                            <option value="monthly">{t('event.monthly')}</option>
+                            <option value="quarterly">{t('event.quarterly')}</option>
+                            <option value="yearly">{t('event.yearly')}</option>
+                            <option value="custom">{t('event.eachX')}</option>
                           </select>
                           {dep.frequency === 'custom' && (
                             <>
@@ -1008,11 +1007,11 @@ export function EventDialog({
                                 onChange={e => updateDeposit(i, 'customUnit', e.target.value)}
                                 className="h-7 text-xs border rounded-md px-1 bg-background"
                               >
-                                <option value="day">day(s)</option>
-                                <option value="week">week(s)</option>
-                                <option value="month">month(s)</option>
-                                <option value="quarter">quarter(s)</option>
-                                <option value="year">year(s)</option>
+                                <option value="day">{t('event.dayUnit')}</option>
+                                <option value="week">{t('event.weekUnit')}</option>
+                                <option value="month">{t('event.monthUnit')}</option>
+                                <option value="quarter">{t('event.quarterUnit')}</option>
+                                <option value="year">{t('event.yearUnit')}</option>
                               </select>
                             </>
                           )}
@@ -1028,7 +1027,7 @@ export function EventDialog({
                               onChange={e => updateDeposit(i, 'wholeEvent', e.target.checked)}
                               className="h-3 w-3"
                             />
-                            Whole event
+                            {t('event.wholeEvent')}
                           </label>
                           <Input
                             type="text"
@@ -1051,14 +1050,14 @@ export function EventDialog({
                         </div>
                         {/* Row 3: increase %/yr · grows %/yr */}
                         <div className="flex gap-1 items-center">
-                          <span className="text-[10px] text-muted-foreground shrink-0">increase</span>
+                          <span className="text-[10px] text-muted-foreground shrink-0">{t('event.increase')}</span>
                           <Input
                             type="number" step="0.1" value={dep.annualGrowthStr} placeholder="0"
                             onChange={e => updateDeposit(i, 'annualGrowthStr', e.target.value)}
                             className="w-16 h-7 text-xs"
                             title="Deposit amount increases by this % each year (e.g. salary raise)"
                           />
-                          <span className="text-[10px] text-muted-foreground shrink-0">%/yr · grows</span>
+                          <span className="text-[10px] text-muted-foreground shrink-0">{t('event.perYrGrows')}</span>
                           <Input
                             type="number" step="0.1" value={dep.balanceGrowthStr} placeholder="0"
                             onChange={e => updateDeposit(i, 'balanceGrowthStr', e.target.value)}
@@ -1070,7 +1069,7 @@ export function EventDialog({
                       </div>
                     ))}
                     <Button type="button" variant="outline" size="sm" onClick={addDeposit} className="h-7 text-xs">
-                      <Plus className="h-3 w-3 mr-1" /> Add recurring change
+                      <Plus className="h-3 w-3 mr-1" /> {t('event.addDeposit')}
                     </Button>
                   </div>
                 </>
@@ -1083,7 +1082,7 @@ export function EventDialog({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Link2 className="h-4 w-4 text-muted-foreground" />
-                <Label className="text-sm font-medium">Dependency</Label>
+                <Label className="text-sm font-medium">{t('event.dependency')}</Label>
               </div>
               <Switch checked={linkEnabled} onCheckedChange={setLinkEnabled} />
             </div>
@@ -1092,16 +1091,16 @@ export function EventDialog({
               <div className="space-y-3">
                 {/* Anchor type */}
                 <div className="flex items-center gap-2">
-                  <Label className="text-xs text-muted-foreground shrink-0 w-20">Anchor to</Label>
+                  <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.anchorTo')}</Label>
                   <select
                     value={linkAnchorType}
                     onChange={e => setLinkAnchorType(e.target.value as 'today' | 'event' | 'start_to_today' | 'today_to_end')}
                     className="h-7 text-xs border rounded-md px-1 bg-background flex-1"
                   >
-                    <option value="today">Today's date</option>
-                    <option value="event">Another event</option>
-                    <option value="start_to_today">Fixed start → today (ongoing)</option>
-                    <option value="today_to_end">Today → fixed end date</option>
+                    <option value="today">{t('event.anchorTodayFull')}</option>
+                    <option value="event">{t('event.anchorEventFull')}</option>
+                    <option value="start_to_today">{t('event.startToToday')}</option>
+                    <option value="today_to_end">{t('event.todayToEnd')}</option>
                   </select>
                 </div>
 
@@ -1109,7 +1108,7 @@ export function EventDialog({
                 {(linkAnchorType === 'start_to_today' || linkAnchorType === 'today_to_end') && (
                   <div className="flex items-center gap-2">
                     <Label className="text-xs text-muted-foreground shrink-0 w-20">
-                      {linkAnchorType === 'start_to_today' ? 'Start date' : 'End date'}
+                      {linkAnchorType === 'start_to_today' ? t('event.startDate') : t('event.endDate')}
                     </Label>
                     <Input
                       type="text"
@@ -1131,34 +1130,34 @@ export function EventDialog({
                 {linkAnchorType === 'event' && (
                   <>
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs text-muted-foreground shrink-0 w-20">Event</Label>
+                      <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.anchorEventFull')}</Label>
                       <select
                         value={linkEventId}
                         onChange={e => setLinkEventId(e.target.value)}
                         className="h-7 text-xs border rounded-md px-1 bg-background flex-1 min-w-0"
                       >
-                        <option value="">— select event —</option>
+                        <option value="">— {t('event.selectLane')} —</option>
                         {events
                           .filter(e => e.id !== editingEvent?.id)
                           .map(e => {
                             const lane = lanes.find(l => l.id === e.laneId)
                             return (
                               <option key={e.id} value={e.id}>
-                                {lane ? `[${lane.name}] ` : ''}{e.emoji ? `${e.emoji} ` : ''}{e.title}
+                                {lane ? `[${translateLaneName(lane.name)}] ` : ''}{e.emoji ? `${e.emoji} ` : ''}{e.title}
                               </option>
                             )
                           })}
                       </select>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs text-muted-foreground shrink-0 w-20">Anchor at</Label>
+                      <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.anchorAt')}</Label>
                       <select
                         value={linkEventAnchor}
                         onChange={e => setLinkEventAnchor(e.target.value as 'start' | 'end')}
                         className="h-7 text-xs border rounded-md px-1 bg-background"
                       >
-                        <option value="start">Start of event</option>
-                        <option value="end">End of event</option>
+                        <option value="start">{t('event.startOfEvent')}</option>
+                        <option value="end">{t('event.endOfEvent')}</option>
                       </select>
                     </div>
                   </>
@@ -1168,25 +1167,25 @@ export function EventDialog({
                 {linkAnchorType !== 'start_to_today' && linkAnchorType !== 'today_to_end' && (
                   <>
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs text-muted-foreground shrink-0 w-20">Start offset</Label>
+                      <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.startOffsetLabel')}</Label>
                       <Input
                         type="number" step="0.01" value={linkStartOffsetStr}
                         onChange={e => setLinkStartOffsetStr(e.target.value)}
                         className="w-24 h-7 text-xs"
                         placeholder="0"
                       />
-                      <span className="text-xs text-muted-foreground">years (− before, + after)</span>
+                      <span className="text-xs text-muted-foreground">{t('event.startOffsetHint')}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs text-muted-foreground shrink-0 w-20">Duration</Label>
+                      <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.durationLabel')}</Label>
                       <Input
                         type="number" step="0.01" min="0" value={linkDurationStr}
                         onChange={e => setLinkDurationStr(e.target.value)}
                         className="w-24 h-7 text-xs"
-                        placeholder="optional"
+                        placeholder={t('common.optional')}
                       />
-                      <span className="text-xs text-muted-foreground">years (sets end date)</span>
+                      <span className="text-xs text-muted-foreground">{t('event.durationHint')}</span>
                     </div>
                   </>
                 )}
@@ -1194,33 +1193,33 @@ export function EventDialog({
                 {/* Computed preview */}
                 {computedLink ? (
                   <div className="rounded bg-muted/50 px-2 py-1.5 text-xs text-muted-foreground space-y-0.5">
-                    <div>Start → <span className="text-foreground font-medium">{fracYearToDMY(computedLink.startYear)}</span></div>
+                    <div>{t('event.previewStart')} <span className="text-foreground font-medium">{fracYearToDMY(computedLink.startYear)}</span></div>
                     {computedLink.endYear != null && (
-                      <div>End → <span className="text-foreground font-medium">{fracYearToDMY(computedLink.endYear)}</span></div>
+                      <div>{t('event.previewEnd')} <span className="text-foreground font-medium">{fracYearToDMY(computedLink.endYear)}</span></div>
                     )}
                   </div>
                 ) : linkAnchorType === 'event' && !linkEventId ? (
-                  <p className="text-xs text-muted-foreground italic">Select an event to preview computed dates.</p>
+                  <p className="text-xs text-muted-foreground italic">{t('event.selectEventHint')}</p>
                 ) : null}
 
                 {/* On delete behaviour (not shown for today anchor) */}
                 {linkAnchorType === 'event' && (
                   <div className="space-y-1 pt-1 border-t">
-                    <Label className="text-xs text-muted-foreground">If linked event is deleted</Label>
+                    <Label className="text-xs text-muted-foreground">{t('event.ifLinkedDeleted')}</Label>
                     <div className="flex gap-2">
                       <button
                         type="button"
                         onClick={() => setLinkOnDelete('freeze')}
                         className={`flex-1 h-7 rounded-md border text-xs transition-colors ${linkOnDelete === 'freeze' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-muted/50'}`}
                       >
-                        Freeze dates
+                        {t('event.freezeDates')}
                       </button>
                       <button
                         type="button"
                         onClick={() => setLinkOnDelete('delete')}
                         className={`flex-1 h-7 rounded-md border text-xs transition-colors ${linkOnDelete === 'delete' ? 'bg-destructive text-destructive-foreground border-destructive' : 'bg-background hover:bg-muted/50'}`}
                       >
-                        Delete this event too
+                        {t('event.deleteEventToo')}
                       </button>
                     </div>
                   </div>
