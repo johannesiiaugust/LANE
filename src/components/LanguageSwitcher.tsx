@@ -1,6 +1,6 @@
 import { useTranslation, SUPPORTED_LANGS, localizedPath, stripLangPrefix, type Lang } from '@/i18n'
 
-const LANG_FLAGS: Record<string, { flag: string; name: string; disabled?: boolean }> = {
+const LANG_FLAGS: Record<string, { flag: string; name: string }> = {
   en: { flag: '🇬🇧', name: 'English' },
   sv: { flag: '🇸🇪', name: 'Svenska' },
   no: { flag: '🇳🇴', name: 'Norsk' },
@@ -9,10 +9,15 @@ const LANG_FLAGS: Record<string, { flag: string; name: string; disabled?: boolea
   lt: { flag: '🇱🇹', name: 'Lietuvių' },
   de: { flag: '🇩🇪', name: 'Deutsch' },
   nl: { flag: '🇳🇱', name: 'Nederlands' },
-  da: { flag: '🇩🇰', name: 'Dansk', disabled: true },
+  fr: { flag: '🇫🇷', name: 'Français' },
+  es: { flag: '🇪🇸', name: 'Español' },
+  it: { flag: '🇮🇹', name: 'Italiano' },
+  da: { flag: '🇩🇰', name: 'Dansk' },
+  pl: { flag: '🇵🇱', name: 'Polski' },
+  cs: { flag: '🇨🇿', name: 'Čeština' },
 }
 
-const ALL_LANG_KEYS = [...SUPPORTED_LANGS, 'da'] as const
+const ALL_LANG_KEYS = SUPPORTED_LANGS
 
 function switchLang(lang: string) {
   const currentPath = stripLangPrefix(window.location.pathname)
@@ -33,19 +38,15 @@ export function LanguageSwitcherInline() {
         const info = LANG_FLAGS[l]
         if (!info) return null
         const isActive = l === lang
-        const isDisabled = !!info.disabled
         return (
           <button
             key={l}
-            onClick={() => !isDisabled && switchLang(l)}
-            title={isDisabled ? `${info.name} (coming soon)` : info.name}
-            disabled={isDisabled}
+            onClick={() => switchLang(l)}
+            title={info.name}
             className={`flex items-center justify-center w-8 h-8 rounded transition-colors text-xl leading-none ${
-              isDisabled
-                ? 'opacity-30 grayscale cursor-not-allowed'
-                : isActive
-                  ? 'bg-primary/15 ring-1 ring-primary/40'
-                  : 'hover:bg-accent cursor-pointer'
+              isActive
+                ? 'bg-primary/15 ring-1 ring-primary/40'
+                : 'hover:bg-accent cursor-pointer'
             }`}
           >
             {info.flag}
@@ -74,18 +75,14 @@ export function LanguageSwitcherDropdown() {
           const info = LANG_FLAGS[l]
           if (!info) return null
           const isActive = l === lang
-          const isDisabled = !!info.disabled
           return (
             <button
               key={l}
-              onClick={() => !isDisabled && switchLang(l)}
-              disabled={isDisabled}
+              onClick={() => switchLang(l)}
               className={`flex items-center gap-2 px-2 py-1.5 rounded text-sm transition-colors w-full text-left ${
-                isDisabled
-                  ? 'opacity-30 grayscale cursor-not-allowed'
-                  : isActive
-                    ? 'bg-primary/10 font-medium'
-                    : 'hover:bg-accent cursor-pointer'
+                isActive
+                  ? 'bg-primary/10 font-medium'
+                  : 'hover:bg-accent cursor-pointer'
               }`}
             >
               <span className="text-lg leading-none">{info.flag}</span>
