@@ -482,6 +482,61 @@ const en = {
     refresh: 'Refresh',
   },
 
+  // ── Seed / demo event content ──
+  seed: {
+    exampleTimelineName: 'Example \u2014 edit me!',
+    // Place
+    place1Title: 'Berlin',
+    place1Desc: 'Grew up and worked in Berlin',
+    place2Title: 'Munich',
+    place2Desc: 'Moved to Munich after returning',
+    sabbaticalTitle: 'Sabbatical \u2014 SE Asia',
+    sabbaticalDesc: 'A year to explore \u2014 Vietnam, Thailand, Bali',
+    // Work
+    schoolTitle: 'School & University',
+    schoolDesc: 'Gymnasium Berlin-Mitte, then TU Berlin Computer Science',
+    engineerTitle: 'Software Engineer',
+    engineerDesc: 'Full-stack developer at tech startup',
+    leadTitle: 'Lead Engineer',
+    leadDesc: 'Returned with new perspective \u2014 promoted to Lead Engineer',
+    bizTitle: '?Own Business?',
+    bizDesc: 'Future venture',
+    monthlyIncome: 'Monthly income',
+    // Health
+    brokeLeftLegTitle: 'Broke Left Leg',
+    brokeLeftLegDesc: 'Skiing accident in the Alps',
+    brokeRightWristTitle: 'Broke Right Wrist',
+    brokeRightWristDesc: 'Mountain biking fall',
+    wristRecoveryTitle: 'Wrist Recovery',
+    wristRecoveryDesc: 'Physio and rest \u2014 back to full strength',
+    firstMarathonTitle: 'First Marathon',
+    firstMarathonDesc: 'Munich marathon \u2014 4h 12m',
+    // Relations
+    firstGirlfriendTitle: 'First Girlfriend',
+    firstGirlfriendDesc: 'High school relationship',
+    marriedTitle: 'Married',
+    childTitle: 'Child',
+    childDesc: 'First child born (Feb 2024)',
+    // Activities
+    chessClubTitle: 'Chess Club',
+    chessClubDesc: 'University chess club',
+    diverTitle: 'PADI Open Water Diver',
+    diverDesc: 'Got certified diving in Koh Tao, Thailand',
+    nobelTitle: '\ud83c\udfc6 Nobel Prize',
+    nobelDesc: 'Nobel Prize in Physics, 2050',
+    // Assets
+    savingsTitle: 'Savings Account',
+    savingsDesc: 'Personal savings account',
+    quarterlySavings: 'Quarterly savings',
+    // Items
+    carTitle: 'Volvo',
+    carDesc: 'Current car',
+    boatTitle: 'Boat',
+    boatDesc: 'Future boat',
+    boatPurchase: 'Purchase',
+    boatRunning: 'Monthly running cost',
+  },
+
   // ── Default lane names ──
   lanes: {
     place: 'Place & Travel',

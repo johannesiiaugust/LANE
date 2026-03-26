@@ -1,5 +1,7 @@
 import type { Lane, TimelineEvent } from '@/types/timeline'
 
+type TFn = (key: string) => string
+
 // Demo person (Alex Weber) timeline date range
 export const DEMO_TIMELINE_START_YEAR = 1980
 export const DEMO_TIMELINE_END_YEAR: number | null = null
@@ -71,3 +73,62 @@ export const DEMO_EVENTS: TimelineEvent[] = [
     },
   },
 ]
+
+export function buildDemoEvents(t: TFn): TimelineEvent[] {
+  return [
+    // Place
+    { id: 'demo-evt-berlin',     laneId: 'place',      emoji: '🏙️', title: t('seed.place1Title'),      description: t('seed.place1Desc'),       type: 'range', startYear: 2000,    endYear: 2021,   color: '#3b82f6' },
+    { id: 'demo-evt-sabbatical', laneId: 'place',      emoji: '🌏', title: t('seed.sabbaticalTitle'),   description: t('seed.sabbaticalDesc'),   type: 'range', startYear: 2021,    endYear: 2023,   color: '#0ea5e9' },
+    { id: 'demo-evt-munich',     laneId: 'place',      emoji: '🏔️', title: t('seed.place2Title'),      description: t('seed.place2Desc'),       type: 'range', startYear: 2023,    endYear: 2035,   color: '#3b82f6' },
+
+    // Work
+    { id: 'demo-evt-highschool', laneId: 'work',       emoji: '🎓', title: t('seed.schoolTitle'),       description: t('seed.schoolDesc'),       type: 'range', startYear: 1994,    endYear: 2004,   color: '#8b5cf6' },
+    { id: 'demo-evt-work',       laneId: 'work',       emoji: '💻', title: t('seed.engineerTitle'),     description: t('seed.engineerDesc'),     type: 'range', startYear: 2005,    endYear: 2020.997, color: '#10b981' },
+    { id: 'demo-evt-leadeng',    laneId: 'work',       emoji: '🚀', title: t('seed.leadTitle'),         description: t('seed.leadDesc'),         type: 'range', startYear: 2023,    endYear: 2040.5, color: '#059669' },
+    { id: 'demo-evt-biz',        laneId: 'work',       emoji: '🏢', title: t('seed.bizTitle'),          description: t('seed.bizDesc'),          type: 'range', startYear: 2040.5,  endYear: 2060.5, fadeOutYear: 2070.5, color: '#0d9488',
+      valueProjection: {
+        startValue: 0,
+        spotChanges: [],
+        growthPeriods: [],
+        deposits: [{ id: 'demo-dep-biz', label: t('seed.monthlyIncome'), amount: 20, frequency: 'monthly', startYear: 2040.5, endYear: 2060.5 }],
+      },
+    },
+
+    // Health
+    { id: 'demo-evt-leg',        laneId: 'health',     emoji: '🦴', title: t('seed.brokeLeftLegTitle'),   description: t('seed.brokeLeftLegDesc'),   type: 'point', startYear: 2010,    color: '#ef4444' },
+    { id: 'demo-evt-wrist',      laneId: 'health',     emoji: '🦴', title: t('seed.brokeRightWristTitle'), description: t('seed.brokeRightWristDesc'), type: 'point', startYear: 2018.3,  color: '#ef4444' },
+    { id: 'demo-evt-wrist-rec',  laneId: 'health',     emoji: '🩹', title: t('seed.wristRecoveryTitle'),  description: t('seed.wristRecoveryDesc'),  type: 'range', startYear: 2018.3,  endYear: 2018.8, color: '#22c55e' },
+    { id: 'demo-evt-marathon',   laneId: 'health',     emoji: '🏃', title: t('seed.firstMarathonTitle'),  description: t('seed.firstMarathonDesc'),  type: 'point', startYear: 2025,    color: '#10b981' },
+
+    // Relations
+    { id: 'demo-evt-girlfriend', laneId: 'relations',  emoji: '💕', title: t('seed.firstGirlfriendTitle'), description: t('seed.firstGirlfriendDesc'), type: 'range', startYear: 1996, endYear: 1999, color: '#ec4899' },
+    { id: 'demo-evt-married',    laneId: 'relations',  emoji: '💍', title: t('seed.marriedTitle'),        description: t('seed.marriedTitle'),      type: 'range', startYear: 2007,    endYear: 2065,   color: '#ec4899' },
+    { id: 'demo-evt-kid',        laneId: 'relations',  emoji: '👶', title: t('seed.childTitle'),          description: t('seed.childDesc'),         type: 'range', startYear: 2024.085, endYear: 2100,  color: '#f97316' },
+
+    // Activities
+    { id: 'demo-evt-chess',      laneId: 'activities', emoji: '♟️', title: t('seed.chessClubTitle'),      description: t('seed.chessClubDesc'),     type: 'range', startYear: 2001, endYear: 2021, color: '#f59e0b' },
+    { id: 'demo-evt-diving',     laneId: 'activities', emoji: '🤿', title: t('seed.diverTitle'),          description: t('seed.diverDesc'),         type: 'point', startYear: 2022.6, color: '#0ea5e9' },
+    { id: 'demo-evt-nobel',      laneId: 'activities',              title: t('seed.nobelTitle'),          description: t('seed.nobelDesc'),         type: 'point', startYear: 2050,    color: '#eab308' },
+
+    // Assets
+    { id: 'demo-evt-bank',       laneId: 'assets',     emoji: '💳', title: t('seed.savingsTitle'),        description: t('seed.savingsDesc'),       type: 'range', startYear: 1998, endYear: 2065, color: '#14b8a6',
+      valueProjection: {
+        startValue: 100,
+        spotChanges: [],
+        growthPeriods: [],
+        deposits: [{ id: 'demo-dep-bank', label: t('seed.quarterlySavings'), amount: 10, frequency: 'quarterly', startYear: 1998, endYear: 2065 }],
+      },
+    },
+
+    // Items
+    { id: 'demo-evt-volvo',      laneId: 'items',      emoji: '🚗', title: t('seed.carTitle'),            description: t('seed.carDesc'),           type: 'range', startYear: 2023, endYear: 2042, color: '#64748b' },
+    { id: 'demo-evt-boat',       laneId: 'items',      emoji: '⛵', title: t('seed.boatTitle'),           description: t('seed.boatDesc'),          type: 'range', startYear: 2053, endYear: 2082, color: '#0ea5e9',
+      valueProjection: {
+        startValue: 0,
+        spotChanges: [{ id: 'demo-vs-boat', year: 2053, amount: -100, label: t('seed.boatPurchase') }],
+        growthPeriods: [],
+        deposits: [{ id: 'demo-dep-boat', label: t('seed.boatRunning'), amount: -10, frequency: 'monthly', startYear: 2053, endYear: 2082 }],
+      },
+    },
+  ]
+}

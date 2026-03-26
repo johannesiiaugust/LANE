@@ -1,7 +1,8 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import type { Lane, TimelineEvent } from '@/types/timeline'
 import type { DbTimeline } from '@/types/database'
-import { DEMO_LANES, DEMO_EVENTS } from '@/data/demoData'
+import { DEMO_LANES, buildDemoEvents } from '@/data/demoData'
+import { useTranslation } from '@/i18n/context'
 import {
   TIMELINE_YEAR_MIN,
   TIMELINE_YEAR_MAX,
@@ -32,7 +33,7 @@ const DEFAULT_META: DemoTimelineMeta = {
   emoji: '👤',
 }
 
-function loadState(): DemoState {
+function loadSavedState(): DemoState | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
@@ -44,7 +45,7 @@ function loadState(): DemoState {
   } catch {
     // ignore
   }
-  return { lanes: DEMO_LANES, events: DEMO_EVENTS }
+  return null
 }
 
 function saveState(state: DemoState) {
@@ -56,9 +57,12 @@ function saveState(state: DemoState) {
 }
 
 export function useDemoTimeline() {
-  const [lanes, setLanes] = useState<Lane[]>(() => loadState().lanes)
-  const [events, setEvents] = useState<TimelineEvent[]>(() => loadState().events)
-  const [meta, setMeta] = useState<DemoTimelineMeta>(() => loadState().meta ?? DEFAULT_META)
+  const { t } = useTranslation()
+  const translatedEvents = useMemo(() => buildDemoEvents(t), [t])
+  const savedState = useMemo(() => loadSavedState(), [])
+  const [lanes, setLanes] = useState<Lane[]>(savedState?.lanes ?? DEMO_LANES)
+  const [events, setEvents] = useState<TimelineEvent[]>(savedState?.events ?? translatedEvents)
+  const [meta, setMeta] = useState<DemoTimelineMeta>(savedState?.meta ?? DEFAULT_META)
   const [pixelsPerYear, setPixelsPerYear] = useState(MIN_PIXELS_PER_YEAR)
 
   const demoTimeline: DbTimeline = {
