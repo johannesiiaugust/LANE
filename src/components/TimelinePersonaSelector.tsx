@@ -31,6 +31,7 @@ import type { OverlayDisplayMode } from '@/hooks/useTimelineOverlays'
 import type { ExternalOverlayInfo } from '@/hooks/useExternalOverlays'
 import { fracYearToMs, msToFracYear } from '@/lib/constants'
 import { fetchLanes, getTimelineShares, addTimelineShare, removeTimelineShare, lookupUserByUsername, fetchPublicProfile, searchUsernames, incrementPersonaView } from '@/lib/api'
+import { useTranslation } from '@/i18n/context'
 
 const DEFAULT_COLOR = '#3b82f6'
 
@@ -40,12 +41,14 @@ function PersonaRow({
   alignedPersonaIds,
   onToggle,
   onToggleAlignment,
+  t,
 }: {
   p: DbPersona
   activePersonaIds: Set<string>
   alignedPersonaIds: Set<string>
   onToggle: (id: string) => void
   onToggleAlignment: (id: string) => void
+  t: (key: string) => string
 }) {
   const isActive = activePersonaIds.has(p.id)
   const aligned = alignedPersonaIds.has(p.id)
@@ -54,13 +57,13 @@ function PersonaRow({
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
           <p className="text-sm font-medium truncate">{p.name}</p>
-          <p className="text-xs text-muted-foreground">{p.birth_year}–{p.death_year ?? 'present'}</p>
+          <p className="text-xs text-muted-foreground">{p.birth_year}–{p.death_year ?? t('personas.present')}</p>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           {isActive && (
             <button
               onClick={() => onToggleAlignment(p.id)}
-              title={aligned ? 'Showing age-aligned — click for real years' : 'Showing real years — click to age-align'}
+              title={aligned ? t('personas.showingAgeAligned') : t('personas.showingRealYears')}
               className={cn('p-1 rounded transition-colors', aligned ? 'text-primary bg-primary/10 animate-blink-fast hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted')}
             >
               {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
@@ -497,7 +500,8 @@ export function TimelinePersonaSelector({
     ? personas.filter(p => p.name.toLowerCase().includes(searchTrimmed)).slice(0, 20)
     : []
 
-  const buttonLabel = currentTimeline?.name ?? 'Timeline'
+  const { t } = useTranslation()
+  const buttonLabel = currentTimeline?.name ?? t('selector.timelines')
 
   return (
     <>
@@ -516,13 +520,13 @@ export function TimelinePersonaSelector({
               onClick={() => toggleSection('tl_section_timelines', timelinesOpen, setTimelinesOpen)}
             >
               {timelinesOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex-1">Timelines</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex-1">{t('selector.timelines')}</p>
             </button>
             {otherTimelines.some(t => activeOverlayIds.has(t.id)) && (
               <button
                 className="pr-3 pt-2 pb-1 text-[10px] text-muted-foreground hover:text-foreground shrink-0"
-                title="Deselect all"
-                onClick={() => otherTimelines.filter(t => activeOverlayIds.has(t.id)).forEach(t => onToggleOverlay(t.id))}
+                title={t('personas.deselectAll')}
+                onClick={() => otherTimelines.filter(tl => activeOverlayIds.has(tl.id)).forEach(tl => onToggleOverlay(tl.id))}
               >
                 <ListX className="h-3 w-3" />
               </button>
@@ -615,7 +619,7 @@ export function TimelinePersonaSelector({
               onClick={handleCreate}
             >
               <Plus className="h-4 w-4" />
-              New Timeline…
+              {t('selector.newTimeline')}
             </button>
           </div>}
 
@@ -628,7 +632,7 @@ export function TimelinePersonaSelector({
               {personasOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 flex-1">
                 <Users className="h-3 w-3" />
-                Personas
+                {t('personas.personas')}
                 {activePersonaIds.size > 0 && (
                   <span className="ml-1 rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{activePersonaIds.size}</span>
                 )}
@@ -637,7 +641,7 @@ export function TimelinePersonaSelector({
             {activePersonaIds.size > 0 && (
               <button
                 className="pr-3 pt-2 pb-1 text-[10px] text-muted-foreground hover:text-foreground shrink-0"
-                title="Deselect all"
+                title={t('personas.deselectAll')}
                 onClick={() => [...activePersonaIds].forEach(id => onTogglePersona(id))}
               >
                 <ListX className="h-3 w-3" />
@@ -646,13 +650,13 @@ export function TimelinePersonaSelector({
           </div>
           {personasOpen && <div className="px-1 pb-2">
             {personas.length === 0 ? (
-              <p className="px-2 py-2 text-xs text-muted-foreground text-center">No personas available</p>
+              <p className="px-2 py-2 text-xs text-muted-foreground text-center">{t('personas.noPersonasAvailable')}</p>
             ) : (
               <>
                 {/* Top 5 most popular */}
                 <div className="px-2 pb-1">
-                  <p className="text-[10px] font-medium text-muted-foreground mb-1">Popular</p>
-                  {top5Personas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
+                  <p className="text-[10px] font-medium text-muted-foreground mb-1">{t('personas.popular')}</p>
+                  {top5Personas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} t={t} />)}
                 </div>
 
                 {/* Search field */}
@@ -661,7 +665,7 @@ export function TimelinePersonaSelector({
                     <Input
                       value={personaSearch}
                       onChange={e => setPersonaSearch(e.target.value)}
-                      placeholder="Search personas…"
+                      placeholder={t('personas.searchPersonas')}
                       className="h-7 text-xs flex-1"
                     />
                     {personaSearch && (
@@ -672,19 +676,19 @@ export function TimelinePersonaSelector({
                   </div>
                   {searchResults.length > 0 && (
                     <div className="mt-1 space-y-0.5">
-                      {searchResults.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
+                      {searchResults.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} t={t} />)}
                     </div>
                   )}
                   {searchTrimmed.length > 0 && searchResults.length === 0 && (
-                    <p className="text-[10px] text-muted-foreground mt-1">No results</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">{t('personas.noResults')}</p>
                   )}
                 </div>
 
                 {/* Recently viewed */}
                 {recentPersonas.length > 0 && searchTrimmed.length === 0 && (
                   <div className="px-2 pt-1.5 border-t">
-                    <p className="text-[10px] font-medium text-muted-foreground mb-1">Recently viewed</p>
-                    {recentPersonas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} />)}
+                    <p className="text-[10px] font-medium text-muted-foreground mb-1">{t('personas.recentlyViewed')}</p>
+                    {recentPersonas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} t={t} />)}
                   </div>
                 )}
               </>
@@ -700,7 +704,7 @@ export function TimelinePersonaSelector({
               {otherUsersOpen ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 flex-1">
                 <Globe className="h-3 w-3" />
-                Other Users
+                {t('selector.otherUsers')}
                 {externalActiveIds.size > 0 && (
                   <span className="ml-1 rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{externalActiveIds.size}</span>
                 )}
@@ -709,7 +713,7 @@ export function TimelinePersonaSelector({
             {externalActiveIds.size > 0 && (
               <button
                 className="pr-3 pt-2 pb-1 text-[10px] text-muted-foreground hover:text-foreground shrink-0"
-                title="Deselect all"
+                title={t('personas.deselectAll')}
                 onClick={() => externalStored.filter(s => externalActiveIds.has(s.timelineId)).forEach(s => onToggleExternalActive?.(s.timelineId))}
               >
                 <ListX className="h-3 w-3" />
@@ -720,7 +724,7 @@ export function TimelinePersonaSelector({
             {/* Shared with you */}
             {sharedWithMe.length > 0 && (
               <div className="px-2 pb-1 space-y-0.5">
-                <p className="text-[10px] font-medium text-muted-foreground mb-1">Shared with you</p>
+                <p className="text-[10px] font-medium text-muted-foreground mb-1">{t('selector.sharedWithYou')}</p>
                 {sharedWithMe.map(item => {
                   const alreadyAdded = !!externalStored.find(s => s.timelineId === item.timeline.id)
                   return (
@@ -731,7 +735,7 @@ export function TimelinePersonaSelector({
                       </div>
                       <Button size="sm" variant={alreadyAdded ? 'secondary' : 'default'} className="h-6 text-[10px] px-2 shrink-0" disabled={alreadyAdded}
                         onClick={() => { if (!alreadyAdded) onAddExternal?.({ username: item.owner.username ?? '', timelineId: item.timeline.id, timelineName: item.timeline.name, displayName: item.owner.display_name || item.owner.username || '', startYear: item.timeline.start_year ?? null }) }}>
-                        {alreadyAdded ? 'Added' : 'Add'}
+                        {alreadyAdded ? t('selector.added') : t('selector.add')}
                       </Button>
                     </div>
                   )
@@ -743,7 +747,7 @@ export function TimelinePersonaSelector({
             {externalStored.length > 0 && (
               <div className="px-2 pb-1 space-y-0.5">
                 {(sharedWithMe.length > 0) && <div className="border-t my-1" />}
-                <p className="text-[10px] font-medium text-muted-foreground mb-1">Added timelines</p>
+                <p className="text-[10px] font-medium text-muted-foreground mb-1">{t('selector.addedTimelines')}</p>
                 {externalStored.map(info => {
                   const isActive = externalActiveIds.has(info.timelineId)
                   const aligned = externalAlignedIds.has(info.timelineId)
@@ -782,13 +786,13 @@ export function TimelinePersonaSelector({
 
             {/* Search for user timelines */}
             <div className={cn('px-2 py-1.5 space-y-1.5', (sharedWithMe.length > 0 || externalStored.length > 0) && 'border-t mt-1 pt-2')}>
-              <p className="text-[10px] font-medium text-muted-foreground">Find timelines by username</p>
+              <p className="text-[10px] font-medium text-muted-foreground">{t('selector.findByUsername')}</p>
               <div className="relative flex items-center">
                 <Search className="absolute left-2 h-3 w-3 text-muted-foreground pointer-events-none" />
                 <Input
                   value={userSearchInput}
                   onChange={e => { setUserSearchInput(e.target.value); setUserSearchResults([]); setUserSearchError(null) }}
-                  placeholder="Search by username…"
+                  placeholder={t('selector.searchByUsername')}
                   className="h-7 text-xs pl-6 pr-6"
                   autoComplete="off"
                 />
@@ -817,14 +821,14 @@ export function TimelinePersonaSelector({
                   ))}
                 </div>
               )}
-              {userSearching && <p className="text-[10px] text-muted-foreground">Searching…</p>}
+              {userSearching && <p className="text-[10px] text-muted-foreground">{t('selector.searching')}</p>}
               {userSearchError && <p className="text-[10px] text-destructive">{userSearchError}</p>}
               {userSearchResults.length > 0 && (
                 <div className="space-y-0.5">
                   {userSearchResults.map(r => {
                     const alreadyAdded = !!externalStored.find(s => s.timelineId === r.timelineId)
                     const access = userSearchAccess.get(r.timelineId)
-                    const accessLabel = access === 'both' ? 'public · shared' : access === 'shared' ? 'shared with you' : 'public'
+                    const accessLabel = access === 'both' ? t('selector.bothAccess') : access === 'shared' ? t('selector.sharedAccess') : t('selector.publicAccess')
                     return (
                       <div key={r.timelineId} className="flex items-center justify-between gap-2 rounded px-1 py-1 hover:bg-accent">
                         <div className="min-w-0">
@@ -833,7 +837,7 @@ export function TimelinePersonaSelector({
                         </div>
                         <Button size="sm" variant={alreadyAdded ? 'secondary' : 'default'} className="h-6 text-[10px] px-2 shrink-0" disabled={alreadyAdded}
                           onClick={() => { if (!alreadyAdded) onAddExternal?.(r) }}>
-                          {alreadyAdded ? 'Added' : 'Add'}
+                          {alreadyAdded ? t('selector.added') : t('selector.add')}
                         </Button>
                       </div>
                     )
@@ -849,15 +853,15 @@ export function TimelinePersonaSelector({
       <AlertDialog open={!!deleteConfirmId} onOpenChange={open => { if (!open) setDeleteConfirmId(null) }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete timeline?</AlertDialogTitle>
+            <AlertDialogTitle>{t('selector.deleteTimeline')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete "{timelines.find(t => t.id === deleteConfirmId)?.name}" and all its lanes and events. This cannot be undone.
+              {t('selector.deleteTimelineDesc', { name: timelines.find(tl => tl.id === deleteConfirmId)?.name ?? '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -867,17 +871,17 @@ export function TimelinePersonaSelector({
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{dialogMode === 'create' ? 'New Timeline' : 'Edit Timeline'}</DialogTitle>
+            <DialogTitle>{dialogMode === 'create' ? t('selector.newTimeline') : t('selector.editTimeline')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="grid gap-4">
             {/* Name + Color */}
             <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
               <div className="grid gap-1.5">
-                <Label htmlFor="tpName">Name</Label>
-                <Input id="tpName" value={nameValue} onChange={e => setNameValue(e.target.value)} placeholder="Timeline name" autoFocus />
+                <Label htmlFor="tpName">{t('common.name')}</Label>
+                <Input id="tpName" value={nameValue} onChange={e => setNameValue(e.target.value)} placeholder={t('selector.timelines')} autoFocus />
               </div>
               <div className="grid gap-1.5">
-                <Label htmlFor="tpColor">Color</Label>
+                <Label htmlFor="tpColor">{t('common.color')}</Label>
                 <input
                   id="tpColor"
                   type="color"
@@ -890,14 +894,14 @@ export function TimelinePersonaSelector({
 
             {/* Start + End date/time — always shown */}
             <div className="grid gap-1.5">
-              <Label>Start <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Label>{t('selector.start')} <span className="text-muted-foreground text-xs">({t('common.optional')})</span></Label>
               <div className="flex gap-2">
                 <DateInput value={startDate} onChange={setStartDate} className="flex-1" />
                 <Input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="w-28" disabled={!startDate} />
               </div>
             </div>
             <div className="grid gap-1.5">
-              <Label>End <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Label>{t('selector.end')} <span className="text-muted-foreground text-xs">({t('common.optional')})</span></Label>
               <div className="flex gap-2">
                 <DateInput value={endDate} onChange={setEndDate} className="flex-1" />
                 <Input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="w-28" disabled={!endDate} />
@@ -909,15 +913,15 @@ export function TimelinePersonaSelector({
               <div className="rounded-md border p-3 space-y-3">
                 <div className="flex items-center gap-2">
                   <Copy className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <Label className="text-sm font-medium">Start from</Label>
+                  <Label className="text-sm font-medium">{t('selector.startFrom')}</Label>
                 </div>
                 <select
                   value={copySourceId}
                   onChange={e => { setCopySourceId(e.target.value); setCopyMode('all') }}
                   className="h-8 text-sm border rounded-md px-2 bg-background w-full"
                 >
-                  <option value={COPY_DEFAULTS}>— start fresh (default lanes) —</option>
-                  <option value={COPY_EMPTY}>— start fresh (empty) —</option>
+                  <option value={COPY_DEFAULTS}>{t('selector.startFreshDefault')}</option>
+                  <option value={COPY_EMPTY}>{t('selector.startFreshEmpty')}</option>
                   {timelines.length > 0 && <option disabled>────────────</option>}
                   {timelines.map(t => (
                     <option key={t.id} value={t.id}>
@@ -928,13 +932,13 @@ export function TimelinePersonaSelector({
 
                 {isRealSource(copySourceId) && (
                   <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">What to copy</Label>
+                    <Label className="text-xs text-muted-foreground">{t('selector.whatToCopy')}</Label>
                     <div className="space-y-1.5">
                       {([
-                        { value: 'all',           label: 'All lanes & events' },
-                        { value: 'past_current',  label: 'All lanes · past & ongoing events only' },
-                        { value: 'all_no_events', label: 'All lanes (no events)' },
-                        { value: 'lanes',         label: 'Select specific lanes…' },
+                        { value: 'all',           label: t('selector.allLanesEvents') },
+                        { value: 'past_current',  label: t('selector.pastCurrentOnly') },
+                        { value: 'all_no_events', label: t('selector.allLanesNoEvents') },
+                        { value: 'lanes',         label: t('selector.selectSpecificLanes') },
                       ] as const).map(opt => (
                         <label key={opt.value} className="flex items-center gap-2 text-sm cursor-pointer select-none">
                           <input
@@ -951,14 +955,14 @@ export function TimelinePersonaSelector({
                     {copyMode === 'lanes' && (
                       <div className="rounded-md border p-2 space-y-1.5 max-h-48 overflow-y-auto">
                         {loadingSourceLanes ? (
-                          <p className="text-xs text-muted-foreground">Loading…</p>
+                          <p className="text-xs text-muted-foreground">{t('selector.loadingLanes')}</p>
                         ) : sourceLanes.length === 0 ? (
-                          <p className="text-xs text-muted-foreground">No lanes found.</p>
+                          <p className="text-xs text-muted-foreground">{t('selector.noLanesFound')}</p>
                         ) : (
                           <>
                             <div className="flex gap-3 pb-1.5 border-b">
-                              <button type="button" onClick={() => setCopyLaneIds(new Set(sourceLanes.map(l => l.id)))} className="text-[11px] text-muted-foreground hover:text-foreground">Select all</button>
-                              <button type="button" onClick={() => setCopyLaneIds(new Set())} className="text-[11px] text-muted-foreground hover:text-foreground">None</button>
+                              <button type="button" onClick={() => setCopyLaneIds(new Set(sourceLanes.map(l => l.id)))} className="text-[11px] text-muted-foreground hover:text-foreground">{t('selector.selectAll')}</button>
+                              <button type="button" onClick={() => setCopyLaneIds(new Set())} className="text-[11px] text-muted-foreground hover:text-foreground">{t('selector.none')}</button>
                             </div>
                             {sourceLanes.map(lane => (
                               <div key={lane.id} className="space-y-1">
@@ -974,7 +978,7 @@ export function TimelinePersonaSelector({
                                 </label>
                                 {copyLaneIds.has(lane.id) && (
                                   <div className="ml-6 flex items-center gap-1.5">
-                                    <span className="text-[11px] text-muted-foreground">Events:</span>
+                                    <span className="text-[11px] text-muted-foreground">{t('selector.events')}</span>
                                     {(['all', 'past_current', 'none'] as LaneEvtFilter[]).map(f => (
                                       <button
                                         key={f}
@@ -982,7 +986,7 @@ export function TimelinePersonaSelector({
                                         onClick={() => setPerLaneFilter(prev => ({ ...prev, [lane.id]: f }))}
                                         className={`text-[11px] px-1.5 py-0.5 rounded border transition-colors ${(perLaneFilter[lane.id] ?? 'all') === f ? 'bg-primary text-primary-foreground border-primary' : 'border-input text-muted-foreground hover:text-foreground'}`}
                                       >
-                                        {f === 'all' ? 'All' : f === 'past_current' ? 'Past & ongoing' : 'None'}
+                                        {f === 'all' ? t('selector.all') : f === 'past_current' ? t('selector.pastAndOngoing') : t('selector.none')}
                                       </button>
                                     ))}
                                   </div>
@@ -1003,8 +1007,8 @@ export function TimelinePersonaSelector({
               <>
                 <div className="flex items-center justify-between">
                   <div className="grid gap-0.5">
-                    <Label>Public</Label>
-                    <p className="text-xs text-muted-foreground">Visible on your public profile</p>
+                    <Label>{t('selector.publicLabel')}</Label>
+                    <p className="text-xs text-muted-foreground">{t('selector.visibleOnProfile')}</p>
                   </div>
                   <Switch checked={isPublic} onCheckedChange={setIsPublic} />
                 </div>
@@ -1012,8 +1016,8 @@ export function TimelinePersonaSelector({
                 {/* Share with specific people */}
                 <div className="rounded-md border p-3 space-y-3">
                   <div>
-                    <p className="text-sm font-medium">Share with people</p>
-                    <p className="text-xs text-muted-foreground">Give specific users access regardless of public setting</p>
+                    <p className="text-sm font-medium">{t('selector.shareWithPeople')}</p>
+                    <p className="text-xs text-muted-foreground">{t('selector.shareDesc')}</p>
                   </div>
                   <div className="flex gap-1.5">
                     <Input
@@ -1048,9 +1052,9 @@ export function TimelinePersonaSelector({
             )}
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>
               <Button type="submit" disabled={copying}>
-                {copying ? 'Duplicating…' : dialogMode === 'create' ? 'Create' : 'Save'}
+                {copying ? t('selector.duplicating') : dialogMode === 'create' ? t('common.create') : t('common.save')}
               </Button>
             </DialogFooter>
           </form>

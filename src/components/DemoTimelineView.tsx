@@ -17,6 +17,7 @@ import { SearchDialog } from '@/components/SearchDialog'
 import { GuideOverlay } from '@/components/GuideOverlay'
 import { useGoogleTranslate } from '@/components/TranslateMenu'
 import { LanguageSwitcherInline } from '@/components/LanguageSwitcher'
+import { useTranslation } from '@/i18n/context'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
@@ -53,9 +54,9 @@ interface DemoTimelineViewProps {
   onSignUpWithTimeline: () => void
 }
 
-const SIZE_NAMES: Record<UiSize, string> = { small: 'Small', medium: 'Medium', large: 'Large', fitscreen: 'Fit Screen' }
-
 function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: DemoTimelineViewProps) {
+  const { t } = useTranslation()
+  const SIZE_NAMES: Record<UiSize, string> = { small: t('toolbar.small'), medium: t('toolbar.medium'), large: t('toolbar.large'), fitscreen: t('toolbar.fitScreen') }
   const {
     lanes,
     events,
@@ -327,7 +328,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="gap-1.5" data-guide="compare">
               <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Compare & edit</span>
+              <span className="hidden sm:inline">{t('selector.compareEdit')}</span>
               <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0" />
             </Button>
           </PopoverTrigger>
@@ -335,7 +336,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
 
             {/* ── Current timeline ── */}
             <div className="px-3 pt-2 pb-1">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">My Timeline</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('selector.myTimeline')}</p>
             </div>
             <div className="px-1 pb-1">
               {!tlEditOpen ? (
@@ -343,7 +344,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
                   {currentTimeline?.color && (
                     <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: currentTimeline.color }} />
                   )}
-                  <span className="flex-1 text-sm font-semibold truncate">{currentTimeline?.name ?? 'My Timeline'}</span>
+                  <span className="flex-1 text-sm font-semibold truncate">{currentTimeline?.name ?? t('selector.myTimeline')}</span>
                   <button
                     className="p-0.5 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"
                     onClick={openTlEdit}
@@ -359,7 +360,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
                     <Input value={tlEditName} onChange={e => setTlEditName(e.target.value)} placeholder="Name" className="h-7 text-xs flex-1" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-muted-foreground mb-0.5">Start date</p>
+                    <p className="text-[10px] text-muted-foreground mb-0.5">{t('selector.startDate')}</p>
                     <DateInput value={tlEditStartDate} onChange={setTlEditStartDate} />
                   </div>
                   <div className="flex gap-1.5 justify-end">
@@ -374,7 +375,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
             <div className="border-t px-3 pt-2 pb-1">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
                 <Users className="h-3 w-3" />
-                Compare with
+                {t('personas.compareWith')}
                 {activePersonaIds.size > 0 && (
                   <span className="ml-auto rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{activePersonaIds.size}</span>
                 )}
@@ -382,12 +383,12 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
             </div>
             <div className="px-1 pt-1 pb-2">
               {personas.length === 0 ? (
-                <p className="px-2 py-2 text-xs text-muted-foreground text-center">No personas available</p>
+                <p className="px-2 py-2 text-xs text-muted-foreground text-center">{t('personas.noPersonasAvailable')}</p>
               ) : (
                 <>
                   {/* Top 5 popular */}
                   <div className="px-2 pb-1">
-                    <p className="text-[10px] font-medium text-muted-foreground mb-1">Popular</p>
+                    <p className="text-[10px] font-medium text-muted-foreground mb-1">{t('personas.popular')}</p>
                     {top5Personas.map(p => {
                       const isActive = activePersonaIds.has(p.id)
                       const aligned = alignedPersonaIds.has(p.id)
@@ -396,12 +397,12 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
                           <div className="flex items-center justify-between gap-2">
                             <div className="min-w-0">
                               <p className="text-sm font-medium truncate">{p.name}</p>
-                              <p className="text-xs text-muted-foreground">{p.birth_year}–{p.death_year ?? 'present'}</p>
+                              <p className="text-xs text-muted-foreground">{p.birth_year}–{p.death_year ?? t('personas.present')}</p>
                             </div>
                             <div className="flex items-center gap-1.5 shrink-0">
                               {isActive && (
                                 <button onClick={() => togglePersonaAlignment(p.id)}
-                                  title={aligned ? 'Age-aligned — click for real years' : 'Real years — click to age-align'}
+                                  title={aligned ? t('personas.ageAlignedTooltip') : t('personas.realYearsTooltip')}
                                   className={cn('p-1 rounded transition-colors', aligned ? 'text-primary bg-primary/10 hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted')}>
                                   {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
                                 </button>
@@ -417,7 +418,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
                   {/* Search */}
                   <div className="px-2 py-1.5 border-t">
                     <div className="flex gap-1.5">
-                      <Input value={personaSearch} onChange={e => setPersonaSearch(e.target.value)} placeholder="Search personas…" className="h-7 text-xs flex-1" />
+                      <Input value={personaSearch} onChange={e => setPersonaSearch(e.target.value)} placeholder={t('personas.searchPersonas')} className="h-7 text-xs flex-1" />
                       {personaSearch && (
                         <button type="button" onClick={() => setPersonaSearch('')} className="shrink-0 text-muted-foreground hover:text-foreground">
                           <X className="h-3.5 w-3.5" />
@@ -434,12 +435,12 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
                               <div className="flex items-center justify-between gap-2">
                                 <div className="min-w-0">
                                   <p className="text-sm font-medium truncate">{p.name}</p>
-                                  <p className="text-xs text-muted-foreground">{p.birth_year}–{p.death_year ?? 'present'}</p>
+                                  <p className="text-xs text-muted-foreground">{p.birth_year}–{p.death_year ?? t('personas.present')}</p>
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
                                   {isActive && (
                                     <button onClick={() => togglePersonaAlignment(p.id)}
-                                      title={aligned ? 'Age-aligned — click for real years' : 'Real years — click to age-align'}
+                                      title={aligned ? t('personas.ageAlignedTooltip') : t('personas.realYearsTooltip')}
                                       className={cn('p-1 rounded transition-colors', aligned ? 'text-primary bg-primary/10 hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted')}>
                                       {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
                                     </button>
@@ -453,14 +454,14 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
                       </div>
                     )}
                     {personaSearchTrimmed.length > 0 && personaSearchResults.length === 0 && (
-                      <p className="text-[10px] text-muted-foreground mt-1">No results</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">{t('personas.noResults')}</p>
                     )}
                   </div>
 
                   {/* Recently viewed */}
                   {recentPersonas.length > 0 && personaSearchTrimmed.length === 0 && (
                     <div className="px-2 pt-1.5 border-t">
-                      <p className="text-[10px] font-medium text-muted-foreground mb-1">Recently viewed</p>
+                      <p className="text-[10px] font-medium text-muted-foreground mb-1">{t('personas.recentlyViewed')}</p>
                       {recentPersonas.map(p => {
                         const isActive = activePersonaIds.has(p.id)
                         const aligned = alignedPersonaIds.has(p.id)
@@ -469,12 +470,12 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
                             <div className="flex items-center justify-between gap-2">
                               <div className="min-w-0">
                                 <p className="text-sm font-medium truncate">{p.name}</p>
-                                <p className="text-xs text-muted-foreground">{p.birth_year}–{p.death_year ?? 'present'}</p>
+                                <p className="text-xs text-muted-foreground">{p.birth_year}–{p.death_year ?? t('personas.present')}</p>
                               </div>
                               <div className="flex items-center gap-1.5 shrink-0">
                                 {isActive && (
                                   <button onClick={() => togglePersonaAlignment(p.id)}
-                                    title={aligned ? 'Age-aligned — click for real years' : 'Real years — click to age-align'}
+                                    title={aligned ? t('personas.ageAlignedTooltip') : t('personas.realYearsTooltip')}
                                     className={cn('p-1 rounded transition-colors', aligned ? 'text-primary bg-primary/10 hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted')}>
                                     {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
                                   </button>
@@ -502,22 +503,22 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
             onClick={() => scrollToTodayRef.current?.()}
             className="fixed top-14 left-1/2 -translate-x-1/2 whitespace-nowrap flex items-center gap-1 px-3 py-1.5 rounded text-xs font-semibold border-2 border-red-500 bg-red-500 text-white hover:bg-red-600 hover:border-red-600 transition-colors z-50 shadow-md"
           >
-            {todayOffScreen.direction === 'left' ? '← ' : '→ '}Back to Today
+            {todayOffScreen.direction === 'left' ? '← ' : '→ '}{t('toolbar.backToToday')}
           </button>
         )}
 
         {/* Zoom out */}
-        <Button variant="outline" size="sm" onClick={() => stepZoom(1 / 1.69)} title="Zoom out" data-guide="zoom">
+        <Button variant="outline" size="sm" onClick={() => stepZoom(1 / 1.69)} title={t('toolbar.zoomOut')} data-guide="zoom">
           <ZoomOut className="h-4 w-4" />
         </Button>
 
         {/* Zoom in */}
-        <Button variant="outline" size="sm" onClick={() => stepZoom(1.69)} title="Zoom in">
+        <Button variant="outline" size="sm" onClick={() => stepZoom(1.69)} title={t('toolbar.zoomIn')}>
           <ZoomIn className="h-4 w-4" />
         </Button>
 
         {/* How to use */}
-        <Button variant="outline" size="sm" onClick={() => setGuideOpen(true)} title="How to use" className="px-2 text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950">
+        <Button variant="outline" size="sm" onClick={() => setGuideOpen(true)} title={t('selector.howToUse')} className="px-2 text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950">
           <span className="font-bold text-base leading-none">?</span>
         </Button>
 
@@ -531,11 +532,11 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
           <DropdownMenuContent align="end" className="w-40">
             <DropdownMenuItem onClick={handleAddEvent}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Event
+              {t('toolbar.addEvent')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleAddLane}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Lane
+              {t('toolbar.addLane')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -551,7 +552,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
             <div className="max-h-[70vh] overflow-y-auto">
               <DropdownMenuItem onClick={() => setSearchOpen(true)}>
                 <Search className="h-4 w-4 mr-2" />
-                Search Events
+                {t('toolbar.searchEvents')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {/* Size */}
@@ -579,7 +580,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
               {/* Import */}
               <DropdownMenuItem onClick={() => openImport('calendar-file')}>
                 <CalendarDays className="h-4 w-4 mr-2" />
-                Import Calendar File, Google or text/voice with AI
+                {t('toolbar.importCalendar')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <LanguageSwitcherInline />
