@@ -521,6 +521,29 @@ const fi: Translations = {
     refresh: 'Päivitä',
   },
 
+  lina: {
+    talkToLina: 'Puhu Linalle',
+    aiAssistant: 'Tekoälyavustaja',
+    messagesLeft: '{count} jäljellä',
+    intro: 'Hei! Olen Lina. Kerro tapahtumista, radoista tai aikajanoja, joita haluat lisätä.',
+    introHint: 'Kokeile: "Muutin Berliiniin maaliskuussa 2020"',
+    demoNote: 'Demo: {limit} viestiä — rekisteröidy rajoittamattoman käytön saamiseksi.',
+    statusAdded: 'Lisätty',
+    statusUpdated: 'Päivitetty',
+    statusDeleted: 'Poistettu',
+    actionAccept: 'Hyväksy',
+    actionUpdate: 'Päivitä',
+    actionDelete: 'Poista',
+    actionCancel: 'Peruuta',
+    acceptAll: 'Hyväksy kaikki',
+    demoLimitReached: 'Demo-raja saavutettu',
+    signUpToContinue: 'Rekisteröidy jatkaaksesi Linan kanssa \u2192',
+    recording: 'Äänitetään {time}',
+    transcribing: 'Transkriboidaan\u2026',
+    inputPlaceholder: 'Kerro Linalle mitä lisätä\u2026',
+    demoLimitMessage: 'Olet saavuttanut demon {limit} viestin rajan. Rekisteröidy ilmaiseksi jatkaaksesi aikajanasi rakentamista Linan kanssa \u2014 ei rajoja! \uD83C\uDF89',
+  },
+
   // ── Demo ──
   lanes: {
     place: 'Paikka & Matkailu',

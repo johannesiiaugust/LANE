@@ -521,6 +521,29 @@ const lt: Translations = {
     refresh: 'Atnaujinti',
   },
 
+  lina: {
+    talkToLina: 'Kalbėk su Lina',
+    aiAssistant: 'AI asistentas',
+    messagesLeft: 'dar {count}',
+    intro: 'Labas! Aš esu Lina. Papasakok apie įvykius, juostas ar laiko juostas, kurias nori pridėti.',
+    introHint: 'Išbandyk: "2020 m. kovo mėnesį persikėliau į Berlyną"',
+    demoNote: 'Demo: {limit} žinutės — prisiregistruok neribotai prieigai.',
+    statusAdded: 'Pridėta',
+    statusUpdated: 'Atnaujinta',
+    statusDeleted: 'Ištrinta',
+    actionAccept: 'Priimti',
+    actionUpdate: 'Atnaujinti',
+    actionDelete: 'Ištrinti',
+    actionCancel: 'Atšaukti',
+    acceptAll: 'Priimti visus',
+    demoLimitReached: 'Demo riba pasiekta',
+    signUpToContinue: 'Prisiregistruok, kad tęstum su Lina \u2192',
+    recording: 'Įrašoma {time}',
+    transcribing: 'Transkribuojama\u2026',
+    inputPlaceholder: 'Pasakyk Linai, ką pridėti\u2026',
+    demoLimitMessage: 'Pasiekei demo ribą \u2014 {limit} žinučių. Prisiregistruok nemokamai ir tęsk savo laiko juostos kūrimą su Lina \u2014 be ribų! \uD83C\uDF89',
+  },
+
   // ── Demo ──
   lanes: {
     place: 'Vieta & Kelionės',

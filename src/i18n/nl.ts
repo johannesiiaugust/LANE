@@ -523,6 +523,29 @@ const nl: Translations = {
     refresh: 'Vernieuwen',
   },
 
+  lina: {
+    talkToLina: 'Praat met Lina',
+    aiAssistant: 'AI-assistent',
+    messagesLeft: '{count} over',
+    intro: 'Hoi! Ik ben Lina. Vertel me over gebeurtenissen, banen of tijdlijnen die je wilt toevoegen.',
+    introHint: 'Probeer: "Ik ben in maart 2020 naar Berlijn verhuisd"',
+    demoNote: 'Demo: {limit} berichten — meld je aan voor onbeperkte toegang.',
+    statusAdded: 'Toegevoegd',
+    statusUpdated: 'Bijgewerkt',
+    statusDeleted: 'Verwijderd',
+    actionAccept: 'Accepteren',
+    actionUpdate: 'Bijwerken',
+    actionDelete: 'Verwijderen',
+    actionCancel: 'Annuleren',
+    acceptAll: 'Alles accepteren',
+    demoLimitReached: 'Demolimiet bereikt',
+    signUpToContinue: 'Meld je aan om door te gaan met Lina \u2192',
+    recording: 'Opname {time}',
+    transcribing: 'Transcriberen\u2026',
+    inputPlaceholder: 'Vertel Lina wat je wilt toevoegen\u2026',
+    demoLimitMessage: 'Je hebt de demolimiet van {limit} berichten bereikt. Meld je gratis aan om je tijdlijn verder te bouwen met Lina \u2014 geen beperkingen! \uD83C\uDF89',
+  },
+
   // ── Demo ──
   lanes: {
     place: 'Plaats & Reizen',

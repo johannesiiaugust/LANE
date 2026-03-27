@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { X, Send, Mic, MicOff, Loader2, Check, CheckCheck, Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { isOpenAIConfigured, transcribeAudio } from '@/lib/openai'
+import { useTranslation } from '@/i18n'
 import type { Lane, TimelineEvent } from '@/types/timeline'
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -187,6 +188,7 @@ function parseAssistantMessage(content: string): { text: string; proposals: Prop
 const DEMO_MESSAGE_LIMIT = 5
 
 export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEvent, addLane, updateLane, deleteLane, createTimeline, demoMode, onSignUp }: LinaAssistantProps) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
@@ -242,7 +244,7 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
       if (nextUsed >= DEMO_MESSAGE_LIMIT) {
         const limitMsg: ChatMessage = {
           role: 'assistant',
-          content: `You've reached the demo limit of ${DEMO_MESSAGE_LIMIT} messages. Sign up for free to keep building your timeline with Lina — no limits! 🎉`,
+          content: t('lina.demoLimitMessage', { limit: String(DEMO_MESSAGE_LIMIT) }),
         }
         setMessages([...newMessages, limitMsg])
         return
@@ -300,7 +302,7 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
     } finally {
       setSending(false)
     }
-  }, [messages, sending, laneNames])
+  }, [messages, sending, laneNames, demoMode, demoUsed, t])
 
   // ── Voice recording ────────────────────────────────────────────────────────
 
@@ -501,7 +503,7 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
           className="fixed bottom-16 right-6 sm:bottom-20 sm:right-8 z-50 flex flex-col items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:shadow-3xl transition-all duration-200 hover:scale-110 active:scale-95 h-20 w-20 sm:h-24 sm:w-24 animate-[lina-pulse_2s_ease-in-out_infinite]"
         >
           <span className="text-3xl sm:text-4xl leading-none">👩</span>
-          <span className="text-[10px] sm:text-xs font-bold mt-0.5 leading-tight">Talk to Lina</span>
+          <span className="text-[10px] sm:text-xs font-bold mt-0.5 leading-tight">{t('lina.talkToLina')}</span>
         </button>
       )}
 
@@ -513,10 +515,10 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
             <div className="flex items-center gap-2">
               <span className="text-lg">👩</span>
               <span className="font-semibold text-foreground">Lina</span>
-              <span className="text-xs text-muted-foreground">AI Assistant</span>
+              <span className="text-xs text-muted-foreground">{t('lina.aiAssistant')}</span>
               {demoMode && (
                 <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', demoUsed >= DEMO_MESSAGE_LIMIT ? 'bg-red-100 text-red-600' : 'bg-muted text-muted-foreground')}>
-                  {Math.max(0, DEMO_MESSAGE_LIMIT - demoUsed)} left
+                  {t('lina.messagesLeft', { count: String(Math.max(0, DEMO_MESSAGE_LIMIT - demoUsed)) })}
                 </span>
               )}
             </div>
@@ -534,14 +536,14 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
               <div className="text-center py-8">
                 <span className="text-4xl block mx-auto mb-3">👩</span>
                 <p className="text-sm text-muted-foreground">
-                  Hi! I'm Lina. Tell me about events, lanes, or timelines you'd like to add.
+                  {t('lina.intro')}
                 </p>
                 <p className="text-xs text-muted-foreground/60 mt-2">
-                  Try: "I moved to Berlin in March 2020"
+                  {t('lina.introHint')}
                 </p>
                 {demoMode && (
                   <p className="text-xs text-muted-foreground/50 mt-3">
-                    Demo: {DEMO_MESSAGE_LIMIT} messages included — sign up for unlimited access.
+                    {t('lina.demoNote', { limit: String(DEMO_MESSAGE_LIMIT) })}
                   </p>
                 )}
               </div>
@@ -586,7 +588,7 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
                               )}>
                                 {item.action !== 'create' ? `${item.action} ` : ''}{item.type}
                               </span>
-                              {status === 'accepted' && <span className="text-green-600 text-[10px] font-medium flex items-center gap-1"><Check className="h-3 w-3" />{item.action === 'delete' ? 'Deleted' : item.action === 'edit' ? 'Updated' : 'Added'}</span>}
+                              {status === 'accepted' && <span className="text-green-600 text-[10px] font-medium flex items-center gap-1"><Check className="h-3 w-3" />{item.action === 'delete' ? t('lina.statusDeleted') : item.action === 'edit' ? t('lina.statusUpdated') : t('lina.statusAdded')}</span>}
                               {status === 'rejected' && <span className="text-red-500 text-[10px] font-medium">Rejected</span>}
                             </div>
 
@@ -640,13 +642,13 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
                                   )}
                                 >
                                   <Check className="h-3 w-3" />
-                                  {item.action === 'delete' ? 'Delete' : item.action === 'edit' ? 'Update' : 'Accept'}
+                                  {item.action === 'delete' ? t('lina.actionDelete') : item.action === 'edit' ? t('lina.actionUpdate') : t('lina.actionAccept')}
                                 </button>
                                 <button
                                   onClick={() => handleRejectItem(msgIdx, itemIdx)}
                                   className="flex-1 flex items-center justify-center gap-1 py-2 text-muted-foreground hover:bg-accent transition-colors font-medium border-l border-border/50"
                                 >
-                                  <X className="h-3 w-3" /> Cancel
+                                  <X className="h-3 w-3" /> {t('lina.actionCancel')}
                                 </button>
                               </div>
                             )}
@@ -660,7 +662,7 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
                           onClick={() => handleAcceptAll(msgIdx)}
                           className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border border-green-300 text-green-700 hover:bg-green-50 transition-colors text-xs font-semibold"
                         >
-                          <CheckCheck className="h-3.5 w-3.5" /> Accept All
+                          <CheckCheck className="h-3.5 w-3.5" /> {t('lina.acceptAll')}
                         </button>
                       )}
                     </div>
@@ -686,12 +688,12 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
             {/* Demo limit reached */}
             {demoMode && demoUsed >= DEMO_MESSAGE_LIMIT && (
               <div className="mb-3 rounded-xl bg-primary/10 border border-primary/20 px-4 py-3 text-center">
-                <p className="text-xs text-muted-foreground mb-2">Demo limit reached</p>
+                <p className="text-xs text-muted-foreground mb-2">{t('lina.demoLimitReached')}</p>
                 <button
                   onClick={onSignUp}
                   className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
                 >
-                  Sign up to continue with Lina →
+                  {t('lina.signUpToContinue')}
                 </button>
               </div>
             )}
@@ -700,14 +702,14 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
               <div className="flex items-center gap-2 mb-2 px-2">
                 <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                 <span className="text-xs text-red-600 font-medium">
-                  Recording {Math.floor(elapsed / 60)}:{(elapsed % 60).toString().padStart(2, '0')}
+                  {t('lina.recording', { time: `${Math.floor(elapsed / 60)}:${(elapsed % 60).toString().padStart(2, '0')}` })}
                 </span>
               </div>
             )}
             {transcribing && (
               <div className="flex items-center gap-2 mb-2 px-2">
                 <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Transcribing...</span>
+                <span className="text-xs text-muted-foreground">{t('lina.transcribing')}</span>
               </div>
             )}
 
@@ -734,7 +736,7 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input) } }}
-                placeholder="Tell Lina what to add..."
+                placeholder={t('lina.inputPlaceholder')}
                 disabled={sending || recording || transcribing}
                 className="flex-1 h-10 rounded-full border border-input bg-background px-4 text-sm outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
               />

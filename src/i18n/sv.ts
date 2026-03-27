@@ -523,6 +523,29 @@ const sv: Translations = {
     refresh: 'Uppdatera',
   },
 
+  lina: {
+    talkToLina: 'Prata med Lina',
+    aiAssistant: 'AI-assistent',
+    messagesLeft: '{count} kvar',
+    intro: 'Hej! Jag heter Lina. Berätta om händelser, banor eller tidslinjer du vill lägga till.',
+    introHint: 'Prova: "Jag flyttade till Berlin i mars 2020"',
+    demoNote: 'Demo: {limit} meddelanden — registrera dig för obegränsad åtkomst.',
+    statusAdded: 'Tillagd',
+    statusUpdated: 'Uppdaterad',
+    statusDeleted: 'Borttagen',
+    actionAccept: 'Godkänn',
+    actionUpdate: 'Uppdatera',
+    actionDelete: 'Ta bort',
+    actionCancel: 'Avbryt',
+    acceptAll: 'Godkänn alla',
+    demoLimitReached: 'Demogräns nådd',
+    signUpToContinue: 'Registrera dig för att fortsätta med Lina \u2192',
+    recording: 'Spelar in {time}',
+    transcribing: 'Transkriberar\u2026',
+    inputPlaceholder: 'Berätta för Lina vad du vill lägga till\u2026',
+    demoLimitMessage: 'Du har nått demogränsen på {limit} meddelanden. Registrera dig gratis för att fortsätta bygga din tidslinje med Lina \u2014 utan begränsningar! \uD83C\uDF89',
+  },
+
   // ── Demo ──
   lanes: {
     place: 'Plats & Resor',

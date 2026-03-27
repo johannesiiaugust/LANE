@@ -517,6 +517,29 @@ const it: Translations = {
     refresh: 'Aggiorna',
   },
 
+  lina: {
+    talkToLina: 'Parla con Lina',
+    aiAssistant: 'Assistente IA',
+    messagesLeft: '{count} rimasti',
+    intro: 'Ciao! Sono Lina. Dimmi degli eventi, delle corsie o delle linee del tempo che vuoi aggiungere.',
+    introHint: 'Prova: "Mi sono trasferito a Berlino nel marzo 2020"',
+    demoNote: 'Demo: {limit} messaggi — registrati per accesso illimitato.',
+    statusAdded: 'Aggiunto',
+    statusUpdated: 'Aggiornato',
+    statusDeleted: 'Eliminato',
+    actionAccept: 'Accetta',
+    actionUpdate: 'Aggiorna',
+    actionDelete: 'Elimina',
+    actionCancel: 'Annulla',
+    acceptAll: 'Accetta tutto',
+    demoLimitReached: 'Limite demo raggiunto',
+    signUpToContinue: 'Iscriviti per continuare con Lina \u2192',
+    recording: 'Registrazione {time}',
+    transcribing: 'Trascrizione\u2026',
+    inputPlaceholder: 'Dì a Lina cosa aggiungere\u2026',
+    demoLimitMessage: 'Hai raggiunto il limite demo di {limit} messaggi. Iscriviti gratuitamente per continuare a costruire la tua linea del tempo con Lina \u2014 senza limiti! \uD83C\uDF89',
+  },
+
   // ── Demo ──
   lanes: {
     place: 'Luogo & Viaggi',
