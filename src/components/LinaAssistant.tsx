@@ -56,6 +56,8 @@ interface LinaAssistantProps {
   updateLane: (id: string, updates: Partial<Omit<Lane, 'id' | 'isDefault'>>) => Promise<void>
   deleteLane: (id: string) => Promise<void>
   createTimeline: (name?: string, emoji?: string, color?: string, withDefaultLanes?: boolean) => Promise<string | null>
+  demoMode?: boolean
+  onSignUp?: () => void
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -182,11 +184,14 @@ function parseAssistantMessage(content: string): { text: string; proposals: Prop
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEvent, addLane, updateLane, deleteLane, createTimeline }: LinaAssistantProps) {
+const DEMO_MESSAGE_LIMIT = 5
+
+export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEvent, addLane, updateLane, deleteLane, createTimeline, demoMode, onSignUp }: LinaAssistantProps) {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
+  const [demoUsed, setDemoUsed] = useState(0)
   const [recording, setRecording] = useState(false)
   const [transcribing, setTranscribing] = useState(false)
   const [elapsed, setElapsed] = useState(0)
@@ -229,6 +234,21 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
     const newMessages = [...messages, userMsg]
     setMessages(newMessages)
     setInput('')
+
+    // Demo limit: block after DEMO_MESSAGE_LIMIT user messages
+    if (demoMode) {
+      const nextUsed = demoUsed + 1
+      setDemoUsed(nextUsed)
+      if (nextUsed >= DEMO_MESSAGE_LIMIT) {
+        const limitMsg: ChatMessage = {
+          role: 'assistant',
+          content: `You've reached the demo limit of ${DEMO_MESSAGE_LIMIT} messages. Sign up for free to keep building your timeline with Lina — no limits! 🎉`,
+        }
+        setMessages([...newMessages, limitMsg])
+        return
+      }
+    }
+
     setSending(true)
 
     try {
@@ -494,6 +514,11 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
               <span className="text-lg">👩</span>
               <span className="font-semibold text-foreground">Lina</span>
               <span className="text-xs text-muted-foreground">AI Assistant</span>
+              {demoMode && (
+                <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', demoUsed >= DEMO_MESSAGE_LIMIT ? 'bg-red-100 text-red-600' : 'bg-muted text-muted-foreground')}>
+                  {Math.max(0, DEMO_MESSAGE_LIMIT - demoUsed)} left
+                </span>
+              )}
             </div>
             <button
               onClick={() => setOpen(false)}
@@ -514,6 +539,11 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
                 <p className="text-xs text-muted-foreground/60 mt-2">
                   Try: "I moved to Berlin in March 2020"
                 </p>
+                {demoMode && (
+                  <p className="text-xs text-muted-foreground/50 mt-3">
+                    Demo: {DEMO_MESSAGE_LIMIT} messages included — sign up for unlimited access.
+                  </p>
+                )}
               </div>
             )}
 
@@ -653,6 +683,18 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
 
           {/* Input area */}
           <div className="shrink-0 border-t border-border bg-background px-3 py-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+            {/* Demo limit reached */}
+            {demoMode && demoUsed >= DEMO_MESSAGE_LIMIT && (
+              <div className="mb-3 rounded-xl bg-primary/10 border border-primary/20 px-4 py-3 text-center">
+                <p className="text-xs text-muted-foreground mb-2">Demo limit reached</p>
+                <button
+                  onClick={onSignUp}
+                  className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+                >
+                  Sign up to continue with Lina →
+                </button>
+              </div>
+            )}
             {/* Recording indicator */}
             {recording && (
               <div className="flex items-center gap-2 mb-2 px-2">
@@ -669,7 +711,7 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
               </div>
             )}
 
-            <div className="flex items-center gap-2">
+            <div className={cn('flex items-center gap-2', demoMode && demoUsed >= DEMO_MESSAGE_LIMIT && 'opacity-40 pointer-events-none')}>
               {/* Mic button */}
               <button
                 onClick={recording ? stopRecording : startRecording}
