@@ -22,6 +22,7 @@ interface DemoTimelineMeta {
 interface DemoState {
   lanes: Lane[]
   meta?: DemoTimelineMeta
+  events?: TimelineEvent[]
 }
 
 const DEFAULT_META: DemoTimelineMeta = {
@@ -36,9 +37,13 @@ function loadSavedState(): DemoState | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
-      const parsed = JSON.parse(raw) as DemoState & { events?: unknown }
+      const parsed = JSON.parse(raw) as DemoState
       if (Array.isArray(parsed.lanes)) {
-        return { lanes: parsed.lanes, meta: parsed.meta }
+        return {
+          lanes: parsed.lanes,
+          meta: parsed.meta,
+          events: Array.isArray(parsed.events) ? parsed.events : undefined,
+        }
       }
     }
   } catch {
@@ -49,7 +54,7 @@ function loadSavedState(): DemoState | null {
 
 function saveState(state: DemoState) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ lanes: state.lanes, meta: state.meta }))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ lanes: state.lanes, meta: state.meta, events: state.events }))
   } catch {
     // ignore
   }
@@ -60,12 +65,15 @@ export function useDemoTimeline() {
   const translatedEvents = useMemo(() => buildDemoEvents(t), [t])
   const savedState = useMemo(() => loadSavedState(), [])
   const [lanes, setLanes] = useState<Lane[]>(savedState?.lanes ?? DEMO_LANES)
-  const [events, setEvents] = useState<TimelineEvent[]>(translatedEvents)
+  const [events, setEvents] = useState<TimelineEvent[]>(savedState?.events ?? translatedEvents)
   const [meta, setMeta] = useState<DemoTimelineMeta>(savedState?.meta ?? DEFAULT_META)
 
-  // Reset events to current language whenever language changes
+  // On language change, refresh base demo events but preserve user-added ones (non demo-evt-* IDs)
   useEffect(() => {
-    setEvents(translatedEvents)
+    setEvents(prev => {
+      const userAdded = prev.filter(e => !e.id.startsWith('demo-evt-'))
+      return [...translatedEvents, ...userAdded]
+    })
   }, [translatedEvents])
   const [pixelsPerYear, setPixelsPerYear] = useState(MIN_PIXELS_PER_YEAR)
 
@@ -85,10 +93,10 @@ export function useDemoTimeline() {
   const yearStart = TIMELINE_YEAR_MIN
   const yearEnd = TIMELINE_YEAR_MAX
 
-  // Persist lanes and meta to localStorage (events are always derived from translations)
+  // Persist lanes, events and meta to localStorage
   useEffect(() => {
-    saveState({ lanes, meta })
-  }, [lanes, meta])
+    saveState({ lanes, meta, events })
+  }, [lanes, meta, events])
 
   const allYears = events.flatMap(e =>
     e.endYear != null ? [e.startYear, e.endYear] : [e.startYear],
