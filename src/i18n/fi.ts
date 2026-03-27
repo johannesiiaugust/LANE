@@ -521,6 +521,16 @@ const fi: Translations = {
     refresh: 'Päivitä',
   },
 
+  welcome: {
+    title: 'Tervetuloa LifeLANEen',
+    subtitle: 'Henkilökohtainen elämäsi aikajana — visualisoi missä olet ollut ja minne olet menossa.',
+    chooseLanguage: 'Valitse kielesi',
+    cookieLabel: 'Hyväksy analytiikkaevästeet',
+    cookieDescription: 'Valitsematta jättäminen tarkoittaa vain välttämättömiä evästeitä. Katso meidän',
+    continue: 'Jatka',
+    aboutButton: 'Tietoa LifeLANEstä',
+  },
+
   lina: {
     talkToLina: 'Puhu Linalle',
     aiAssistant: 'Tekoälyavustaja',

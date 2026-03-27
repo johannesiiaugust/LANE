@@ -525,6 +525,17 @@ const da: Translations = {
     continueWithExample: 'Fortsæt med eksempel →',
     next: 'Næste',
   },
+
+  welcome: {
+    title: 'Velkommen til LifeLANE',
+    subtitle: 'Din personlige livstidslinje — visualiser, hvor du har været, og hvor du er på vej hen.',
+    chooseLanguage: 'Vælg dit sprog',
+    cookieLabel: 'Accepter analytiske cookies',
+    cookieDescription: 'Ikke afkrydset betyder kun nødvendige cookies. Se vores',
+    continue: 'Fortsæt',
+    aboutButton: 'Om LifeLANE',
+  },
+
   lina: {
     talkToLina: 'Snak med Lina',
     aiAssistant: 'AI-assistent',

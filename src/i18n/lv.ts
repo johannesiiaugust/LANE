@@ -523,6 +523,16 @@ const lv: Translations = {
     refresh: 'Atjaunināt',
   },
 
+  welcome: {
+    title: 'Laipni lūdzam LifeLANE',
+    subtitle: 'Tava personīgā dzīves laika skala — vizualizē, kur esi bijis un kurp dodies.',
+    chooseLanguage: 'Izvēlies savu valodu',
+    cookieLabel: 'Pieņemt analītiskās sīkdatnes',
+    cookieDescription: 'Neatzīmēts nozīmē tikai nepieciešamās sīkdatnes. Skatīt mūsu',
+    continue: 'Turpināt',
+    aboutButton: 'Par LifeLANE',
+  },
+
   lina: {
     talkToLina: 'Runā ar Linu',
     aiAssistant: 'AI asistents',

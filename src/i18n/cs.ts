@@ -525,6 +525,17 @@ const cs: Translations = {
     continueWithExample: 'Pokračovat s příkladem →',
     next: 'Další',
   },
+
+  welcome: {
+    title: 'Vítejte v LifeLANE',
+    subtitle: 'Tvoje osobní životní osa — vizualizuj, kde jsi byl/a a kam směřuješ.',
+    chooseLanguage: 'Vyber si jazyk',
+    cookieLabel: 'Přijmout analytické cookies',
+    cookieDescription: 'Nezaškrtnuté znamená pouze nezbytné cookies. Viz naše',
+    continue: 'Pokračovat',
+    aboutButton: 'O LifeLANE',
+  },
+
   lina: {
     talkToLina: 'Mluvte s Linou',
     aiAssistant: 'AI asistent',

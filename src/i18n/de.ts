@@ -523,6 +523,16 @@ const de: Translations = {
     refresh: 'Aktualisieren',
   },
 
+  welcome: {
+    title: 'Willkommen bei LifeLANE',
+    subtitle: 'Deine persönliche Lebenszeitachse — visualisiere, wo du warst und wohin du gehst.',
+    chooseLanguage: 'Wähle deine Sprache',
+    cookieLabel: 'Analyse-Cookies akzeptieren',
+    cookieDescription: 'Nicht angehakt bedeutet nur notwendige Cookies. Siehe unsere',
+    continue: 'Weiter',
+    aboutButton: 'Über LifeLANE',
+  },
+
   lina: {
     talkToLina: 'Mit Lina sprechen',
     aiAssistant: 'KI-Assistent',

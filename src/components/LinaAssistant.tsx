@@ -570,10 +570,10 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
                             key={itemIdx}
                             className={cn(
                               'rounded-lg border text-xs overflow-hidden transition-all',
-                              status === 'accepted' ? 'border-green-300 bg-green-50' :
-                              status === 'rejected' ? 'border-red-200 bg-red-50 opacity-50' :
-                              item.action === 'delete' ? 'border-red-300 bg-red-50/30' :
-                              item.action === 'edit' ? 'border-amber-300 bg-amber-50/30' :
+                              status === 'accepted' ? 'border-green-500/40 bg-green-500/10' :
+                              status === 'rejected' ? 'border-red-500/40 bg-red-500/10 opacity-50' :
+                              item.action === 'delete' ? 'border-red-500/40 bg-red-500/10' :
+                              item.action === 'edit' ? 'border-amber-500/40 bg-amber-500/10' :
                               'border-border bg-background',
                             )}
                           >
@@ -636,9 +636,9 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
                                   onClick={() => handleAcceptItem(msgIdx, itemIdx)}
                                   className={cn(
                                     'flex-1 flex items-center justify-center gap-1 py-2 transition-colors font-medium',
-                                    item.action === 'delete' ? 'text-red-600 hover:bg-red-50' :
-                                    item.action === 'edit' ? 'text-amber-600 hover:bg-amber-50' :
-                                    'text-green-600 hover:bg-green-50',
+                                    item.action === 'delete' ? 'text-red-500 hover:bg-red-500/10' :
+                                    item.action === 'edit' ? 'text-amber-500 hover:bg-amber-500/10' :
+                                    'text-green-500 hover:bg-green-500/10',
                                   )}
                                 >
                                   <Check className="h-3 w-3" />
@@ -660,7 +660,7 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
                       {msg.proposalStatus.some(s => s === 'pending') && msg.proposals.length > 1 && (
                         <button
                           onClick={() => handleAcceptAll(msgIdx)}
-                          className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border border-green-300 text-green-700 hover:bg-green-50 transition-colors text-xs font-semibold"
+                          className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border border-green-500/40 text-green-500 hover:bg-green-500/10 transition-colors text-xs font-semibold"
                         >
                           <CheckCheck className="h-3.5 w-3.5" /> {t('lina.acceptAll')}
                         </button>
