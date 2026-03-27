@@ -342,6 +342,8 @@ const da: Translations = {
     date: 'Dato',
     lane: 'Bane',
     importEvents: 'Importer {count} begivenhed(er)',
+    limitHint: 'Maks. 250 begivenheder pr. import',
+    tooManyEvents: 'Du har valgt {count} begivenheder. Opdel importen i portioner på 250 eller færre.',
     dropOrClick: 'Træk en kalenderfil hertil, eller klik for at vælge',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     connectGoogle: 'Forbind Google Kalender',

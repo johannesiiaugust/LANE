@@ -358,6 +358,8 @@ const sv: Translations = {
     date: 'Datum',
     lane: 'Bana',
     importEvents: 'Importera {count} händelse(r)',
+    limitHint: 'Maximalt 250 händelser per import',
+    tooManyEvents: 'Du har valt {count} händelser. Dela upp importen i omgångar om högst 250.',
     dropOrClick: 'Släpp en kalenderfil här, eller klicka för att välja',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google Kalender-flik

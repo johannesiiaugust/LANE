@@ -342,6 +342,8 @@ const cs: Translations = {
     date: 'Datum',
     lane: 'D\u00e1ha',
     importEvents: 'Importovat {count} ud\u00e1lost\u00ed',
+    limitHint: 'Maximálně 250 událostí na import',
+    tooManyEvents: 'Vybral(a) jsi {count} událostí. Rozděl import na dávky po nejvýše 250.',
     dropOrClick: 'P\u0159et\u00e1hn\u011bte soubor kalend\u00e1\u0159e sem nebo klikn\u011bte pro v\u00fdb\u011br',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     connectGoogle: 'P\u0159ipojit Kalend\u00e1\u0159 Google',

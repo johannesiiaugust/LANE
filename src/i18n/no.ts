@@ -358,6 +358,8 @@ const no: Translations = {
     date: 'Dato',
     lane: 'Bane',
     importEvents: 'Importer {count} hendelse(r)',
+    limitHint: 'Maksimalt 250 hendelser per import',
+    tooManyEvents: 'Du har valgt {count} hendelser. Del importen i porsjoner på 250 eller færre.',
     dropOrClick: 'Slipp en kalenderfil her, eller klikk for å velge',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google Kalender-fane

@@ -358,6 +358,8 @@ const lt: Translations = {
     date: 'Data',
     lane: 'Juosta',
     importEvents: 'Importuoti įvykių: {count}',
+    limitHint: 'Daugiausiai 250 įvykių vienu importu',
+    tooManyEvents: 'Pasirinkote {count} įvykius. Paskirstykite importą į paketus po ne daugiau kaip 250.',
     dropOrClick: 'Vilkite kalendoriaus failą čia arba paspauskite, kad pasirinktumėte',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google kalendoriaus skirtukas

@@ -355,6 +355,8 @@ const es: Translations = {
     date: 'Fecha',
     lane: 'Carril',
     importEvents: 'Importar {count} evento(s)',
+    limitHint: 'Máximo 250 eventos por importación',
+    tooManyEvents: 'Has seleccionado {count} eventos. Divide la importación en lotes de 250 o menos.',
     dropOrClick: 'Suelta un archivo de calendario aquí, o haz clic para seleccionar',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     connectGoogle: 'Conectar Google Calendar',

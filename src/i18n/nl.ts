@@ -358,6 +358,8 @@ const nl: Translations = {
     date: 'Datum',
     lane: 'Baan',
     importEvents: '{count} gebeurtenis(sen) importeren',
+    limitHint: 'Maximaal 250 evenementen per import',
+    tooManyEvents: 'Je hebt {count} evenementen geselecteerd. Verdeel de import in batches van 250 of minder.',
     dropOrClick: 'Sleep een agendabestand hierheen of klik om te selecteren',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google Agenda-tabblad
