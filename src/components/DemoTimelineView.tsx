@@ -23,8 +23,6 @@ import {
   ZoomIn,
   ZoomOut,
   CalendarDays,
-  Search,
-  MoreHorizontal,
   Users,
   Link2,
   Link2Off,
@@ -49,9 +47,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 interface DemoTimelineViewProps {
   onSignUpWithTimeline: () => void
+  searchOpen?: boolean
+  onSearchOpenChange?: (open: boolean) => void
 }
 
-function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: DemoTimelineViewProps) {
+function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, searchOpen: searchOpenProp, onSearchOpenChange }: DemoTimelineViewProps) {
   const { t } = useTranslation()
   const {
     lanes,
@@ -185,7 +185,9 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
   const { size: _size } = useSizeConfig()
   const [importDialogOpen, setImportDialogOpen] = useState(false)
   const [importTab, setImportTab] = useState<ImportTab>('calendar-file')
-  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchOpenInternal, setSearchOpenInternal] = useState(false)
+  const searchOpen = searchOpenProp ?? searchOpenInternal
+  const setSearchOpen = onSearchOpenChange ?? setSearchOpenInternal
   const [guideOpen, setGuideOpen] = useState(false)
   useGoogleTranslate()
   const guideWasOpenRef = useRef(false)
@@ -512,21 +514,6 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
           <span className="font-bold text-base leading-none">?</span>
         </Button>
 
-        {/* 3-dot menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="px-2">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-44">
-            <DropdownMenuItem onClick={() => setSearchOpen(true)}>
-              <Search className="h-4 w-4 mr-2" />
-              {t('toolbar.searchEvents')}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
         {/* Add dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -610,10 +597,10 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
   )
 }
 
-export function DemoTimelineView({ onSignUpWithTimeline }: DemoTimelineViewProps) {
+export function DemoTimelineView({ onSignUpWithTimeline, searchOpen, onSearchOpenChange }: DemoTimelineViewProps) {
   return (
     <TooltipProvider>
-      <DemoTimelineViewInner onSignUpWithTimeline={onSignUpWithTimeline} />
+      <DemoTimelineViewInner onSignUpWithTimeline={onSignUpWithTimeline} searchOpen={searchOpen} onSearchOpenChange={onSearchOpenChange} />
     </TooltipProvider>
   )
 }
