@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/i18n'
-import { navigateLocalized, type Lang } from '@/i18n/context'
+import { navigateLocalized, loadTranslation, type Lang } from '@/i18n/context'
+import { en, type Translations } from '@/i18n'
 
 const WELCOME_LANGS: { id: Lang; flag: string; label: string }[] = [
   { id: 'en', flag: '🇬🇧', label: 'English' },
@@ -17,13 +18,40 @@ const WELCOME_LANGS: { id: Lang; flag: string; label: string }[] = [
 interface WelcomeModalProps {
   currentLang: Lang
   onDismiss: () => void
-  onAbout: () => void
 }
 
-export function WelcomeModal({ currentLang, onDismiss, onAbout }: WelcomeModalProps) {
-  const { t } = useTranslation()
+export function WelcomeModal({ currentLang, onDismiss }: WelcomeModalProps) {
+  const { t: tApp } = useTranslation()
   const [selectedLang, setSelectedLang] = useState<Lang>(currentLang)
   const [cookiesAccepted, setCookiesAccepted] = useState(false)
+  const [previewTranslations, setPreviewTranslations] = useState<Translations | null>(null)
+
+  // Load translations for preview when selected language changes
+  useEffect(() => {
+    if (selectedLang === currentLang) {
+      setPreviewTranslations(null)
+      return
+    }
+    if (selectedLang === 'en') {
+      setPreviewTranslations(en)
+      return
+    }
+    loadTranslation(selectedLang).then(setPreviewTranslations)
+  }, [selectedLang, currentLang])
+
+  // Use preview translations if a different language is selected, otherwise app translations
+  function t(key: string): string {
+    const trans = previewTranslations ?? null
+    if (!trans) return tApp(key as Parameters<typeof tApp>[0])
+    // Navigate nested key like 'welcome.title'
+    const parts = key.split('.')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let val: any = trans
+    for (const part of parts) {
+      val = val?.[part]
+    }
+    return typeof val === 'string' ? val : tApp(key as Parameters<typeof tApp>[0])
+  }
 
   function handleContinue() {
     localStorage.setItem('cookie_consent', cookiesAccepted ? 'full' : 'essential')
@@ -36,10 +64,6 @@ export function WelcomeModal({ currentLang, onDismiss, onAbout }: WelcomeModalPr
   function handleBackdropClick() {
     localStorage.setItem('cookie_consent', 'essential')
     onDismiss()
-  }
-
-  function handleSelectLang(lang: Lang) {
-    setSelectedLang(lang)
   }
 
   return (
@@ -66,7 +90,7 @@ export function WelcomeModal({ currentLang, onDismiss, onAbout }: WelcomeModalPr
             {WELCOME_LANGS.map(({ id, flag, label }) => (
               <button
                 key={id}
-                onClick={() => handleSelectLang(id)}
+                onClick={() => setSelectedLang(id)}
                 title={label}
                 className={`flex flex-col items-center gap-0.5 rounded-lg py-1.5 px-1 transition-all text-center ${
                   selectedLang === id
@@ -93,7 +117,7 @@ export function WelcomeModal({ currentLang, onDismiss, onAbout }: WelcomeModalPr
             <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
               {t('welcome.cookieDescription')}{' '}
               <button
-                onClick={() => { onAbout(); onDismiss() }}
+                onClick={() => { navigateLocalized('/about', selectedLang); onDismiss() }}
                 className="underline hover:text-foreground transition-colors"
               >
                 {t('terms.title')}
@@ -107,7 +131,7 @@ export function WelcomeModal({ currentLang, onDismiss, onAbout }: WelcomeModalPr
           <Button className="flex-1" onClick={handleContinue}>
             {t('welcome.continue')}
           </Button>
-          <Button variant="outline" onClick={() => { onAbout(); onDismiss() }}>
+          <Button variant="outline" onClick={() => { navigateLocalized('/about', selectedLang); onDismiss() }}>
             {t('welcome.aboutButton')}
           </Button>
         </div>
