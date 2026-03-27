@@ -586,7 +586,8 @@ const nl: Translations = {
     placeholderPlace: 'bijv. Amsterdam',
     placeholderWork: 'bijv. Software Engineer bij Google',
     addAnotherEvent: 'Nog een gebeurtenis toevoegen',
-    continueWithExample: 'Doorgaan met voorbeeld →',
+    fillRequiredFields: 'Vul alle verplichte velden in',
+    continueWithExample: 'Doorgaan met het voorbeeld →',
     next: 'Volgende',
   },
   demo: {

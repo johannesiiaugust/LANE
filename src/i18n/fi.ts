@@ -584,6 +584,7 @@ const fi: Translations = {
     placeholderPlace: 'esim. Helsinki',
     placeholderWork: 'esim. Ohjelmistoinsinööri Googlella',
     addAnotherEvent: 'Lisää toinen tapahtuma',
+    fillRequiredFields: 'Täytä kaikki pakolliset kentät',
     continueWithExample: 'Jatka esimerkillä →',
     next: 'Seuraava',
   },

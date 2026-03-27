@@ -286,7 +286,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
                 </div>
               </div>
               {submitted && !birthDate && (
-                <p className="text-xs text-red-500 pl-28">Birth date is required</p>
+                <p className="text-xs text-red-500 pl-28">{t('auth.birthDateRequired')}</p>
               )}
             </div>
 
@@ -297,7 +297,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
                 <div key={row.id} className="flex flex-wrap gap-2 items-end p-3 rounded-lg border bg-muted/30">
                   {/* Lane selector */}
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-xs text-muted-foreground">{t('timeline.lane')}</span>
+                    <span className="text-xs text-muted-foreground">{t('event.lane')}</span>
                     <select
                       value={row.laneId}
                       onChange={e => updateRow(row.id, { laneId: e.target.value })}
@@ -323,14 +323,14 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
                   {/* From / To */}
                   <div className="flex items-end gap-1.5 flex-wrap">
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-xs text-muted-foreground">{t('timeline.start')} <span className="text-red-500">*</span></span>
+                      <span className="text-xs text-muted-foreground">{t('selector.start')} <span className="text-red-500">*</span></span>
                       <div className={submitted && !row.fromYear.trim() ? 'ring-2 ring-red-500 rounded-md' : ''}>
                         <DateInput value={row.fromYear} onChange={v => updateRow(row.id, { fromYear: v })} minIso="1900-01-01" maxIso="2100-12-31" />
                       </div>
                     </div>
                     <span className="text-muted-foreground text-xs pb-2">→</span>
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-xs text-muted-foreground">{t('timeline.end')}</span>
+                      <span className="text-xs text-muted-foreground">{t('selector.end')}</span>
                       <DateInput value={row.toYear} onChange={v => updateRow(row.id, { toYear: v })} minIso="1900-01-01" maxIso="2100-12-31" />
                     </div>
                   </div>
@@ -367,7 +367,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
               ))}
             </div>
             {submitted && (!birthDate || rows.every(r => !r.title.trim() || !r.fromYear.trim())) && (
-              <p className="text-xs text-red-500">Please fill in all required fields (*)</p>
+              <p className="text-xs text-red-500">{t('guide.fillRequiredFields')}</p>
             )}
             <button
               type="button"

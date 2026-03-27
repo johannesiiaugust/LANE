@@ -586,7 +586,8 @@ const sv: Translations = {
     placeholderPlace: 't.ex. Stockholm',
     placeholderWork: 't.ex. Mjukvaruingeniör på Google',
     addAnotherEvent: 'Lägg till ytterligare händelse',
-    continueWithExample: 'Fortsätt med exempel →',
+    fillRequiredFields: 'Fyll i alla obligatoriska fält',
+    continueWithExample: 'Fortsätt med exemplet →',
     next: 'Nästa',
   },
   demo: {

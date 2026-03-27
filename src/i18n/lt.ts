@@ -584,6 +584,7 @@ const lt: Translations = {
     placeholderPlace: 'pvz. Vilnius',
     placeholderWork: 'pvz. Programinės įrangos inžinierius Google',
     addAnotherEvent: 'Pridėti dar vieną įvykį',
+    fillRequiredFields: 'Užpildykite visus privalomus laukus',
     continueWithExample: 'Tęsti su pavyzdžiu →',
     next: 'Kitas',
   },

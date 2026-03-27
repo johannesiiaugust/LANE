@@ -586,7 +586,8 @@ const de: Translations = {
     placeholderPlace: 'z.B. Berlin',
     placeholderWork: 'z.B. Softwareentwickler bei Google',
     addAnotherEvent: 'Weiteres Ereignis hinzufügen',
-    continueWithExample: 'Mit Beispiel fortfahren →',
+    fillRequiredFields: 'Bitte alle Pflichtfelder ausfüllen',
+    continueWithExample: 'Mit dem Beispiel fortfahren →',
     next: 'Weiter',
   },
   demo: {
