@@ -580,7 +580,8 @@ const it: Translations = {
     placeholderPlace: 'es. Roma',
     placeholderWork: 'es. Ingegnere software presso Google',
     addAnotherEvent: 'Aggiungi un altro evento',
-    continueWithExample: "Continua con l'esempio →",
+    fillRequiredFields: 'Compila tutti i campi obbligatori',
+    continueWithExample: 'Continua con l’esempio →',
     next: 'Avanti',
   },
   demo: {

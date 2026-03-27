@@ -523,6 +523,7 @@ const pl: Translations = {
     placeholderPlace: 'np. Warszawa',
     placeholderWork: 'np. Inżyniera oprogramowania w Google',
     addAnotherEvent: 'Dodaj kolejne wydarzenie',
+    fillRequiredFields: 'Proszę wypełnić wszystkie wymagane pola',
     continueWithExample: 'Kontynuuj z przykładem →',
     next: 'Dalej',
   },

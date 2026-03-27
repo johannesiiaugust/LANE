@@ -586,6 +586,7 @@ const lv: Translations = {
     placeholderPlace: 'piem. Rīga',
     placeholderWork: 'piem. Programmatūras inženīeris Google',
     addAnotherEvent: 'Pievienot vēl vienu notīkumu',
+    fillRequiredFields: 'Lūdzu, aizpildiet visus obligātos laukus',
     continueWithExample: 'Turpināt ar piemēru →',
     next: 'Nākamais',
   },

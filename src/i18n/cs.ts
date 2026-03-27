@@ -523,6 +523,7 @@ const cs: Translations = {
     placeholderPlace: 'např. Praha',
     placeholderWork: 'např. Softwarový inženýr v Google',
     addAnotherEvent: 'Přidat další událost',
+    fillRequiredFields: 'Vyplňte prosím všechna povinná pole',
     continueWithExample: 'Pokračovat s příkladem →',
     next: 'Další',
   },

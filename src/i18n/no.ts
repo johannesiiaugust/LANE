@@ -584,7 +584,8 @@ const no: Translations = {
     placeholderPlace: 'f.eks. Oslo',
     placeholderWork: 'f.eks. Programvareutvikler hos Google',
     addAnotherEvent: 'Legg til en hendelse til',
-    continueWithExample: 'Fortsett med eksempel →',
+    fillRequiredFields: 'Fyll inn alle obligatoriske felt',
+    continueWithExample: 'Fortsett med eksemplet →',
     next: 'Neste',
   },
   demo: {

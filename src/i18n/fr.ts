@@ -580,6 +580,7 @@ const fr: Translations = {
     placeholderPlace: 'ex. Paris',
     placeholderWork: 'ex. Ingénieur logiciel chez Google',
     addAnotherEvent: 'Ajouter un autre événement',
+    fillRequiredFields: 'Veuillez remplir tous les champs obligatoires',
     continueWithExample: 'Continuer avec l’exemple →',
     next: 'Suivant',
   },

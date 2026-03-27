@@ -610,7 +610,8 @@ const en = {
     placeholderPlace: 'e.g. New York',
     placeholderWork: 'e.g. Software Engineer at Google',
     addAnotherEvent: 'Add another event',
-    continueWithExample: 'Continue with example \u2192',
+    fillRequiredFields: 'Please fill in all required fields',
+    continueWithExample: 'Continue with the example →',
     next: 'Next',
   },
 

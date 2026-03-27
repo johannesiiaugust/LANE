@@ -523,7 +523,8 @@ const da: Translations = {
     placeholderPlace: 'f.eks. København',
     placeholderWork: 'f.eks. Softwareudvikler hos Google',
     addAnotherEvent: 'Tilføj endnu en hændelse',
-    continueWithExample: 'Fortsæt med eksempel →',
+    fillRequiredFields: 'Udfyld venligst alle obligatoriske felter',
+    continueWithExample: 'Fortsæt med eksemplet →',
     next: 'Næste',
   },
 
