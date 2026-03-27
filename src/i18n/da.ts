@@ -78,7 +78,7 @@ const da: Translations = {
     zoomOut: 'Zoom ud',
     backToToday: 'Tilbage til i dag',
     editProfile: 'Rediger profil',
-    importCalendar: 'Importer kalenderfil, Google eller tekst/tale med AI',
+    importCalendar: 'Importer begivenheder',
     analytics: 'Analyse',
     small: 'Lille',
     medium: 'Mellem',

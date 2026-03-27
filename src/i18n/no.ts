@@ -81,7 +81,7 @@ const no: Translations = {
     zoomOut: 'Zoom ut',
     backToToday: 'Tilbake til i dag',
     editProfile: 'Rediger profil',
-    importCalendar: 'Importer kalenderfil, Google eller tekst/tale med KI',
+    importCalendar: 'Importer hendelser',
     analytics: 'Analyse',
     small: 'Liten',
     medium: 'Middels',

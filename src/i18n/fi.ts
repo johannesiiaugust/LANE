@@ -81,7 +81,7 @@ const fi: Translations = {
     zoomOut: 'Loitonna',
     backToToday: 'Takaisin tähän päivään',
     editProfile: 'Muokkaa profiilia',
-    importCalendar: 'Tuo kalenteritiedosto, Google tai teksti/ääni tekoälyllä',
+    importCalendar: 'Tuo tapahtumia',
     analytics: 'Analytiikka',
     small: 'Pieni',
     medium: 'Keskikokoinen',

@@ -81,7 +81,7 @@ const lt: Translations = {
     zoomOut: 'Atitolinti',
     backToToday: 'Grįžti į šiandieną',
     editProfile: 'Redaguoti profilį',
-    importCalendar: 'Importuoti kalendoriaus failą, Google arba tekstą/balsą su DI',
+    importCalendar: 'Importuoti įvykius',
     analytics: 'Analitika',
     small: 'Mažas',
     medium: 'Vidutinis',

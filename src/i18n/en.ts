@@ -80,7 +80,7 @@ const en = {
     zoomOut: 'Zoom out',
     backToToday: 'Back to Today',
     editProfile: 'Edit Profile',
-    importCalendar: 'Import Calendar File, Google or text/voice with AI',
+    importCalendar: 'Import events',
     analytics: 'Analytics',
     small: 'Small',
     medium: 'Medium',

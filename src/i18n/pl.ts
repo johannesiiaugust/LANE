@@ -78,7 +78,7 @@ const pl: Translations = {
     zoomOut: 'Oddal',
     backToToday: 'Wróć do dziś',
     editProfile: 'Edytuj profil',
-    importCalendar: 'Importuj plik kalendarza, Google lub tekst/głos z AI',
+    importCalendar: 'Importuj wydarzenia',
     analytics: 'Analityka',
     small: 'Mały',
     medium: 'Średni',

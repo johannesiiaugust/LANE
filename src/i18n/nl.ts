@@ -81,7 +81,7 @@ const nl: Translations = {
     zoomOut: 'Uitzoomen',
     backToToday: 'Terug naar vandaag',
     editProfile: 'Profiel bewerken',
-    importCalendar: 'Agenda importeren, Google of tekst/spraak met AI',
+    importCalendar: 'Evenementen importeren',
     analytics: 'Analyse',
     small: 'Klein',
     medium: 'Middel',

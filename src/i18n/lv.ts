@@ -81,7 +81,7 @@ const lv: Translations = {
     zoomOut: 'Attālināt',
     backToToday: 'Atpakaļ uz šodienu',
     editProfile: 'Rediģēt profilu',
-    importCalendar: 'Importēt kalendāra failu, Google vai tekstu/balsi ar MI',
+    importCalendar: 'Importēt notikumus',
     analytics: 'Analītika',
     small: 'Mazs',
     medium: 'Vidējs',

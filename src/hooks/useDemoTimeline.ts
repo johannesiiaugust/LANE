@@ -23,6 +23,7 @@ interface DemoState {
   lanes: Lane[]
   meta?: DemoTimelineMeta
   events?: TimelineEvent[]
+  userOwnStory?: boolean
 }
 
 const DEFAULT_META: DemoTimelineMeta = {
@@ -43,6 +44,7 @@ function loadSavedState(): DemoState | null {
           lanes: parsed.lanes,
           meta: parsed.meta,
           events: Array.isArray(parsed.events) ? parsed.events : undefined,
+          userOwnStory: parsed.userOwnStory === true,
         }
       }
     }
@@ -54,7 +56,7 @@ function loadSavedState(): DemoState | null {
 
 function saveState(state: DemoState) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ lanes: state.lanes, meta: state.meta, events: state.events }))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ lanes: state.lanes, meta: state.meta, events: state.events, userOwnStory: state.userOwnStory }))
   } catch {
     // ignore
   }
@@ -67,14 +69,17 @@ export function useDemoTimeline() {
   const [lanes, setLanes] = useState<Lane[]>(savedState?.lanes ?? DEMO_LANES)
   const [events, setEvents] = useState<TimelineEvent[]>(savedState?.events ?? translatedEvents)
   const [meta, setMeta] = useState<DemoTimelineMeta>(savedState?.meta ?? DEFAULT_META)
+  const [userOwnStory] = useState(savedState?.userOwnStory ?? false)
 
-  // On language change, refresh base demo events but preserve user-added ones (non demo-evt-* IDs)
+  // On language change, refresh base demo events but preserve user-added ones (non demo-evt-* IDs).
+  // Skip if the user has started their own story — keep only their events.
   useEffect(() => {
+    if (userOwnStory) return
     setEvents(prev => {
       const userAdded = prev.filter(e => !e.id.startsWith('demo-evt-'))
       return [...translatedEvents, ...userAdded]
     })
-  }, [translatedEvents])
+  }, [translatedEvents, userOwnStory])
   const [pixelsPerYear, setPixelsPerYear] = useState(MIN_PIXELS_PER_YEAR)
 
   const demoTimeline: DbTimeline = {
@@ -93,10 +98,10 @@ export function useDemoTimeline() {
   const yearStart = TIMELINE_YEAR_MIN
   const yearEnd = TIMELINE_YEAR_MAX
 
-  // Persist lanes, events and meta to localStorage
+  // Persist lanes, events, meta and userOwnStory to localStorage
   useEffect(() => {
-    saveState({ lanes, meta, events })
-  }, [lanes, meta, events])
+    saveState({ lanes, meta, events, userOwnStory })
+  }, [lanes, meta, events, userOwnStory])
 
   const allYears = events.flatMap(e =>
     e.endYear != null ? [e.startYear, e.endYear] : [e.startYear],

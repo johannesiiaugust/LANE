@@ -81,7 +81,7 @@ const de: Translations = {
     zoomOut: 'Verkleinern',
     backToToday: 'Zurück zu Heute',
     editProfile: 'Profil bearbeiten',
-    importCalendar: 'Kalenderdatei, Google oder Text/Sprache mit KI importieren',
+    importCalendar: 'Ereignisse importieren',
     analytics: 'Analysen',
     small: 'Klein',
     medium: 'Mittel',

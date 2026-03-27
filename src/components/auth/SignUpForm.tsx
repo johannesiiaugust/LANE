@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { DateInput } from '@/components/ui/DateInput'
 
 const USERNAME_RE = /^[a-z0-9_]{3,32}$/
 
@@ -25,6 +26,7 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProp
   const [usernameError, setUsernameError] = useState<string | null>(null)
   const [usernameOk, setUsernameOk] = useState(false)
   const [bio, setBio] = useState('')
+  const [birthDate, setBirthDate] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -81,6 +83,7 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProp
           bio: bio.trim(),
           username: trimmedUsername,
           email,
+          ...(birthDate ? { birth_date: birthDate } : {}),
           created_at: new Date().toISOString(),
         }),
       )
@@ -164,6 +167,18 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProp
           onChange={e => setConfirmPassword(e.target.value)}
           required
           minLength={6}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="signupBirthDate">
+          {t('guide.birthDate')} <span className="text-red-500">*</span>
+        </Label>
+        <DateInput
+          value={birthDate}
+          onChange={setBirthDate}
+          minIso="1900-01-01"
+          maxIso="2020-12-31"
+          className="w-full"
         />
       </div>
       <div className="space-y-2">

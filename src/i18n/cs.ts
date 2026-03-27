@@ -78,7 +78,7 @@ const cs: Translations = {
     zoomOut: 'Odd\u00e1lit',
     backToToday: 'Zp\u011bt na dnes',
     editProfile: 'Upravit profil',
-    importCalendar: 'Importovat soubor kalend\u00e1\u0159e, Google nebo text/hlas s AI',
+    importCalendar: 'Importovat události',
     analytics: 'Analytika',
     small: 'Mal\u00e9',
     medium: 'St\u0159edn\u00ed',
