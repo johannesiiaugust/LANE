@@ -79,6 +79,8 @@ const cs: Translations = {
     zoomOut: 'Odd\u00e1lit',
     backToToday: 'Zp\u011bt na dnes',
     editProfile: 'Upravit profil',
+    hideLena: 'Skrýt Lenu',
+    showLena: 'Zobrazit Lenu',
     importCalendar: 'Importovat události',
     analytics: 'Analytika',
     small: 'Mal\u00e9',
@@ -538,11 +540,11 @@ const cs: Translations = {
     aboutButton: 'O LifeLANE',
   },
 
-  lina: {
-    talkToLina: 'Mluvte s Linou',
+  lena: {
+    talkToLina: 'Mluvte s Lenou',
     aiAssistant: 'AI asistent',
     messagesLeft: '{count} zbývá',
-    intro: 'Ahoj! Jsem Lina. Pověz mi o událostech, dráhách nebo časových osách, které chceš přidat.',
+    intro: 'Ahoj! Jsem Lena. Pověz mi o událostech, dráhách nebo časových osách, které chceš přidat.',
     introHint: 'Zkus: "V březnu 2020 jsem se přestěhoval do Berlína"',
     demoNote: 'Demo: {limit} zpráv — zaregistruj se pro větší přístup.',
     statusAdded: 'Přidáno',

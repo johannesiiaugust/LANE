@@ -79,6 +79,8 @@ const pl: Translations = {
     zoomOut: 'Oddal',
     backToToday: 'Wróć do dziś',
     editProfile: 'Edytuj profil',
+    hideLena: 'Ukryj Lenę',
+    showLena: 'Pokaż Lenę',
     importCalendar: 'Importuj wydarzenia',
     analytics: 'Analityka',
     small: 'Mały',
@@ -538,11 +540,11 @@ const pl: Translations = {
     aboutButton: 'O LifeLANE',
   },
 
-  lina: {
-    talkToLina: 'Porozmawiaj z Liną',
+  lena: {
+    talkToLina: 'Porozmawiaj z Leną',
     aiAssistant: 'Asystent AI',
     messagesLeft: '{count} pozostało',
-    intro: 'Cześć! Jestem Lina. Powiedz mi o wydarzeniach, torach lub osiach czasu, które chcesz dodać.',
+    intro: 'Cześć! Jestem Lena. Powiedz mi o wydarzeniach, torach lub osiach czasu, które chcesz dodać.',
     introHint: 'Spróbuj: "Przeprowadziłem się do Berlina w marcu 2020"',
     demoNote: 'Demo: {limit} wiadomości — zarejestruj się, aby uzyskać więcej dostępu.',
     statusAdded: 'Dodano',

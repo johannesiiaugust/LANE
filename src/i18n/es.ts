@@ -82,6 +82,8 @@ const es: Translations = {
     zoomOut: 'Alejar',
     backToToday: 'Volver a hoy',
     editProfile: 'Editar perfil',
+    hideLena: 'Ocultar Lena',
+    showLena: 'Mostrar Lena',
     importCalendar: 'Importar eventos',
     analytics: 'Analíticas',
     small: 'Pequeño',
@@ -528,11 +530,11 @@ const es: Translations = {
     aboutButton: 'Acerca de LifeLANE',
   },
 
-  lina: {
-    talkToLina: 'Habla con Lina',
+  lena: {
+    talkToLina: 'Habla con Lena',
     aiAssistant: 'Asistente IA',
     messagesLeft: '{count} restantes',
-    intro: '¡Hola! Soy Lina. Cuéntame sobre eventos, carriles o líneas de tiempo que quieras añadir.',
+    intro: '¡Hola! Soy Lena. Cuéntame sobre eventos, carriles o líneas de tiempo que quieras añadir.',
     introHint: 'Intenta: "Me mudé a Berlín en marzo de 2020"',
     demoNote: 'Demo: {limit} mensajes — regístrate para más acceso.',
     statusAdded: 'Añadido',
@@ -544,11 +546,11 @@ const es: Translations = {
     actionCancel: 'Cancelar',
     acceptAll: 'Aceptar todo',
     demoLimitReached: 'Límite de demo alcanzado',
-    signUpToContinue: 'Regístrate para continuar con Lina \u2192',
+    signUpToContinue: 'Regístrate para continuar con Lena \u2192',
     recording: 'Grabando {time}',
     transcribing: 'Transcribiendo\u2026',
-    inputPlaceholder: 'Dile a Lina qué añadir\u2026',
-    demoLimitMessage: 'Has alcanzado el límite de demo de {limit} mensajes. Regístrate para más acceso y sigue construyendo tu línea de tiempo con Lina! \uD83C\uDF89',
+    inputPlaceholder: 'Dile a Lena qué añadir\u2026',
+    demoLimitMessage: 'Has alcanzado el límite de demo de {limit} mensajes. Regístrate para más acceso y sigue construyendo tu línea de tiempo con  Lena! \uD83C\uDF89',
   },
 
   // ── Demo ──

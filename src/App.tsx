@@ -18,7 +18,7 @@ import { TimelineContainer } from '@/components/timeline/TimelineContainer'
 import { TimelineOverview } from '@/components/TimelineOverview'
 import { KanbanBoard } from '@/components/kanban/KanbanBoard'
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
-import { LinaAssistant } from '@/components/LinaAssistant'
+import { LenaAssistant } from '@/components/LenaAssistant'
 import { EventPopover } from '@/components/EventPopover'
 import { EventDialog } from '@/components/dialogs/EventDialog'
 import { LaneDialog } from '@/components/dialogs/LaneDialog'
@@ -237,7 +237,7 @@ function TimelineView() {
 
   // URL-synced view state
   const [activeView, setActiveView] = useAppView()
-  const [linaEnabled, setLinaEnabled] = useState(() => localStorage.getItem('lina_enabled') !== 'false')
+  const [lenaEnabled, setLinaEnabled] = useState(() => localStorage.getItem('lena_enabled') !== 'false')
   const scrollToTodayRef = useRef<(() => void) | null>(null)
   const scrollToEventRef = useRef<((event: TimelineEvent) => void) | null>(null)
   const [todayOffScreen, setTodayOffScreen] = useState<{ direction: 'left' | 'right' } | null>(null)
@@ -472,10 +472,10 @@ function TimelineView() {
           onAddTimeline={() => setRequestCreateTimeline(true)}
           requestCreateTimeline={requestCreateTimeline}
           onRequestCreateTimelineHandled={() => setRequestCreateTimeline(false)}
-          linaEnabled={linaEnabled}
-          onToggleLina={() => setLinaEnabled(prev => {
+          lenaEnabled={lenaEnabled}
+          onToggleLena={() => setLinaEnabled(prev => {
             const next = !prev
-            localStorage.setItem('lina_enabled', String(next))
+            localStorage.setItem('lena_enabled', String(next))
             return next
           })}
         />
@@ -563,8 +563,8 @@ function TimelineView() {
         )}
         <Footer />
       </div>
-      {linaEnabled && (
-        <LinaAssistant
+      {lenaEnabled && (
+        <LenaAssistant
           lanes={lanes}
           events={events}
           addEvent={addEvent}

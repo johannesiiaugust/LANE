@@ -79,6 +79,8 @@ const da: Translations = {
     zoomOut: 'Zoom ud',
     backToToday: 'Tilbage til i dag',
     editProfile: 'Rediger profil',
+    hideLena: 'Skjul Lena',
+    showLena: 'Vis Lena',
     importCalendar: 'Importer begivenheder',
     analytics: 'Analyse',
     small: 'Lille',
@@ -538,11 +540,11 @@ const da: Translations = {
     aboutButton: 'Om LifeLANE',
   },
 
-  lina: {
-    talkToLina: 'Snak med Lina',
+  lena: {
+    talkToLina: 'Snak med Lena',
     aiAssistant: 'AI-assistent',
     messagesLeft: '{count} tilbage',
-    intro: 'Hej! Jeg hedder Lina. Fortæl mig om begivenheder, spor eller tidslinjer du vil tilføje.',
+    intro: 'Hej! Jeg hedder Lena. Fortæl mig om begivenheder, spor eller tidslinjer du vil tilføje.',
     introHint: 'Prøv: "Jeg flyttede til Berlin i marts 2020"',
     demoNote: 'Demo: {limit} beskeder — tilmeld dig for mere adgang.',
     statusAdded: 'Tilføjet',
@@ -554,11 +556,11 @@ const da: Translations = {
     actionCancel: 'Annuller',
     acceptAll: 'Acceptér alle',
     demoLimitReached: 'Demolimit nået',
-    signUpToContinue: 'Tilmeld dig for at fortsætte med Lina \u2192',
+    signUpToContinue: 'Tilmeld dig for at fortsætte med Lena \u2192',
     recording: 'Optager {time}',
     transcribing: 'Transskriberer\u2026',
-    inputPlaceholder: 'Fortæl Lina hvad du vil tilføje\u2026',
-    demoLimitMessage: 'Du har nået demolimitten på {limit} beskeder. Tilmeld dig for mere adgang og fortsæt med at bygge din tidslinje med Lina! \uD83C\uDF89',
+    inputPlaceholder: 'Fortæl Lena hvad du vil tilføje\u2026',
+    demoLimitMessage: 'Du har nået demolimitten på {limit} beskeder. Tilmeld dig for mere adgang og fortsæt med at bygge din tidslinje med  Lena! \uD83C\uDF89',
   },
   demo: {
     comparingYouVs: 'Sammenligning \u2014 Dig vs. Albert Einstein',

@@ -81,6 +81,8 @@ const en = {
     zoomOut: 'Zoom out',
     backToToday: 'Back to Today',
     editProfile: 'Edit Profile',
+    hideLena: 'Hide Lena',
+    showLena: 'Show Lena',
     importCalendar: 'Import events',
     analytics: 'Analytics',
     small: 'Small',
@@ -626,12 +628,12 @@ const en = {
     aboutButton: 'About LifeLANE',
   },
 
-  // ── Lina AI Assistant ──
-  lina: {
-    talkToLina: 'Talk to Lina',
+  // ── Lena AI Assistant ──
+  lena: {
+    talkToLina: 'Talk to Lena',
     aiAssistant: 'AI Assistant',
     messagesLeft: '{count} left',
-    intro: "Hi! I'm Lina. Tell me about events, lanes, or timelines you'd like to add.",
+    intro: "Hi! I'm Lena. Tell me about events, lanes, or timelines you'd like to add.",
     introHint: 'Try: "I moved to Berlin in March 2020"',
     demoNote: 'Demo: {limit} messages — sign up for more access.',
     statusAdded: 'Added',
@@ -643,11 +645,11 @@ const en = {
     actionCancel: 'Cancel',
     acceptAll: 'Accept All',
     demoLimitReached: 'Demo limit reached',
-    signUpToContinue: 'Sign up to continue with Lina \u2192',
+    signUpToContinue: 'Sign up to continue with Lena \u2192',
     recording: 'Recording {time}',
     transcribing: 'Transcribing\u2026',
-    inputPlaceholder: 'Tell Lina what to add\u2026',
-    demoLimitMessage: "You've reached the demo limit of {limit} messages. Sign up to get more access and keep building your timeline with Lina! \uD83C\uDF89",
+    inputPlaceholder: 'Tell Lena what to add\u2026',
+    demoLimitMessage: "You've reached the demo limit of {limit} messages. Sign up to get more access and keep building your timeline with Lena! \uD83C\uDF89",
   },
 
   // ── Demo ──

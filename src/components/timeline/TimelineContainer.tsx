@@ -1101,7 +1101,18 @@ export function TimelineContainer({
   const computeFitScreen = useCallback(() => {
     const el = containerRef.current
     if (!el) return
-    const containerHeight = el.clientHeight
+    // Measure from the container's top edge to the footer's top edge (or window bottom).
+    // This is more reliable than el.clientHeight, which can include the footer
+    // during the first layout pass before the flex algorithm has fully settled.
+    const footerEl = document.querySelector('[data-lane-footer]') as HTMLElement | null
+    let containerHeight: number
+    if (footerEl) {
+      const containerRect = el.getBoundingClientRect()
+      const footerRect = footerEl.getBoundingClientRect()
+      containerHeight = footerRect.top - containerRect.top
+    } else {
+      containerHeight = el.clientHeight
+    }
     if (containerHeight <= 0) return
     const { grandTotalHeight: gh, blh, hr } = fitRef.current
     if (gh <= 0 || blh <= 0) return

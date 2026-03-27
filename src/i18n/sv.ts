@@ -82,6 +82,8 @@ const sv: Translations = {
     zoomOut: 'Zooma ut',
     backToToday: 'Tillbaka till idag',
     editProfile: 'Redigera profil',
+    hideLena: 'Dölj Lena',
+    showLena: 'Visa Lena',
     importCalendar: 'Importera händelser',
     analytics: 'Analys',
     small: 'Liten',
@@ -534,11 +536,11 @@ const sv: Translations = {
     aboutButton: 'Om LifeLANE',
   },
 
-  lina: {
-    talkToLina: 'Prata med Lina',
+  lena: {
+    talkToLina: 'Prata med Lena',
     aiAssistant: 'AI-assistent',
     messagesLeft: '{count} kvar',
-    intro: 'Hej! Jag heter Lina. Berätta om händelser, banor eller tidslinjer du vill lägga till.',
+    intro: 'Hej! Jag heter Lena. Berätta om händelser, banor eller tidslinjer du vill lägga till.',
     introHint: 'Prova: "Jag flyttade till Berlin i mars 2020"',
     demoNote: 'Demo: {limit} meddelanden — registrera dig för mer åtkomst.',
     statusAdded: 'Tillagd',
@@ -550,11 +552,11 @@ const sv: Translations = {
     actionCancel: 'Avbryt',
     acceptAll: 'Godkänn alla',
     demoLimitReached: 'Demogräns nådd',
-    signUpToContinue: 'Registrera dig för att fortsätta med Lina \u2192',
+    signUpToContinue: 'Registrera dig för att fortsätta med Lena \u2192',
     recording: 'Spelar in {time}',
     transcribing: 'Transkriberar\u2026',
-    inputPlaceholder: 'Berätta för Lina vad du vill lägga till\u2026',
-    demoLimitMessage: 'Du har nått demogränsen på {limit} meddelanden. Registrera dig för mer åtkomst och fortsätt bygga din tidslinje med Lina! \uD83C\uDF89',
+    inputPlaceholder: 'Berätta för Lena vad du vill lägga till\u2026',
+    demoLimitMessage: 'Du har nått demogränsen på {limit} meddelanden. Registrera dig för mer åtkomst och fortsätt bygga din tidslinje med  Lena! \uD83C\uDF89',
   },
 
   // ── Demo ──

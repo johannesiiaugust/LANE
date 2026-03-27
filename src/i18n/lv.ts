@@ -82,6 +82,8 @@ const lv: Translations = {
     zoomOut: 'Attālināt',
     backToToday: 'Atpakaļ uz šodienu',
     editProfile: 'Rediģēt profilu',
+    hideLena: 'Paslēpt Lenu',
+    showLena: 'Rādīt Lenu',
     importCalendar: 'Importēt notikumus',
     analytics: 'Analītika',
     small: 'Mazs',
@@ -534,11 +536,11 @@ const lv: Translations = {
     aboutButton: 'Par LifeLANE',
   },
 
-  lina: {
-    talkToLina: 'Runā ar Linu',
+  lena: {
+    talkToLina: 'Runā ar Lenu',
     aiAssistant: 'AI asistents',
     messagesLeft: 'vēl {count}',
-    intro: 'Sveiki! Es esmu Lina. Pastāsti man par notikumiem, celiņiem vai laika skalām, ko vēlies pievienot.',
+    intro: 'Sveiki! Es esmu Lena. Pastāsti man par notikumiem, celiņiem vai laika skalām, ko vēlies pievienot.',
     introHint: 'Pamēģini: "2020. gada martā pārcēlos uz Berlīni"',
     demoNote: 'Demo: {limit} ziņojumi — reģistrējies lielākai piekļuvei.',
     statusAdded: 'Pievienots',
@@ -553,7 +555,7 @@ const lv: Translations = {
     signUpToContinue: 'Reģistrējies, lai turpinātu ar Linu \u2192',
     recording: 'Ieraksts {time}',
     transcribing: 'Pārrakstīšana\u2026',
-    inputPlaceholder: 'Pastāsti Linai, ko pievienot\u2026',
+    inputPlaceholder: 'Pastāsti Lenai, ko pievienot\u2026',
     demoLimitMessage: 'Esi sasniedzis demo limitu \u2014 {limit} ziņojumi. Reģistrējies lielākai piekļuvei un turpini veidot savu laika skalu ar Linu! \uD83C\uDF89',
   },
 

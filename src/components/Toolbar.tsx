@@ -73,8 +73,8 @@ interface ToolbarProps {
   requestCreateTimeline?: boolean
   onRequestCreateTimelineHandled?: () => void
   showUserMenu?: boolean
-  linaEnabled?: boolean
-  onToggleLina?: () => void
+  lenaEnabled?: boolean
+  onToggleLena?: () => void
   extraActions?: React.ReactNode
 }
 
@@ -133,8 +133,8 @@ export function Toolbar({
   requestCreateTimeline,
   onRequestCreateTimelineHandled,
   showUserMenu = true,
-  linaEnabled = true,
-  onToggleLina,
+  lenaEnabled = true,
+  onToggleLena,
   extraActions,
 }: ToolbarProps) {
   useGoogleTranslate()
@@ -300,13 +300,13 @@ export function Toolbar({
                     <UserPen className="h-4 w-4 mr-2" />
                     {t('toolbar.editProfile')}
                   </DropdownMenuItem>
-                  {onToggleLina && (
-                    <DropdownMenuItem onClick={onToggleLina}>
-                      {linaEnabled
+                  {onToggleLena && (
+                    <DropdownMenuItem onClick={onToggleLena}>
+                      {lenaEnabled
                         ? <EyeOff className="h-4 w-4 mr-2" />
                         : <Eye className="h-4 w-4 mr-2" />
                       }
-                      {linaEnabled ? 'Hide Lina' : 'Show Lina'}
+                      {lenaEnabled ? t('toolbar.hideLena') : t('toolbar.showLena')}
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem onClick={signOut}>
