@@ -478,7 +478,7 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 flex flex-col items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:shadow-3xl transition-all duration-200 hover:scale-110 active:scale-95 h-20 w-20 sm:h-24 sm:w-24 animate-[lina-pulse_2s_ease-in-out_infinite]"
+          className="fixed bottom-16 right-6 sm:bottom-20 sm:right-8 z-50 flex flex-col items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:shadow-3xl transition-all duration-200 hover:scale-110 active:scale-95 h-20 w-20 sm:h-24 sm:w-24 animate-[lina-pulse_2s_ease-in-out_infinite]"
         >
           <span className="text-3xl sm:text-4xl leading-none">👩</span>
           <span className="text-[10px] sm:text-xs font-bold mt-0.5 leading-tight">Talk to Lina</span>

@@ -9,14 +9,11 @@ import { LaneDialog } from '@/components/dialogs/LaneDialog'
 import { DeleteConfirmDialog } from '@/components/dialogs/DeleteConfirmDialog'
 import { EventPopover } from '@/components/EventPopover'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { UiSizeProvider, useSizeConfig, type UiSize } from '@/contexts/UiSizeContext'
-import { useSkin, SKINS } from '@/contexts/SkinContext'
-import { SkinDialog } from '@/components/SkinDialog'
+import { useSizeConfig } from '@/contexts/UiSizeContext'
 import { ImportDialog, type ImportTab } from '@/components/ImportDialog'
 import { SearchDialog } from '@/components/SearchDialog'
 import { GuideOverlay } from '@/components/GuideOverlay'
 import { useGoogleTranslate } from '@/components/TranslateMenu'
-import { LanguageSwitcherInline } from '@/components/LanguageSwitcher'
 import { useTranslation } from '@/i18n/context'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -25,9 +22,7 @@ import {
   Plus,
   ZoomIn,
   ZoomOut,
-  MoreHorizontal,
   CalendarDays,
-  Search,
   Users,
   Link2,
   Link2Off,
@@ -52,11 +47,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 interface DemoTimelineViewProps {
   onSignUpWithTimeline: () => void
+  searchOpen?: boolean
+  onSearchOpenChange?: (open: boolean) => void
 }
 
-function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: DemoTimelineViewProps) {
+function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, searchOpen: searchOpenProp, onSearchOpenChange }: DemoTimelineViewProps) {
   const { t } = useTranslation()
-  const SIZE_NAMES: Record<UiSize, string> = { small: t('toolbar.small'), medium: t('toolbar.medium'), large: t('toolbar.large'), fitscreen: t('toolbar.fitScreen') }
   const {
     lanes,
     events,
@@ -186,12 +182,12 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
     setTlEditOpen(false)
   }
 
-  const { size, setSize } = useSizeConfig()
-  const { skinId, setSkinId } = useSkin()
-  const [skinDialogOpen, setSkinDialogOpen] = useState(false)
+  const { size: _size } = useSizeConfig()
   const [importDialogOpen, setImportDialogOpen] = useState(false)
   const [importTab, setImportTab] = useState<ImportTab>('calendar-file')
-  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchOpenInternal, setSearchOpenInternal] = useState(false)
+  const searchOpen = searchOpenProp ?? searchOpenInternal
+  const setSearchOpen = onSearchOpenChange ?? setSearchOpenInternal
   const [guideOpen, setGuideOpen] = useState(false)
   useGoogleTranslate()
   const guideWasOpenRef = useRef(false)
@@ -220,10 +216,6 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
     setImportDialogOpen(true)
   }
 
-  const handleSelectSkin = (id: Parameters<typeof setSkinId>[0]) => {
-    setSkinId(id)
-    if (id === 'custom') setSkinDialogOpen(true)
-  }
 
   const scrollToTodayRef = useRef<(() => void) | null>(null)
   const scrollToEventRef = useRef<((event: TimelineEvent) => void) | null>(null)
@@ -529,7 +521,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
               <Plus className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
+          <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem onClick={handleAddEvent}>
               <Plus className="h-4 w-4 mr-2" />
               {t('toolbar.addEvent')}
@@ -538,53 +530,11 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
               <Plus className="h-4 w-4 mr-2" />
               {t('toolbar.addLane')}
             </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Three-dot overflow menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="px-2" data-guide="overflow-menu">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-52">
-            <div className="max-h-[70vh] overflow-y-auto">
-              <DropdownMenuItem onClick={() => setSearchOpen(true)}>
-                <Search className="h-4 w-4 mr-2" />
-                {t('toolbar.searchEvents')}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {/* Size */}
-              {(['small', 'large', 'fitscreen'] as UiSize[]).map(s => (
-                <DropdownMenuItem
-                  key={s}
-                  onClick={() => setSize(s)}
-                  className={size === s ? 'font-semibold' : ''}
-                >
-                  {SIZE_NAMES[s]}
-                </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-              {/* Theme */}
-              {SKINS.filter(s => ['classic', 'dark', 'sepia'].includes(s.id)).map(s => (
-                <DropdownMenuItem
-                  key={s.id}
-                  onClick={() => handleSelectSkin(s.id)}
-                  className={skinId === s.id ? 'font-semibold' : ''}
-                >
-                  {s.name}
-                </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-              {/* Import */}
-              <DropdownMenuItem onClick={() => openImport('calendar-file')}>
-                <CalendarDays className="h-4 w-4 mr-2" />
-                {t('toolbar.importCalendar')}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <LanguageSwitcherInline />
-            </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => openImport('calendar-file')}>
+              <CalendarDays className="h-4 w-4 mr-2" />
+              {t('toolbar.importCalendar')}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         </div>
@@ -640,7 +590,6 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
       <EventDialog open={eventDialogOpen} onOpenChange={setEventDialogOpen} lanes={lanes} editingEvent={editingEvent} onSave={handleSaveEvent} defaultLaneId={defaultLaneId} defaultStartYear={defaultStartYear} defaultEndYear={defaultEndYear} />
       <LaneDialog open={laneDialogOpen} onOpenChange={setLaneDialogOpen} editingLane={editingLane} onSave={handleSaveLane} />
       <DeleteConfirmDialog open={deleteDialog.open} onOpenChange={open => setDeleteDialog(p => ({ ...p, open }))} title={deleteDialog.title} description={deleteDialog.description} onConfirm={deleteDialog.onConfirm} />
-      <SkinDialog open={skinDialogOpen} onOpenChange={setSkinDialogOpen} />
       <ImportDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} defaultTab={importTab} lanes={lanes} addEvent={addEvent} addLane={addLane} />
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} events={events} lanes={lanes} onNavigate={handleSearchNavigate} />
       <GuideOverlay open={guideOpen} onClose={() => setGuideOpen(false)} />
@@ -648,12 +597,10 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
   )
 }
 
-export function DemoTimelineView({ onSignUpWithTimeline }: DemoTimelineViewProps) {
+export function DemoTimelineView({ onSignUpWithTimeline, searchOpen, onSearchOpenChange }: DemoTimelineViewProps) {
   return (
     <TooltipProvider>
-      <UiSizeProvider storageKey="ui-size-demo" initialSize="small">
-        <DemoTimelineViewInner onSignUpWithTimeline={onSignUpWithTimeline} />
-      </UiSizeProvider>
+      <DemoTimelineViewInner onSignUpWithTimeline={onSignUpWithTimeline} searchOpen={searchOpen} onSearchOpenChange={onSearchOpenChange} />
     </TooltipProvider>
   )
 }
