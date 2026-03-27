@@ -51,6 +51,7 @@ const fi: Translations = {
     passwordsDoNotMatch: 'Salasanat eivät täsmää',
     checkYourEmail: 'Tarkista sähköpostisi',
     sentLink: 'Olemme lähettäneet sinulle linkin. Tarkista postilaatikkosi ja seuraa ohjeita.',
+    birthDateRequired: 'Syntymäaika on pakollinen',
     pleaseChooseUsername: 'Valitse käyttäjänimi',
     usernameAlreadyTaken: 'Käyttäjänimi on jo varattu',
     usernameChars: '3\u201332 merkkiä, pienet kirjaimet, numerot ja alaviivat',

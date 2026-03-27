@@ -51,6 +51,7 @@ const lt: Translations = {
     passwordsDoNotMatch: 'Slaptažodžiai nesutampa',
     checkYourEmail: 'Patikrinkite el. paštą',
     sentLink: 'Išsiuntėme jums nuorodą. Patikrinkite savo pašto dėžutę ir sekite instrukcijas.',
+    birthDateRequired: 'Gimimo data yra privaloma',
     pleaseChooseUsername: 'Pasirinkite vartotojo vardą',
     usernameAlreadyTaken: 'Vartotojo vardas jau užimtas',
     usernameChars: '3–32 simboliai, mažosios raidės, skaičiai, pabraukimai',

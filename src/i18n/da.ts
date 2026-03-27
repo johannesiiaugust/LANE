@@ -49,6 +49,7 @@ const da: Translations = {
     passwordsDoNotMatch: 'Adgangskoderne stemmer ikke overens',
     checkYourEmail: 'Tjek din e-mail',
     sentLink: 'Vi har sendt dig et link. Tjek venligst din indbakke og følg instruktionerne.',
+    birthDateRequired: 'Fødselsdato er påkrævet',
     pleaseChooseUsername: 'Vælg et brugernavn',
     usernameAlreadyTaken: 'Brugernavnet er allerede taget',
     usernameChars: '3\u201332 tegn, kun små bogstaver, tal og underscores',

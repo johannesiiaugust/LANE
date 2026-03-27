@@ -49,6 +49,7 @@ const pl: Translations = {
     passwordsDoNotMatch: 'Hasła nie są zgodne',
     checkYourEmail: 'Sprawdź swój e-mail',
     sentLink: 'Wysłaliśmy Ci link. Sprawdź swoją skrzynkę i postępuj zgodnie z instrukcjami.',
+    birthDateRequired: 'Data urodzenia jest wymagana',
     pleaseChooseUsername: 'Wybierz nazwę użytkownika',
     usernameAlreadyTaken: 'Nazwa użytkownika jest już zajęta',
     usernameChars: '3\u201332 znaki, tylko małe litery, cyfry i podkreślenia',

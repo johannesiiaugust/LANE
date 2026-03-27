@@ -49,6 +49,7 @@ const cs: Translations = {
     passwordsDoNotMatch: 'Hesla se neshoduj\u00ed',
     checkYourEmail: 'Zkontrolujte sv\u016fj e-mail',
     sentLink: 'Zaslali jsme v\u00e1m odkaz. Zkontrolujte dorucenou po\u0161tu a postupujte podle pokyn\u016f.',
+    birthDateRequired: 'Datum narození je povinné',
     pleaseChooseUsername: 'Pros\u00edm zvolte u\u017eivatelsk\u00e9 jm\u00e9no',
     usernameAlreadyTaken: 'U\u017eivatelsk\u00e9 jm\u00e9no je ji\u017e obsazeno',
     usernameChars: '3\u201332 znak\u016f, pouze mal\u00e1 p\u00edsmena, \u010d\u00edsla a podtr\u017e\u00edtka',

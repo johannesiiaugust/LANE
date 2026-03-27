@@ -51,6 +51,7 @@ const nl: Translations = {
     passwordsDoNotMatch: 'Wachtwoorden komen niet overeen',
     checkYourEmail: 'Controleer je e-mail',
     sentLink: 'We hebben je een koppeling gestuurd. Controleer je inbox en volg de instructies.',
+    birthDateRequired: 'Geboortedatum is verplicht',
     pleaseChooseUsername: 'Kies een gebruikersnaam',
     usernameAlreadyTaken: 'Gebruikersnaam is al in gebruik',
     usernameChars: '3\u201332 tekens, kleine letters, cijfers en underscores',

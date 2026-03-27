@@ -51,6 +51,7 @@ const lv: Translations = {
     passwordsDoNotMatch: 'Paroles nesakrīt',
     checkYourEmail: 'Pārbaudiet savu e-pastu',
     sentLink: 'Mēs jums nosūtījām saiti. Lūdzu, pārbaudiet savu iesūtni un sekojiet norādījumiem.',
+    birthDateRequired: 'Dzimšanas datums ir obligāts',
     pleaseChooseUsername: 'Lūdzu, izvēlieties lietotājvārdu',
     usernameAlreadyTaken: 'Lietotājvārds jau ir aizņemts',
     usernameChars: '3–32 rakstzīmes, mazie burti, cipari, pasvītrojumi',

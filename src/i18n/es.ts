@@ -51,6 +51,7 @@ const es: Translations = {
     passwordsDoNotMatch: 'Las contraseñas no coinciden',
     checkYourEmail: 'Revisa tu correo',
     sentLink: 'Te hemos enviado un enlace. Por favor, revisa tu bandeja de entrada y sigue las instrucciones.',
+    birthDateRequired: 'La fecha de nacimiento es obligatoria',
     pleaseChooseUsername: 'Por favor elige un nombre de usuario',
     usernameAlreadyTaken: 'El nombre de usuario ya está en uso',
     usernameChars: '3\u201332 caracteres, letras minúsculas, números y guiones bajos únicamente',
