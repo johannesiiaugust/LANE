@@ -192,10 +192,141 @@ export function Toolbar({
 
   return (
     <>
+      {/* ── Header row: brand + 3-dot ── */}
+      <div className="shrink-0 border-b shadow-sm bg-background px-4 py-3 flex items-center justify-between gap-4">
+        <div className="shrink-0">
+          <div className="text-xl font-bold leading-tight">LifeLANE</div>
+          <div className="text-xs text-muted-foreground italic">{t('auth.theOSForYourLife')}</div>
+        </div>
+
+        {/* ── 3-dot menu ── */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="px-2">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <div className="max-h-[85vh] overflow-y-auto">
+
+              {/* Search */}
+              <DropdownMenuItem onClick={() => setSearchOpen(true)}>
+                <Search className="h-4 w-4 mr-2" />
+                {t('toolbar.searchEvents')}
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              {/* Zoom slider + label */}
+              <div className="px-2 py-1.5 flex items-center gap-2">
+                <ZoomOut className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <input
+                  type="range"
+                  min={0}
+                  max={250}
+                  value={sliderValue}
+                  onChange={handleSliderChange}
+                  className="h-1 flex-1 cursor-pointer accent-primary"
+                  onClick={e => e.stopPropagation()}
+                />
+                <ZoomIn className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <span className="text-[10px] text-muted-foreground w-12 text-right shrink-0">{zoomLabel}</span>
+              </div>
+
+              {/* Max events */}
+              <div className="px-2 py-1.5 flex items-center gap-2">
+                <span className="text-xs text-muted-foreground whitespace-nowrap">{t('toolbar.maxEvents')}</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={99999}
+                  value={maxEvents}
+                  onChange={e => { const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1) onMaxEventsChange(v) }}
+                  onClick={e => e.stopPropagation()}
+                  className="w-16 h-7 rounded-md border border-input bg-background px-2 text-xs text-center ml-auto"
+                  title={t('toolbar.maxEventsTooltip')}
+                />
+              </div>
+
+              <DropdownMenuSeparator />
+
+              {/* Size */}
+              {(['small', 'large', 'fitscreen'] as UiSize[]).map(s => (
+                <DropdownMenuItem
+                  key={s}
+                  onClick={() => setSize(s)}
+                  className={size === s ? 'font-semibold' : ''}
+                >
+                  {SIZE_NAMES[s]}
+                </DropdownMenuItem>
+              ))}
+
+              <DropdownMenuSeparator />
+
+              {/* Theme */}
+              {SKINS.filter(s => ['classic', 'dark', 'sepia'].includes(s.id)).map(s => (
+                <DropdownMenuItem
+                  key={s.id}
+                  onClick={() => handleSelectSkin(s.id)}
+                  className={`gap-2 ${skinId === s.id ? 'font-semibold' : ''}`}
+                >
+                  <SkinSwatch bg={s.bgColor} accent={s.accentColor} />
+                  {s.name}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuItem onClick={() => handleSelectSkin('custom')} className={`gap-2 ${skinId === 'custom' ? 'font-semibold' : ''}`}>
+                <SkinSwatch bg={swatchBg} accent={swatchAccent} />
+                {skinId === 'custom' ? skinLabel : t('toolbar.custom')}
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              {/* Import */}
+              <DropdownMenuItem onClick={() => openImport('calendar-file')}>
+                <CalendarSearch className="h-4 w-4 mr-2" />
+                {t('toolbar.importCalendar')}
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              {/* Analytics */}
+              <DropdownMenuItem onClick={() => _onSetActiveView('anal')}>
+                <BarChart3 className="h-4 w-4 mr-2" />
+                {t('toolbar.analytics')}
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+              <LanguageSwitcherInline />
+
+              {/* User section */}
+              {showUserMenu && user && (
+                <>
+                  <DropdownMenuSeparator />
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground truncate flex items-center gap-2">
+                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-medium shrink-0">
+                      {userInitial}
+                    </span>
+                    {displayName || user.email}
+                  </div>
+                  <DropdownMenuItem onClick={() => setProfileOpen(true)}>
+                    <UserPen className="h-4 w-4 mr-2" />
+                    {t('toolbar.editProfile')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    {t('auth.signOut')}
+                  </DropdownMenuItem>
+                </>
+              )}
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* ── Functional toolbar row ── */}
       <div className="flex items-center justify-between border-b bg-background px-3 py-2 gap-2">
-        {/* ── Left: branding + timeline selector ── */}
+        {/* ── Left: timeline selector ── */}
         <div className="flex items-center gap-2 min-w-0">
-          <h1 className="text-lg font-semibold shrink-0 hidden sm:block">LifeLANE</h1>
           <TimelinePersonaSelector
             personas={personas}
             activePersonaIds={activePersonaIds}
@@ -267,129 +398,6 @@ export function Toolbar({
                 <Plus className="h-4 w-4 mr-2" />
                 {t('toolbar.addTimeline')}
               </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* ── 3-dot menu: everything else ── */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="px-2">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <div className="max-h-[85vh] overflow-y-auto">
-
-                {/* Search */}
-                <DropdownMenuItem onClick={() => setSearchOpen(true)}>
-                  <Search className="h-4 w-4 mr-2" />
-                  {t('toolbar.searchEvents')}
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                {/* Zoom slider + label */}
-                <div className="px-2 py-1.5 flex items-center gap-2">
-                  <ZoomOut className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  <input
-                    type="range"
-                    min={0}
-                    max={250}
-                    value={sliderValue}
-                    onChange={handleSliderChange}
-                    className="h-1 flex-1 cursor-pointer accent-primary"
-                    onClick={e => e.stopPropagation()}
-                  />
-                  <ZoomIn className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  <span className="text-[10px] text-muted-foreground w-12 text-right shrink-0">{zoomLabel}</span>
-                </div>
-
-                {/* Max events */}
-                <div className="px-2 py-1.5 flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">{t('toolbar.maxEvents')}</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={99999}
-                    value={maxEvents}
-                    onChange={e => { const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1) onMaxEventsChange(v) }}
-                    onClick={e => e.stopPropagation()}
-                    className="w-16 h-7 rounded-md border border-input bg-background px-2 text-xs text-center ml-auto"
-                    title={t('toolbar.maxEventsTooltip')}
-                  />
-                </div>
-
-                <DropdownMenuSeparator />
-
-                {/* Size */}
-                {(['small', 'large', 'fitscreen'] as UiSize[]).map(s => (
-                  <DropdownMenuItem
-                    key={s}
-                    onClick={() => setSize(s)}
-                    className={size === s ? 'font-semibold' : ''}
-                  >
-                    {SIZE_NAMES[s]}
-                  </DropdownMenuItem>
-                ))}
-
-                <DropdownMenuSeparator />
-
-                {/* Theme */}
-                {SKINS.filter(s => ['classic', 'dark', 'sepia'].includes(s.id)).map(s => (
-                  <DropdownMenuItem
-                    key={s.id}
-                    onClick={() => handleSelectSkin(s.id)}
-                    className={`gap-2 ${skinId === s.id ? 'font-semibold' : ''}`}
-                  >
-                    <SkinSwatch bg={s.bgColor} accent={s.accentColor} />
-                    {s.name}
-                  </DropdownMenuItem>
-                ))}
-                <DropdownMenuItem onClick={() => handleSelectSkin('custom')} className={`gap-2 ${skinId === 'custom' ? 'font-semibold' : ''}`}>
-                  <SkinSwatch bg={swatchBg} accent={swatchAccent} />
-                  {skinId === 'custom' ? skinLabel : t('toolbar.custom')}
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                {/* Import */}
-                <DropdownMenuItem onClick={() => openImport('calendar-file')}>
-                  <CalendarSearch className="h-4 w-4 mr-2" />
-                  {t('toolbar.importCalendar')}
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                {/* Analytics */}
-                <DropdownMenuItem onClick={() => _onSetActiveView('anal')}>
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  {t('toolbar.analytics')}
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-                <LanguageSwitcherInline />
-
-                {/* User section */}
-                {showUserMenu && user && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <div className="px-2 py-1.5 text-xs text-muted-foreground truncate flex items-center gap-2">
-                      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-medium shrink-0">
-                        {userInitial}
-                      </span>
-                      {displayName || user.email}
-                    </div>
-                    <DropdownMenuItem onClick={() => setProfileOpen(true)}>
-                      <UserPen className="h-4 w-4 mr-2" />
-                      {t('toolbar.editProfile')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={signOut}>
-                      <LogOut className="h-4 w-4 mr-2" />
-                      {t('auth.signOut')}
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </div>
             </DropdownMenuContent>
           </DropdownMenu>
 
