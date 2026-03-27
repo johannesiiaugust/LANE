@@ -81,7 +81,7 @@ const es: Translations = {
     zoomOut: 'Alejar',
     backToToday: 'Volver a hoy',
     editProfile: 'Editar perfil',
-    importCalendar: 'Importar archivo de calendario, Google o texto/voz con IA',
+    importCalendar: 'Importar eventos',
     analytics: 'Analíticas',
     small: 'Pequeño',
     medium: 'Mediano',

@@ -33,8 +33,6 @@ interface UserEventRow {
   toYear: string
 }
 
-const LANE_OPTIONS = DEMO_LANES.map(l => ({ id: l.id, label: `${l.emoji ?? ''} ${l.name}`.trim() }))
-
 function makeRow(laneId: string): UserEventRow {
   return { id: crypto.randomUUID(), laneId, title: '', fromYear: '', toYear: '' }
 }
@@ -50,6 +48,11 @@ interface TargetRect { top: number; left: number; width: number; height: number 
 
 export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
   const { t } = useTranslation()
+
+  const LANE_OPTIONS = DEMO_LANES.map(l => ({
+    id: l.id,
+    label: `${l.emoji ?? ''} ${t(`lanes.${l.id}` as Parameters<typeof t>[0])}`.trim(),
+  }))
 
   const STEPS: Step[] = [
     {
@@ -100,6 +103,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
     makeRow('place'),
     makeRow('work'),
   ])
+  const [submitted, setSubmitted] = useState(false)
 
   const measure = useCallback(() => {
     const s = STEPS[step]
@@ -215,22 +219,38 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
   }
 
   function handleStartOwn() {
-    const events: TimelineEvent[] = rows
-      .filter(r => r.title.trim() && r.fromYear.trim())
-      .map(r => ({
-        id: crypto.randomUUID(),
-        laneId: r.laneId,
-        title: r.title.trim(),
-        description: '',
-        type: 'range' as const,
-        startYear: dateStrToFracYear(r.fromYear),
-        endYear: r.toYear.trim() ? dateStrToFracYear(r.toYear) : undefined,
-      }))
+    setSubmitted(true)
 
-    const birthFrac = birthDate ? dateStrToFracYear(birthDate) : 1990
+    const validRows = rows.filter(r => r.title.trim() && r.fromYear.trim())
+    if (!birthDate || validRows.length === 0) return
+
+    const newEvents: TimelineEvent[] = validRows.map(r => ({
+      id: crypto.randomUUID(),
+      laneId: r.laneId,
+      title: r.title.trim(),
+      description: '',
+      type: 'range' as const,
+      startYear: dateStrToFracYear(r.fromYear),
+      endYear: r.toYear.trim() ? dateStrToFracYear(r.toYear) : undefined,
+    }))
+
+    // Merge with existing user events (preserve events from previous guide runs)
+    let existingUserEvents: TimelineEvent[] = []
+    try {
+      const savedRaw = localStorage.getItem('timeline_demo_v3')
+      if (savedRaw) {
+        const saved = JSON.parse(savedRaw) as { events?: TimelineEvent[] }
+        if (Array.isArray(saved.events)) {
+          existingUserEvents = saved.events.filter(e => !e.id.startsWith('demo-evt-'))
+        }
+      }
+    } catch { /* ignore */ }
+
+    const allUserEvents = [...existingUserEvents, ...newEvents]
+    const birthFrac = dateStrToFracYear(birthDate)
     const meta = { name: 'My Life', color: '#6366f1', start_year: birthFrac, end_year: null, emoji: '👤' }
     try {
-      localStorage.setItem('timeline_demo_v3', JSON.stringify({ lanes: DEMO_LANES, events, meta }))
+      localStorage.setItem('timeline_demo_v3', JSON.stringify({ lanes: DEMO_LANES, events: allUserEvents, meta, userOwnStory: true }))
       localStorage.setItem('timeline_guide_completed', '1')
     } catch { /* ignore */ }
     onClose()
@@ -256,40 +276,63 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
           <div className="px-6 py-5 space-y-5">
 
             {/* Birth date */}
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium shrink-0 w-24">{t('guide.birthDate')}</label>
-              <DateInput value={birthDate} onChange={setBirthDate} minIso="1900-01-01" maxIso="2020-12-31" className="w-56" />
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-medium shrink-0 w-24">
+                  {t('guide.birthDate')} <span className="text-red-500">*</span>
+                </label>
+                <div className={submitted && !birthDate ? 'ring-2 ring-red-500 rounded-md' : ''}>
+                  <DateInput value={birthDate} onChange={setBirthDate} minIso="1900-01-01" maxIso="2020-12-31" className="w-56" />
+                </div>
+              </div>
+              {submitted && !birthDate && (
+                <p className="text-xs text-red-500 pl-28">Birth date is required</p>
+              )}
             </div>
 
             {/* Event rows */}
             <div className="space-y-3">
               <p className="text-sm font-medium">{t('guide.yourLifeEvents')}</p>
               {rows.map((row, idx) => (
-                <div key={row.id} className="flex flex-wrap gap-2 items-start p-3 rounded-lg border bg-muted/30">
+                <div key={row.id} className="flex flex-wrap gap-2 items-end p-3 rounded-lg border bg-muted/30">
                   {/* Lane selector */}
-                  <select
-                    value={row.laneId}
-                    onChange={e => updateRow(row.id, { laneId: e.target.value })}
-                    className="h-8 text-sm border rounded-md px-2 bg-background min-w-[150px]"
-                  >
-                    {LANE_OPTIONS.map(l => (
-                      <option key={l.id} value={l.id}>{l.label}</option>
-                    ))}
-                  </select>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground">{t('timeline.lane')}</span>
+                    <select
+                      value={row.laneId}
+                      onChange={e => updateRow(row.id, { laneId: e.target.value })}
+                      className="h-8 text-sm border rounded-md px-2 bg-background min-w-[150px]"
+                    >
+                      {LANE_OPTIONS.map(l => (
+                        <option key={l.id} value={l.id}>{l.label}</option>
+                      ))}
+                    </select>
+                  </div>
 
                   {/* Title */}
-                  <Input
-                    value={row.title}
-                    onChange={e => updateRow(row.id, { title: e.target.value })}
-                    placeholder={idx === 0 ? t('guide.placeholderPlace') : t('guide.placeholderWork')}
-                    className="h-8 text-sm flex-1 min-w-[140px]"
-                  />
+                  <div className="flex flex-col gap-0.5 flex-1 min-w-[140px]">
+                    <span className="text-xs text-muted-foreground">{t('common.title')} <span className="text-red-500">*</span></span>
+                    <Input
+                      value={row.title}
+                      onChange={e => updateRow(row.id, { title: e.target.value })}
+                      placeholder={idx === 0 ? t('guide.placeholderPlace') : t('guide.placeholderWork')}
+                      className={`h-8 text-sm ${submitted && !row.title.trim() ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                    />
+                  </div>
 
                   {/* From / To */}
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <DateInput value={row.fromYear} onChange={v => updateRow(row.id, { fromYear: v })} minIso="1900-01-01" maxIso="2100-12-31" />
-                    <span className="text-muted-foreground text-xs">→</span>
-                    <DateInput value={row.toYear} onChange={v => updateRow(row.id, { toYear: v })} minIso="1900-01-01" maxIso="2100-12-31" />
+                  <div className="flex items-end gap-1.5 flex-wrap">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs text-muted-foreground">{t('timeline.start')} <span className="text-red-500">*</span></span>
+                      <div className={submitted && !row.fromYear.trim() ? 'ring-2 ring-red-500 rounded-md' : ''}>
+                        <DateInput value={row.fromYear} onChange={v => updateRow(row.id, { fromYear: v })} minIso="1900-01-01" maxIso="2100-12-31" />
+                      </div>
+                    </div>
+                    <span className="text-muted-foreground text-xs pb-2">→</span>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs text-muted-foreground">{t('timeline.end')}</span>
+                      <DateInput value={row.toYear} onChange={v => updateRow(row.id, { toYear: v })} minIso="1900-01-01" maxIso="2100-12-31" />
+                    </div>
                   </div>
 
                   {/* Remove (only if more than 1 row) */}
@@ -323,6 +366,9 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
                 />
               ))}
             </div>
+            {submitted && (!birthDate || rows.every(r => !r.title.trim() || !r.fromYear.trim())) && (
+              <p className="text-xs text-red-500">Please fill in all required fields (*)</p>
+            )}
             <button
               type="button"
               onClick={onClose}

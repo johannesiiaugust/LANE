@@ -378,7 +378,7 @@ export function Toolbar({
             </>
           )}
 
-          {/* ── + dropdown: Event / Lane / Timeline ── */}
+          {/* ── + dropdown: Event / Lane / Timeline / Import ── */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="sm" className="px-2.5" title={t('toolbar.add')}>
@@ -397,6 +397,11 @@ export function Toolbar({
               <DropdownMenuItem onClick={onAddTimeline}>
                 <Plus className="h-4 w-4 mr-2" />
                 {t('toolbar.addTimeline')}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => openImport('calendar-file')}>
+                <CalendarSearch className="h-4 w-4 mr-2" />
+                {t('toolbar.importCalendar')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

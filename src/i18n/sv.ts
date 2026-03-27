@@ -81,7 +81,7 @@ const sv: Translations = {
     zoomOut: 'Zooma ut',
     backToToday: 'Tillbaka till idag',
     editProfile: 'Redigera profil',
-    importCalendar: 'Importera kalenderfil, Google eller text/röst med AI',
+    importCalendar: 'Importera händelser',
     analytics: 'Analys',
     small: 'Liten',
     medium: 'Medium',
