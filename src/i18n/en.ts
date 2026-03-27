@@ -613,6 +613,17 @@ const en = {
     next: 'Next',
   },
 
+  // ── Welcome Modal ──
+  welcome: {
+    title: 'Welcome to LifeLANE',
+    subtitle: 'Your personal life timeline — visualize where you\u2019ve been and where you\u2019re going.',
+    chooseLanguage: 'Choose your language',
+    cookieLabel: 'Accept analytics cookies',
+    cookieDescription: 'Unticked means essential cookies only. See our',
+    continue: 'Continue',
+    aboutButton: 'About LifeLANE',
+  },
+
   // ── Lina AI Assistant ──
   lina: {
     talkToLina: 'Talk to Lina',

@@ -525,6 +525,17 @@ const pl: Translations = {
     continueWithExample: 'Kontynuuj z przykładem →',
     next: 'Dalej',
   },
+
+  welcome: {
+    title: 'Witamy w LifeLANE',
+    subtitle: 'Twoja osobista oś czasu życia — wizualizuj, gdzie byłeś i dokąd zmierzasz.',
+    chooseLanguage: 'Wybierz swój język',
+    cookieLabel: 'Zaakceptuj analityczne pliki cookie',
+    cookieDescription: 'Niezaznaczone oznacza tylko niezbędne pliki cookie. Zobacz nasze',
+    continue: 'Kontynuuj',
+    aboutButton: 'O LifeLANE',
+  },
+
   lina: {
     talkToLina: 'Porozmawiaj z Liną',
     aiAssistant: 'Asystent AI',

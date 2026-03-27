@@ -517,6 +517,16 @@ const fr: Translations = {
     refresh: 'Actualiser',
   },
 
+  welcome: {
+    title: 'Bienvenue sur LifeLANE',
+    subtitle: 'Ta chronologie de vie personnelle — visualise d\'où tu viens et où tu vas.',
+    chooseLanguage: 'Choisir ta langue',
+    cookieLabel: 'Accepter les cookies analytiques',
+    cookieDescription: 'Non coché signifie cookies essentiels uniquement. Voir nos',
+    continue: 'Continuer',
+    aboutButton: 'À propos de LifeLANE',
+  },
+
   lina: {
     talkToLina: 'Parler à Lina',
     aiAssistant: 'Assistant IA',

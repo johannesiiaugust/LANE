@@ -523,6 +523,16 @@ const nl: Translations = {
     refresh: 'Vernieuwen',
   },
 
+  welcome: {
+    title: 'Welkom bij LifeLANE',
+    subtitle: 'Jouw persoonlijke levenslijn — visualiseer waar je bent geweest en waar je naartoe gaat.',
+    chooseLanguage: 'Kies je taal',
+    cookieLabel: 'Analytische cookies accepteren',
+    cookieDescription: 'Niet aangevinkt betekent alleen essentiële cookies. Zie onze',
+    continue: 'Doorgaan',
+    aboutButton: 'Over LifeLANE',
+  },
+
   lina: {
     talkToLina: 'Praat met Lina',
     aiAssistant: 'AI-assistent',

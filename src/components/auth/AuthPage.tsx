@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTitle } from '@/hooks/useTitle'
 import { useTranslation } from '@/i18n'
+import { useLanguage } from '@/i18n'
+import { WelcomeModal } from '@/components/WelcomeModal'
 import { SignInForm } from './SignInForm'
 import { SignUpForm } from './SignUpForm'
 import { ForgotPasswordForm } from './ForgotPasswordForm'
@@ -83,12 +85,14 @@ function AuthHeader({ onOpenAuth, onOpenSearch }: { onOpenAuth: () => void; onOp
 }
 
 export function AuthPage() {
-  const { t } = useTranslation()
+  const { t, navigate } = useTranslation()
+  const lang = useLanguage()
   useTitle(`LifeLANE — ${t('auth.startYourLife')}`)
   const [mode, setMode] = useState<AuthMode>('landing')
   const [authOpen, setAuthOpen] = useState(false)
   const [fromDemo, setFromDemo] = useState(false)
   const [demoSearchOpen, setDemoSearchOpen] = useState(false)
+  const [welcomeOpen, setWelcomeOpen] = useState(() => !localStorage.getItem('welcome_shown'))
 
   function handleSignUpWithTimeline() {
     localStorage.setItem('timeline_import_demo', '1')
@@ -100,6 +104,11 @@ export function AuthPage() {
   function openLanding() {
     setMode('landing')
     setAuthOpen(true)
+  }
+
+  function handleWelcomeDismiss() {
+    localStorage.setItem('welcome_shown', '1')
+    setWelcomeOpen(false)
   }
 
   return (
@@ -165,6 +174,14 @@ export function AuthPage() {
           <Footer />
         </div>
       </UiSizeProvider>
+
+      {welcomeOpen && (
+        <WelcomeModal
+          currentLang={lang}
+          onDismiss={handleWelcomeDismiss}
+          onAbout={() => navigate('/about')}
+        />
+      )}
     </SkinProvider>
   )
 }

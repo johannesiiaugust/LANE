@@ -523,6 +523,16 @@ const sv: Translations = {
     refresh: 'Uppdatera',
   },
 
+  welcome: {
+    title: 'Välkommen till LifeLANE',
+    subtitle: 'Din personliga livstidslinje — visualisera var du har varit och vart du är på väg.',
+    chooseLanguage: 'Välj ditt språk',
+    cookieLabel: 'Acceptera analytiska cookies',
+    cookieDescription: 'Avbockat innebär endast nödvändiga cookies. Se våra',
+    continue: 'Fortsätt',
+    aboutButton: 'Om LifeLANE',
+  },
+
   lina: {
     talkToLina: 'Prata med Lina',
     aiAssistant: 'AI-assistent',

@@ -521,6 +521,16 @@ const lt: Translations = {
     refresh: 'Atnaujinti',
   },
 
+  welcome: {
+    title: 'Sveiki atvykę į LifeLANE',
+    subtitle: 'Jūsų asmeninė gyvenimo laiko juosta — vizualizuokite, kur buvote ir kur einate.',
+    chooseLanguage: 'Pasirinkite savo kalbą',
+    cookieLabel: 'Priimti analitinius slapukus',
+    cookieDescription: 'Nepažymėta reiškia tik būtinus slapukus. Žiūrėti mūsų',
+    continue: 'Tęsti',
+    aboutButton: 'Apie LifeLANE',
+  },
+
   lina: {
     talkToLina: 'Kalbėk su Lina',
     aiAssistant: 'AI asistentas',
