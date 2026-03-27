@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { DateInput } from '@/components/ui/DateInput'
 
 interface ProfileDialogProps {
   open: boolean
@@ -28,6 +29,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
   const [displayName, setDisplayName] = useState('')
   const [bio, setBio] = useState('')
   const [username, setUsername] = useState('')
+  const [birthDate, setBirthDate] = useState('')
   const [usernameError, setUsernameError] = useState<string | null>(null)
   const [usernameOk, setUsernameOk] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -43,6 +45,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
       setDisplayName(profile.display_name)
       setBio(profile.bio)
       setUsername(profile.username ?? '')
+      setBirthDate(profile.birth_date ?? '')
       setUsernameError(null)
       setUsernameOk(false)
       setAvatarPreview(profile.avatar_url ?? null)
@@ -97,6 +100,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
       display_name: displayName.trim(),
       bio: bio.trim(),
       username: trimmedUsername,
+      birth_date: birthDate || null,
       ...(avatarUrl !== undefined ? { avatar_url: avatarUrl } : {}),
     })
     setSaving(false)
@@ -183,6 +187,15 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
               onChange={e => setBio(e.target.value)}
               placeholder={t('profile.shortBio')}
               rows={3}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="profileBirthDate">{t('guide.birthDate')}</Label>
+            <DateInput
+              value={birthDate}
+              onChange={setBirthDate}
+              minIso="1900-01-01"
+              maxIso="2020-12-31"
             />
           </div>
           <DialogFooter className="mt-2">

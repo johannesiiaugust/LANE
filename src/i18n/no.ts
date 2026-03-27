@@ -51,6 +51,7 @@ const no: Translations = {
     passwordsDoNotMatch: 'Passordene stemmer ikke overens',
     checkYourEmail: 'Sjekk e-posten din',
     sentLink: 'Vi har sendt deg en lenke. Sjekk innboksen din og følg instruksjonene.',
+    birthDateRequired: 'Fødselsdato er påkrevd',
     pleaseChooseUsername: 'Vennligst velg et brukernavn',
     usernameAlreadyTaken: 'Brukernavnet er allerede tatt',
     usernameChars: '3\u201332 tegn, små bokstaver, tall og understrek',

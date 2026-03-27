@@ -50,6 +50,7 @@ const en = {
     passwordsDoNotMatch: 'Passwords do not match',
     checkYourEmail: 'Check your email',
     sentLink: "We've sent you a link. Please check your inbox and follow the instructions.",
+    birthDateRequired: 'Birth date is required',
     pleaseChooseUsername: 'Please choose a username',
     usernameAlreadyTaken: 'Username is already taken',
     usernameChars: '3\u201332 chars, lowercase letters, numbers, underscores only',

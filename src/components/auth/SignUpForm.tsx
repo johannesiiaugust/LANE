@@ -71,6 +71,11 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProp
       return
     }
 
+    if (!birthDate) {
+      setError(t('auth.birthDateRequired'))
+      return
+    }
+
     setSubmitting(true)
     const { error } = await signUp(email, password)
     if (error) {

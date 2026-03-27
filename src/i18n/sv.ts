@@ -51,6 +51,7 @@ const sv: Translations = {
     passwordsDoNotMatch: 'Lösenorden matchar inte',
     checkYourEmail: 'Kolla din e-post',
     sentLink: 'Vi har skickat en länk till dig. Kolla din inkorg och följ instruktionerna.',
+    birthDateRequired: 'Födelsedatum krävs',
     pleaseChooseUsername: 'Välj ett användarnamn',
     usernameAlreadyTaken: 'Användarnamnet är redan taget',
     usernameChars: '3\u201332 tecken, gemener, siffror och understreck',
