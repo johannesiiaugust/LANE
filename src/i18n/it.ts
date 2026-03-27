@@ -523,7 +523,7 @@ const it: Translations = {
     messagesLeft: '{count} rimasti',
     intro: 'Ciao! Sono Lina. Dimmi degli eventi, delle corsie o delle linee del tempo che vuoi aggiungere.',
     introHint: 'Prova: "Mi sono trasferito a Berlino nel marzo 2020"',
-    demoNote: 'Demo: {limit} messaggi — registrati per accesso illimitato.',
+    demoNote: 'Demo: {limit} messaggi — registrati per più accesso.',
     statusAdded: 'Aggiunto',
     statusUpdated: 'Aggiornato',
     statusDeleted: 'Eliminato',
@@ -537,7 +537,7 @@ const it: Translations = {
     recording: 'Registrazione {time}',
     transcribing: 'Trascrizione\u2026',
     inputPlaceholder: 'Dì a Lina cosa aggiungere\u2026',
-    demoLimitMessage: 'Hai raggiunto il limite demo di {limit} messaggi. Iscriviti gratuitamente per continuare a costruire la tua linea del tempo con Lina \u2014 senza limiti! \uD83C\uDF89',
+    demoLimitMessage: 'Hai raggiunto il limite demo di {limit} messaggi. Registrati per più accesso e continua a costruire la tua linea del tempo con Lina! \uD83C\uDF89',
   },
 
   // ── Demo ──

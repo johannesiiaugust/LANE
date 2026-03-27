@@ -531,7 +531,7 @@ const da: Translations = {
     messagesLeft: '{count} tilbage',
     intro: 'Hej! Jeg hedder Lina. Fortæl mig om begivenheder, spor eller tidslinjer du vil tilføje.',
     introHint: 'Prøv: "Jeg flyttede til Berlin i marts 2020"',
-    demoNote: 'Demo: {limit} beskeder — tilmeld dig for ubegrænset adgang.',
+    demoNote: 'Demo: {limit} beskeder — tilmeld dig for mere adgang.',
     statusAdded: 'Tilføjet',
     statusUpdated: 'Opdateret',
     statusDeleted: 'Slettet',
@@ -545,7 +545,7 @@ const da: Translations = {
     recording: 'Optager {time}',
     transcribing: 'Transskriberer\u2026',
     inputPlaceholder: 'Fortæl Lina hvad du vil tilføje\u2026',
-    demoLimitMessage: 'Du har nået demolimitten på {limit} beskeder. Tilmeld dig gratis for at fortsætte med at bygge din tidslinje med Lina \u2014 ingen grænser! \uD83C\uDF89',
+    demoLimitMessage: 'Du har nået demolimitten på {limit} beskeder. Tilmeld dig for mere adgang og fortsæt med at bygge din tidslinje med Lina! \uD83C\uDF89',
   },
   demo: {
     comparingYouVs: 'Sammenligning \u2014 Dig vs. Albert Einstein',

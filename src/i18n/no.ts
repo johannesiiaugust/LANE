@@ -527,7 +527,7 @@ const no: Translations = {
     messagesLeft: '{count} igjen',
     intro: 'Hei! Jeg heter Lina. Fortell meg om hendelser, spor eller tidslinjer du vil legge til.',
     introHint: 'Prøv: "Jeg flyttet til Berlin i mars 2020"',
-    demoNote: 'Demo: {limit} meldinger — registrer deg for ubegrenset tilgang.',
+    demoNote: 'Demo: {limit} meldinger — registrer deg for mer tilgang.',
     statusAdded: 'Lagt til',
     statusUpdated: 'Oppdatert',
     statusDeleted: 'Slettet',
@@ -541,7 +541,7 @@ const no: Translations = {
     recording: 'Tar opp {time}',
     transcribing: 'Transkriberer\u2026',
     inputPlaceholder: 'Fortell Lina hva du vil legge til\u2026',
-    demoLimitMessage: 'Du har nådd demolimiten på {limit} meldinger. Registrer deg gratis for å fortsette å bygge tidslinjen din med Lina \u2014 ingen grenser! \uD83C\uDF89',
+    demoLimitMessage: 'Du har nådd demolimiten på {limit} meldinger. Registrer deg for mer tilgang og fortsett å bygge tidslinjen din med Lina! \uD83C\uDF89',
   },
 
   // ── Demo ──

@@ -531,7 +531,7 @@ const cs: Translations = {
     messagesLeft: '{count} zbývá',
     intro: 'Ahoj! Jsem Lina. Pověz mi o událostech, dráhách nebo časových osách, které chceš přidat.',
     introHint: 'Zkus: "V březnu 2020 jsem se přestěhoval do Berlína"',
-    demoNote: 'Demo: {limit} zpráv — zaregistruj se pro neomezený přístup.',
+    demoNote: 'Demo: {limit} zpráv — zaregistruj se pro větší přístup.',
     statusAdded: 'Přidáno',
     statusUpdated: 'Aktualizováno',
     statusDeleted: 'Smazáno',
@@ -545,7 +545,7 @@ const cs: Translations = {
     recording: 'Nahrávání {time}',
     transcribing: 'Přepisování\u2026',
     inputPlaceholder: 'Řekni Lině, co chceš přidat\u2026',
-    demoLimitMessage: 'Dosáhl/a jsi limitu dema {limit} zpráv. Zaregistruj se zdarma a pokračuj ve vytváření své časové osy s Linou \u2014 bez omezení! \uD83C\uDF89',
+    demoLimitMessage: 'Dosáhl/a jsi limitu dema {limit} zpráv. Zaregistruj se pro větší přístup a pokračuj ve vytváření své časové osy s Linou! \uD83C\uDF89',
   },
   demo: {
     comparingYouVs: 'Porovn\u00e1n\u00ed \u2014 Vy vs. Albert Einstein',

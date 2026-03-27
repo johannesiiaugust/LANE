@@ -529,7 +529,7 @@ const de: Translations = {
     messagesLeft: 'Noch {count}',
     intro: 'Hallo! Ich bin Lina. Erzähl mir von Ereignissen, Spuren oder Zeitachsen, die du hinzufügen möchtest.',
     introHint: 'Versuch: "Ich bin im März 2020 nach Berlin gezogen"',
-    demoNote: 'Demo: {limit} Nachrichten — registriere dich für unbegrenzten Zugang.',
+    demoNote: 'Demo: {limit} Nachrichten — registriere dich für mehr Zugang.',
     statusAdded: 'Hinzugefügt',
     statusUpdated: 'Aktualisiert',
     statusDeleted: 'Gelöscht',
@@ -543,7 +543,7 @@ const de: Translations = {
     recording: 'Aufnahme {time}',
     transcribing: 'Transkribiere\u2026',
     inputPlaceholder: 'Sag Lina, was du hinzufügen möchtest\u2026',
-    demoLimitMessage: 'Du hast das Demo-Limit von {limit} Nachrichten erreicht. Registriere dich kostenlos, um deine Zeitachse mit Lina weiterzubauen \u2014 ohne Limits! \uD83C\uDF89',
+    demoLimitMessage: 'Du hast das Demo-Limit von {limit} Nachrichten erreicht. Registriere dich für mehr Zugang und baue deine Zeitachse mit Lina weiter! \uD83C\uDF89',
   },
 
   // ── Demo ──

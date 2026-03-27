@@ -531,7 +531,7 @@ const pl: Translations = {
     messagesLeft: '{count} pozostało',
     intro: 'Cześć! Jestem Lina. Powiedz mi o wydarzeniach, torach lub osiach czasu, które chcesz dodać.',
     introHint: 'Spróbuj: "Przeprowadziłem się do Berlina w marcu 2020"',
-    demoNote: 'Demo: {limit} wiadomości — zarejestruj się, aby uzyskać nieograniczony dostęp.',
+    demoNote: 'Demo: {limit} wiadomości — zarejestruj się, aby uzyskać więcej dostępu.',
     statusAdded: 'Dodano',
     statusUpdated: 'Zaktualizowano',
     statusDeleted: 'Usunięto',
@@ -545,7 +545,7 @@ const pl: Translations = {
     recording: 'Nagrywanie {time}',
     transcribing: 'Transkrypcja\u2026',
     inputPlaceholder: 'Powiedz Linie co dodać\u2026',
-    demoLimitMessage: 'Osiągnąłeś limit demo wynoszący {limit} wiadomości. Zarejestruj się za darmo, aby dalej budować swoją oś czasu z Liną \u2014 bez ograniczeń! \uD83C\uDF89',
+    demoLimitMessage: 'Osiągnąłeś limit demo wynoszący {limit} wiadomości. Zarejestruj się, aby uzyskać więcej dostępu i dalej budować swoją oś czasu z Liną! \uD83C\uDF89',
   },
   demo: {
     comparingYouVs: 'Porównanie \u2014 Ty vs. Albert Einstein',

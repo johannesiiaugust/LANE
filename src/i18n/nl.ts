@@ -529,7 +529,7 @@ const nl: Translations = {
     messagesLeft: '{count} over',
     intro: 'Hoi! Ik ben Lina. Vertel me over gebeurtenissen, banen of tijdlijnen die je wilt toevoegen.',
     introHint: 'Probeer: "Ik ben in maart 2020 naar Berlijn verhuisd"',
-    demoNote: 'Demo: {limit} berichten — meld je aan voor onbeperkte toegang.',
+    demoNote: 'Demo: {limit} berichten — meld je aan voor meer toegang.',
     statusAdded: 'Toegevoegd',
     statusUpdated: 'Bijgewerkt',
     statusDeleted: 'Verwijderd',
@@ -543,7 +543,7 @@ const nl: Translations = {
     recording: 'Opname {time}',
     transcribing: 'Transcriberen\u2026',
     inputPlaceholder: 'Vertel Lina wat je wilt toevoegen\u2026',
-    demoLimitMessage: 'Je hebt de demolimiet van {limit} berichten bereikt. Meld je gratis aan om je tijdlijn verder te bouwen met Lina \u2014 geen beperkingen! \uD83C\uDF89',
+    demoLimitMessage: 'Je hebt de demolimiet van {limit} berichten bereikt. Meld je aan voor meer toegang en bouw verder aan je tijdlijn met Lina! \uD83C\uDF89',
   },
 
   // ── Demo ──

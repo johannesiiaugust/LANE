@@ -529,7 +529,7 @@ const sv: Translations = {
     messagesLeft: '{count} kvar',
     intro: 'Hej! Jag heter Lina. Berätta om händelser, banor eller tidslinjer du vill lägga till.',
     introHint: 'Prova: "Jag flyttade till Berlin i mars 2020"',
-    demoNote: 'Demo: {limit} meddelanden — registrera dig för obegränsad åtkomst.',
+    demoNote: 'Demo: {limit} meddelanden — registrera dig för mer åtkomst.',
     statusAdded: 'Tillagd',
     statusUpdated: 'Uppdaterad',
     statusDeleted: 'Borttagen',
@@ -543,7 +543,7 @@ const sv: Translations = {
     recording: 'Spelar in {time}',
     transcribing: 'Transkriberar\u2026',
     inputPlaceholder: 'Berätta för Lina vad du vill lägga till\u2026',
-    demoLimitMessage: 'Du har nått demogränsen på {limit} meddelanden. Registrera dig gratis för att fortsätta bygga din tidslinje med Lina \u2014 utan begränsningar! \uD83C\uDF89',
+    demoLimitMessage: 'Du har nått demogränsen på {limit} meddelanden. Registrera dig för mer åtkomst och fortsätt bygga din tidslinje med Lina! \uD83C\uDF89',
   },
 
   // ── Demo ──

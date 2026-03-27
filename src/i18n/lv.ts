@@ -529,7 +529,7 @@ const lv: Translations = {
     messagesLeft: 'vēl {count}',
     intro: 'Sveiki! Es esmu Lina. Pastāsti man par notikumiem, celiņiem vai laika skalām, ko vēlies pievienot.',
     introHint: 'Pamēģini: "2020. gada martā pārcēlos uz Berlīni"',
-    demoNote: 'Demo: {limit} ziņojumi — reģistrējies neierobežotai piekļuvei.',
+    demoNote: 'Demo: {limit} ziņojumi — reģistrējies lielākai piekļuvei.',
     statusAdded: 'Pievienots',
     statusUpdated: 'Atjaunināts',
     statusDeleted: 'Dzēsts',
@@ -543,7 +543,7 @@ const lv: Translations = {
     recording: 'Ieraksts {time}',
     transcribing: 'Pārrakstīšana\u2026',
     inputPlaceholder: 'Pastāsti Linai, ko pievienot\u2026',
-    demoLimitMessage: 'Esi sasniedzis demo limitu \u2014 {limit} ziņojumi. Reģistrējies bez maksas, lai turpinātu veidot savu laika skalu ar Linu \u2014 bez ierobežojumiem! \uD83C\uDF89',
+    demoLimitMessage: 'Esi sasniedzis demo limitu \u2014 {limit} ziņojumi. Reģistrējies lielākai piekļuvei un turpini veidot savu laika skalu ar Linu! \uD83C\uDF89',
   },
 
   // ── Demo ──

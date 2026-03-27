@@ -527,7 +527,7 @@ const lt: Translations = {
     messagesLeft: 'dar {count}',
     intro: 'Labas! Aš esu Lina. Papasakok apie įvykius, juostas ar laiko juostas, kurias nori pridėti.',
     introHint: 'Išbandyk: "2020 m. kovo mėnesį persikėliau į Berlyną"',
-    demoNote: 'Demo: {limit} žinutės — prisiregistruok neribotai prieigai.',
+    demoNote: 'Demo: {limit} žinutės — prisiregistruok daugiau prieigai.',
     statusAdded: 'Pridėta',
     statusUpdated: 'Atnaujinta',
     statusDeleted: 'Ištrinta',
@@ -541,7 +541,7 @@ const lt: Translations = {
     recording: 'Įrašoma {time}',
     transcribing: 'Transkribuojama\u2026',
     inputPlaceholder: 'Pasakyk Linai, ką pridėti\u2026',
-    demoLimitMessage: 'Pasiekei demo ribą \u2014 {limit} žinučių. Prisiregistruok nemokamai ir tęsk savo laiko juostos kūrimą su Lina \u2014 be ribų! \uD83C\uDF89',
+    demoLimitMessage: 'Pasiekei demo ribą \u2014 {limit} žinučių. Prisiregistruok daugiau prieigai ir tęsk savo laiko juostos kūrimą su Lina! \uD83C\uDF89',
   },
 
   // ── Demo ──
