@@ -2,24 +2,17 @@ import { useState } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/i18n'
-import { SUPPORTED_LANGS, navigateLocalized, type Lang } from '@/i18n/context'
+import { navigateLocalized, type Lang } from '@/i18n/context'
 
-const LANG_META: Record<Lang, { flag: string; label: string }> = {
-  en: { flag: '🇬🇧', label: 'English' },
-  sv: { flag: '🇸🇪', label: 'Svenska' },
-  no: { flag: '🇳🇴', label: 'Norsk' },
-  fi: { flag: '🇫🇮', label: 'Suomi' },
-  da: { flag: '🇩🇰', label: 'Dansk' },
-  de: { flag: '🇩🇪', label: 'Deutsch' },
-  nl: { flag: '🇳🇱', label: 'Nederlands' },
-  fr: { flag: '🇫🇷', label: 'Français' },
-  es: { flag: '🇪🇸', label: 'Español' },
-  it: { flag: '🇮🇹', label: 'Italiano' },
-  pl: { flag: '🇵🇱', label: 'Polski' },
-  cs: { flag: '🇨🇿', label: 'Čeština' },
-  lv: { flag: '🇱🇻', label: 'Latviešu' },
-  lt: { flag: '🇱🇹', label: 'Lietuvių' },
-}
+const WELCOME_LANGS: { id: Lang; flag: string; label: string }[] = [
+  { id: 'en', flag: '🇬🇧', label: 'English' },
+  { id: 'de', flag: '🇩🇪', label: 'Deutsch' },
+  { id: 'fr', flag: '🇫🇷', label: 'Français' },
+  { id: 'es', flag: '🇪🇸', label: 'Español' },
+  { id: 'it', flag: '🇮🇹', label: 'Italiano' },
+  { id: 'nl', flag: '🇳🇱', label: 'Nederlands' },
+  { id: 'sv', flag: '🇸🇪', label: 'Svenska' },
+]
 
 interface WelcomeModalProps {
   currentLang: Lang
@@ -70,19 +63,19 @@ export function WelcomeModal({ currentLang, onDismiss, onAbout }: WelcomeModalPr
         <div>
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t('welcome.chooseLanguage')}</p>
           <div className="grid grid-cols-7 gap-1">
-            {SUPPORTED_LANGS.map(lang => (
+            {WELCOME_LANGS.map(({ id, flag, label }) => (
               <button
-                key={lang}
-                onClick={() => handleSelectLang(lang)}
-                title={LANG_META[lang].label}
+                key={id}
+                onClick={() => handleSelectLang(id)}
+                title={label}
                 className={`flex flex-col items-center gap-0.5 rounded-lg py-1.5 px-1 transition-all text-center ${
-                  selectedLang === lang
+                  selectedLang === id
                     ? 'bg-primary/15 ring-2 ring-primary'
                     : 'hover:bg-accent'
                 }`}
               >
-                <span className="text-xl leading-none">{LANG_META[lang].flag}</span>
-                <span className="text-[9px] text-muted-foreground leading-tight truncate w-full text-center">{LANG_META[lang].label}</span>
+                <span className="text-xl leading-none">{flag}</span>
+                <span className="text-[9px] text-muted-foreground leading-tight truncate w-full text-center">{label}</span>
               </button>
             ))}
           </div>

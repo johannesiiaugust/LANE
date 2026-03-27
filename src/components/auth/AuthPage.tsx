@@ -93,6 +93,7 @@ export function AuthPage() {
   const [fromDemo, setFromDemo] = useState(false)
   const [demoSearchOpen, setDemoSearchOpen] = useState(false)
   const [welcomeOpen, setWelcomeOpen] = useState(() => !localStorage.getItem('welcome_shown'))
+  const [welcomeDone, setWelcomeDone] = useState(() => !!localStorage.getItem('welcome_shown'))
 
   function handleSignUpWithTimeline() {
     localStorage.setItem('timeline_import_demo', '1')
@@ -109,6 +110,7 @@ export function AuthPage() {
   function handleWelcomeDismiss() {
     localStorage.setItem('welcome_shown', '1')
     setWelcomeOpen(false)
+    setWelcomeDone(true)
   }
 
   return (
@@ -168,7 +170,7 @@ export function AuthPage() {
           {/* Demo timeline fills remaining space */}
           <div className="flex-1 overflow-hidden">
             <DemoTimelineProvider>
-              <DemoTimelineView onSignUpWithTimeline={handleSignUpWithTimeline} searchOpen={demoSearchOpen} onSearchOpenChange={setDemoSearchOpen} />
+              <DemoTimelineView onSignUpWithTimeline={handleSignUpWithTimeline} searchOpen={demoSearchOpen} onSearchOpenChange={setDemoSearchOpen} welcomeDone={welcomeDone} />
             </DemoTimelineProvider>
           </div>
           <Footer />
