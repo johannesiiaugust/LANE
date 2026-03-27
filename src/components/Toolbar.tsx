@@ -2,7 +2,7 @@ import { useMemo, useCallback, useState } from 'react'
 import { useGoogleTranslate } from '@/components/TranslateMenu'
 import { LanguageSwitcherInline } from '@/components/LanguageSwitcher'
 import { useTranslation } from '@/i18n'
-import { Plus, ZoomIn, ZoomOut, MoreHorizontal, CalendarSearch, Search, LogOut, UserPen, BarChart3 } from 'lucide-react'
+import { Plus, ZoomIn, ZoomOut, MoreHorizontal, CalendarSearch, Search, LogOut, UserPen, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TimelinePersonaSelector } from '@/components/TimelinePersonaSelector'
 import { ProfileDialog } from '@/components/ProfileDialog'
@@ -73,6 +73,8 @@ interface ToolbarProps {
   requestCreateTimeline?: boolean
   onRequestCreateTimelineHandled?: () => void
   showUserMenu?: boolean
+  linaEnabled?: boolean
+  onToggleLina?: () => void
   extraActions?: React.ReactNode
 }
 
@@ -131,6 +133,8 @@ export function Toolbar({
   requestCreateTimeline,
   onRequestCreateTimelineHandled,
   showUserMenu = true,
+  linaEnabled = true,
+  onToggleLina,
   extraActions,
 }: ToolbarProps) {
   useGoogleTranslate()
@@ -280,22 +284,6 @@ export function Toolbar({
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
-
-              {/* Import */}
-              <DropdownMenuItem onClick={() => openImport('calendar-file')}>
-                <CalendarSearch className="h-4 w-4 mr-2" />
-                {t('toolbar.importCalendar')}
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator />
-
-              {/* Analytics */}
-              <DropdownMenuItem onClick={() => _onSetActiveView('anal')}>
-                <BarChart3 className="h-4 w-4 mr-2" />
-                {t('toolbar.analytics')}
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator />
               <LanguageSwitcherInline />
 
               {/* User section */}
@@ -312,6 +300,15 @@ export function Toolbar({
                     <UserPen className="h-4 w-4 mr-2" />
                     {t('toolbar.editProfile')}
                   </DropdownMenuItem>
+                  {onToggleLina && (
+                    <DropdownMenuItem onClick={onToggleLina}>
+                      {linaEnabled
+                        ? <EyeOff className="h-4 w-4 mr-2" />
+                        : <Eye className="h-4 w-4 mr-2" />
+                      }
+                      {linaEnabled ? 'Hide Lina' : 'Show Lina'}
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={signOut}>
                     <LogOut className="h-4 w-4 mr-2" />
                     {t('auth.signOut')}

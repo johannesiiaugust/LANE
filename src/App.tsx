@@ -237,6 +237,7 @@ function TimelineView() {
 
   // URL-synced view state
   const [activeView, setActiveView] = useAppView()
+  const [linaEnabled, setLinaEnabled] = useState(() => localStorage.getItem('lina_enabled') !== 'false')
   const scrollToTodayRef = useRef<(() => void) | null>(null)
   const scrollToEventRef = useRef<((event: TimelineEvent) => void) | null>(null)
   const [todayOffScreen, setTodayOffScreen] = useState<{ direction: 'left' | 'right' } | null>(null)
@@ -471,6 +472,12 @@ function TimelineView() {
           onAddTimeline={() => setRequestCreateTimeline(true)}
           requestCreateTimeline={requestCreateTimeline}
           onRequestCreateTimelineHandled={() => setRequestCreateTimeline(false)}
+          linaEnabled={linaEnabled}
+          onToggleLina={() => setLinaEnabled(prev => {
+            const next = !prev
+            localStorage.setItem('lina_enabled', String(next))
+            return next
+          })}
         />
 
         {activeView === 'overview' ? (
@@ -556,17 +563,19 @@ function TimelineView() {
         )}
         <Footer />
       </div>
-      <LinaAssistant
-        lanes={lanes}
-        events={events}
-        addEvent={addEvent}
-        updateEvent={updateEvent}
-        deleteEvent={deleteEvent}
-        addLane={addLane}
-        updateLane={updateLane}
-        deleteLane={deleteLane}
-        createTimeline={createTimeline}
-      />
+      {linaEnabled && (
+        <LinaAssistant
+          lanes={lanes}
+          events={events}
+          addEvent={addEvent}
+          updateEvent={updateEvent}
+          deleteEvent={deleteEvent}
+          addLane={addLane}
+          updateLane={updateLane}
+          deleteLane={deleteLane}
+          createTimeline={createTimeline}
+        />
+      )}
     </TooltipProvider>
   )
 }
