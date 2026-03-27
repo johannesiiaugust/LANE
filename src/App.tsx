@@ -614,10 +614,6 @@ function AppRouter() {
   }
 
   if (!user) {
-    if (!localStorage.getItem('lane_seen_about')) {
-      localStorage.setItem('lane_seen_about', '1')
-      return <AboutPage />
-    }
     return <AuthPage />
   }
 

@@ -85,7 +85,7 @@ function AuthHeader({ onOpenAuth, onOpenSearch }: { onOpenAuth: () => void; onOp
 }
 
 export function AuthPage() {
-  const { t, navigate } = useTranslation()
+  const { t } = useTranslation()
   const lang = useLanguage()
   useTitle(`LifeLANE — ${t('auth.startYourLife')}`)
   const [mode, setMode] = useState<AuthMode>('landing')
@@ -181,7 +181,6 @@ export function AuthPage() {
         <WelcomeModal
           currentLang={lang}
           onDismiss={handleWelcomeDismiss}
-          onAbout={() => navigate('/about')}
         />
       )}
     </SkinProvider>
