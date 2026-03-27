@@ -24,6 +24,7 @@ import {
   ZoomOut,
   CalendarDays,
   Search,
+  MoreHorizontal,
   Users,
   Link2,
   Link2Off,
@@ -511,10 +512,20 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline }: 
           <span className="font-bold text-base leading-none">?</span>
         </Button>
 
-        {/* Search */}
-        <Button variant="outline" size="sm" className="px-2" onClick={() => setSearchOpen(true)} title={t('toolbar.searchEvents')}>
-          <Search className="h-4 w-4" />
-        </Button>
+        {/* 3-dot menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="px-2">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-44">
+            <DropdownMenuItem onClick={() => setSearchOpen(true)}>
+              <Search className="h-4 w-4 mr-2" />
+              {t('toolbar.searchEvents')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Add dropdown */}
         <DropdownMenu>
