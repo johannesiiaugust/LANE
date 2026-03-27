@@ -517,6 +517,29 @@ const es: Translations = {
     refresh: 'Actualizar',
   },
 
+  lina: {
+    talkToLina: 'Habla con Lina',
+    aiAssistant: 'Asistente IA',
+    messagesLeft: '{count} restantes',
+    intro: '¡Hola! Soy Lina. Cuéntame sobre eventos, carriles o líneas de tiempo que quieras añadir.',
+    introHint: 'Intenta: "Me mudé a Berlín en marzo de 2020"',
+    demoNote: 'Demo: {limit} mensajes — regístrate para más acceso.',
+    statusAdded: 'Añadido',
+    statusUpdated: 'Actualizado',
+    statusDeleted: 'Eliminado',
+    actionAccept: 'Aceptar',
+    actionUpdate: 'Actualizar',
+    actionDelete: 'Eliminar',
+    actionCancel: 'Cancelar',
+    acceptAll: 'Aceptar todo',
+    demoLimitReached: 'Límite de demo alcanzado',
+    signUpToContinue: 'Regístrate para continuar con Lina \u2192',
+    recording: 'Grabando {time}',
+    transcribing: 'Transcribiendo\u2026',
+    inputPlaceholder: 'Dile a Lina qué añadir\u2026',
+    demoLimitMessage: 'Has alcanzado el límite de demo de {limit} mensajes. Regístrate para más acceso y sigue construyendo tu línea de tiempo con Lina! \uD83C\uDF89',
+  },
+
   // ── Demo ──
   lanes: {
     place: 'Lugar & Viajes',

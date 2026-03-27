@@ -13,6 +13,7 @@ import { useSizeConfig } from '@/contexts/UiSizeContext'
 import { ImportDialog, type ImportTab } from '@/components/ImportDialog'
 import { SearchDialog } from '@/components/SearchDialog'
 import { GuideOverlay } from '@/components/GuideOverlay'
+import { LinaAssistant } from '@/components/LinaAssistant'
 import { useGoogleTranslate } from '@/components/TranslateMenu'
 import { useTranslation } from '@/i18n/context'
 import { Button } from '@/components/ui/button'
@@ -593,6 +594,19 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
       <ImportDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} defaultTab={importTab} lanes={lanes} addEvent={addEvent} addLane={addLane} />
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} events={events} lanes={lanes} onNavigate={handleSearchNavigate} />
       <GuideOverlay open={guideOpen} onClose={() => setGuideOpen(false)} />
+      <LinaAssistant
+        lanes={lanes}
+        events={events}
+        addEvent={addEvent}
+        updateEvent={updateEvent}
+        deleteEvent={deleteEvent}
+        addLane={addLane}
+        updateLane={updateLane}
+        deleteLane={deleteLane}
+        createTimeline={async () => null}
+        demoMode
+        onSignUp={_onSignUpWithTimeline}
+      />
     </div>
   )
 }

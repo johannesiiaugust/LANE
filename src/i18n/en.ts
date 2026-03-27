@@ -613,6 +613,30 @@ const en = {
     next: 'Next',
   },
 
+  // ── Lina AI Assistant ──
+  lina: {
+    talkToLina: 'Talk to Lina',
+    aiAssistant: 'AI Assistant',
+    messagesLeft: '{count} left',
+    intro: "Hi! I'm Lina. Tell me about events, lanes, or timelines you'd like to add.",
+    introHint: 'Try: "I moved to Berlin in March 2020"',
+    demoNote: 'Demo: {limit} messages — sign up for more access.',
+    statusAdded: 'Added',
+    statusUpdated: 'Updated',
+    statusDeleted: 'Deleted',
+    actionAccept: 'Accept',
+    actionUpdate: 'Update',
+    actionDelete: 'Delete',
+    actionCancel: 'Cancel',
+    acceptAll: 'Accept All',
+    demoLimitReached: 'Demo limit reached',
+    signUpToContinue: 'Sign up to continue with Lina \u2192',
+    recording: 'Recording {time}',
+    transcribing: 'Transcribing\u2026',
+    inputPlaceholder: 'Tell Lina what to add\u2026',
+    demoLimitMessage: "You've reached the demo limit of {limit} messages. Sign up to get more access and keep building your timeline with Lina! \uD83C\uDF89",
+  },
+
   // ── Demo ──
   demo: {
     comparingYouVs: 'Comparing \u2014 You vs. Albert Einstein',

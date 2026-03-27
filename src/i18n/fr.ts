@@ -517,6 +517,29 @@ const fr: Translations = {
     refresh: 'Actualiser',
   },
 
+  lina: {
+    talkToLina: 'Parler à Lina',
+    aiAssistant: 'Assistant IA',
+    messagesLeft: '{count} restant',
+    intro: "Salut\u00a0! Je suis Lina. Parle-moi des événements, des voies ou des chronologies que tu souhaites ajouter.",
+    introHint: 'Essaie\u00a0: "J\'ai déménagé à Berlin en mars 2020"',
+    demoNote: 'Démo\u00a0: {limit} messages — inscris-toi pour plus d\'accès.',
+    statusAdded: 'Ajouté',
+    statusUpdated: 'Mis à jour',
+    statusDeleted: 'Supprimé',
+    actionAccept: 'Accepter',
+    actionUpdate: 'Mettre à jour',
+    actionDelete: 'Supprimer',
+    actionCancel: 'Annuler',
+    acceptAll: 'Tout accepter',
+    demoLimitReached: 'Limite démo atteinte',
+    signUpToContinue: 'Inscris-toi pour continuer avec Lina \u2192',
+    recording: 'Enregistrement {time}',
+    transcribing: 'Transcription\u2026',
+    inputPlaceholder: 'Dis à Lina ce que tu veux ajouter\u2026',
+    demoLimitMessage: "Tu as atteint la limite démo de {limit} messages. Inscris-toi pour plus d'accès et continue à construire ta chronologie avec Lina\u00a0! \uD83C\uDF89",
+  },
+
   // ── Demo ──
   lanes: {
     place: 'Lieu & Voyages',

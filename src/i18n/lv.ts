@@ -523,6 +523,29 @@ const lv: Translations = {
     refresh: 'Atjaunināt',
   },
 
+  lina: {
+    talkToLina: 'Runā ar Linu',
+    aiAssistant: 'AI asistents',
+    messagesLeft: 'vēl {count}',
+    intro: 'Sveiki! Es esmu Lina. Pastāsti man par notikumiem, celiņiem vai laika skalām, ko vēlies pievienot.',
+    introHint: 'Pamēģini: "2020. gada martā pārcēlos uz Berlīni"',
+    demoNote: 'Demo: {limit} ziņojumi — reģistrējies lielākai piekļuvei.',
+    statusAdded: 'Pievienots',
+    statusUpdated: 'Atjaunināts',
+    statusDeleted: 'Dzēsts',
+    actionAccept: 'Pieņemt',
+    actionUpdate: 'Atjaunināt',
+    actionDelete: 'Dzēst',
+    actionCancel: 'Atcelt',
+    acceptAll: 'Pieņemt visus',
+    demoLimitReached: 'Demo limits sasniegts',
+    signUpToContinue: 'Reģistrējies, lai turpinātu ar Linu \u2192',
+    recording: 'Ieraksts {time}',
+    transcribing: 'Pārrakstīšana\u2026',
+    inputPlaceholder: 'Pastāsti Linai, ko pievienot\u2026',
+    demoLimitMessage: 'Esi sasniedzis demo limitu \u2014 {limit} ziņojumi. Reģistrējies lielākai piekļuvei un turpini veidot savu laika skalu ar Linu! \uD83C\uDF89',
+  },
+
   // ── Demo ──
   lanes: {
     place: 'Vieta & Ceļojumi',

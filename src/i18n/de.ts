@@ -523,6 +523,29 @@ const de: Translations = {
     refresh: 'Aktualisieren',
   },
 
+  lina: {
+    talkToLina: 'Mit Lina sprechen',
+    aiAssistant: 'KI-Assistent',
+    messagesLeft: 'Noch {count}',
+    intro: 'Hallo! Ich bin Lina. Erzähl mir von Ereignissen, Spuren oder Zeitachsen, die du hinzufügen möchtest.',
+    introHint: 'Versuch: "Ich bin im März 2020 nach Berlin gezogen"',
+    demoNote: 'Demo: {limit} Nachrichten — registriere dich für mehr Zugang.',
+    statusAdded: 'Hinzugefügt',
+    statusUpdated: 'Aktualisiert',
+    statusDeleted: 'Gelöscht',
+    actionAccept: 'Annehmen',
+    actionUpdate: 'Aktualisieren',
+    actionDelete: 'Löschen',
+    actionCancel: 'Abbrechen',
+    acceptAll: 'Alle annehmen',
+    demoLimitReached: 'Demo-Limit erreicht',
+    signUpToContinue: 'Registriere dich, um mit Lina weiterzumachen \u2192',
+    recording: 'Aufnahme {time}',
+    transcribing: 'Transkribiere\u2026',
+    inputPlaceholder: 'Sag Lina, was du hinzufügen möchtest\u2026',
+    demoLimitMessage: 'Du hast das Demo-Limit von {limit} Nachrichten erreicht. Registriere dich für mehr Zugang und baue deine Zeitachse mit Lina weiter! \uD83C\uDF89',
+  },
+
   // ── Demo ──
   lanes: {
     place: 'Ort & Reisen',

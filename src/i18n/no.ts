@@ -521,6 +521,29 @@ const no: Translations = {
     refresh: 'Oppdater',
   },
 
+  lina: {
+    talkToLina: 'Snakk med Lina',
+    aiAssistant: 'AI-assistent',
+    messagesLeft: '{count} igjen',
+    intro: 'Hei! Jeg heter Lina. Fortell meg om hendelser, spor eller tidslinjer du vil legge til.',
+    introHint: 'Prøv: "Jeg flyttet til Berlin i mars 2020"',
+    demoNote: 'Demo: {limit} meldinger — registrer deg for mer tilgang.',
+    statusAdded: 'Lagt til',
+    statusUpdated: 'Oppdatert',
+    statusDeleted: 'Slettet',
+    actionAccept: 'Godkjenn',
+    actionUpdate: 'Oppdater',
+    actionDelete: 'Slett',
+    actionCancel: 'Avbryt',
+    acceptAll: 'Godkjenn alle',
+    demoLimitReached: 'Demogrense nådd',
+    signUpToContinue: 'Registrer deg for å fortsette med Lina \u2192',
+    recording: 'Tar opp {time}',
+    transcribing: 'Transkriberer\u2026',
+    inputPlaceholder: 'Fortell Lina hva du vil legge til\u2026',
+    demoLimitMessage: 'Du har nådd demolimiten på {limit} meldinger. Registrer deg for mer tilgang og fortsett å bygge tidslinjen din med Lina! \uD83C\uDF89',
+  },
+
   // ── Demo ──
   lanes: {
     place: 'Sted & Reiser',
