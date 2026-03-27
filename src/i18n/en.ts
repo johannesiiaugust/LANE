@@ -359,6 +359,8 @@ const en = {
     date: 'Date',
     lane: 'Lane',
     importEvents: 'Import {count} Event(s)',
+    limitHint: 'Maximum 250 events per import',
+    tooManyEvents: 'You selected {count} events. Please break your import into batches of 250 or fewer.',
     dropOrClick: 'Drop a calendar file here, or click to select',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google Calendar tab

@@ -358,6 +358,8 @@ const lv: Translations = {
     date: 'Datums',
     lane: 'Josla',
     importEvents: 'Importēt {count} notikumu(-s)',
+    limitHint: 'Maksimums 250 notikumi vienā importā',
+    tooManyEvents: 'Esat atlasījis {count} notikumus. Sadaliet importu partijās līdz 250.',
     dropOrClick: 'Ievelciet kalendāra failu šeit vai noklikšķiniet, lai izvēlētos',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google Calendar tab

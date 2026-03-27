@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import { useTranslation } from '@/i18n'
 import { pushEvent } from '@/lib/analytics'
 import { CalendarDays, FileText, Mic, Upload, CheckCircle2, AlertCircle, X, Loader2, ChevronRight } from 'lucide-react'
 import {
@@ -59,7 +60,10 @@ interface CalendarFileTabProps {
   onDone: () => void
 }
 
+const IMPORT_LIMIT = 250
+
 function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabProps) {
+  const { t } = useTranslation()
   const [parsedEvents, setParsedEvents] = useState<ParsedCalendarEvent[]>([])
   const [laneAssignments, setLaneAssignments] = useState<Map<number, string>>(new Map())
   const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set())
@@ -68,6 +72,7 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
   const [newLaneName, setNewLaneName] = useState('')
   const [fileName, setFileName] = useState('')
   const [error, setError] = useState('')
+  const [tooManyError, setTooManyError] = useState(false)
   const [importing, setImporting] = useState(false)
   const [importedCount, setImportedCount] = useState(0)
   const [importProgress, setImportProgress] = useState(0)
@@ -163,6 +168,11 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
   }
 
   const handleImport = async () => {
+    if (selectedCount > IMPORT_LIMIT) {
+      setTooManyError(true)
+      return
+    }
+    setTooManyError(false)
     setImporting(true)
     setImportProgress(0)
     let count = 0
@@ -194,6 +204,7 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
     setParsedEvents([])
     setFileName('')
     setError('')
+    setTooManyError(false)
     setImportedCount(0)
     setImportProgress(0)
     setLaneAssignments(new Map())
@@ -373,6 +384,13 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
         <Button onClick={handleImport} disabled={selectedCount === 0} className="w-full">
           Import {selectedCount} Event{selectedCount !== 1 ? 's' : ''}
         </Button>
+        {tooManyError && (
+          <div className="flex items-start gap-2 text-sm text-destructive">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+            <span>{t('import.tooManyEvents', { count: String(selectedCount) })}</span>
+          </div>
+        )}
+        <p className="text-xs text-muted-foreground text-center">{t('import.limitHint')}</p>
       </div>
     )
   }
@@ -411,6 +429,7 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
           {error}
         </div>
       )}
+      <p className="text-xs text-muted-foreground text-center">{t('import.limitHint')}</p>
     </div>
   )
 }

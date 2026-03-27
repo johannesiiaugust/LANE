@@ -355,6 +355,8 @@ const fr: Translations = {
     date: 'Date',
     lane: 'Voie',
     importEvents: 'Importer {count} événement(s)',
+    limitHint: 'Maximum 250 événements par import',
+    tooManyEvents: 'Tu as sélectionné {count} événements. Divise l\'import en lots de 250 au maximum.',
     dropOrClick: 'Déposez un fichier calendrier ici, ou cliquez pour sélectionner',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     connectGoogle: 'Connecter Google Agenda',

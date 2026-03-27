@@ -342,6 +342,8 @@ const pl: Translations = {
     date: 'Data',
     lane: 'Tor',
     importEvents: 'Importuj {count} wydarzenie(a)',
+    limitHint: 'Maksymalnie 250 wydarzeń na import',
+    tooManyEvents: 'Wybrano {count} wydarzeń. Podziel import na partie po maksymalnie 250 wydarzeń.',
     dropOrClick: 'Upuść plik kalendarza tutaj lub kliknij, aby wybrać',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     connectGoogle: 'Połącz z Kalendarzem Google',

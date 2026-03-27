@@ -358,6 +358,8 @@ const de: Translations = {
     date: 'Datum',
     lane: 'Spur',
     importEvents: '{count} Ereignis(se) importieren',
+    limitHint: 'Maximal 250 Ereignisse pro Import',
+    tooManyEvents: 'Du hast {count} Ereignisse ausgewählt. Bitte teile den Import in Stapel von maximal 250 auf.',
     dropOrClick: 'Kalenderdatei hierher ziehen oder klicken zum Auswählen',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google Kalender Tab

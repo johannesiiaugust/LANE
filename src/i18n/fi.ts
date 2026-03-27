@@ -358,6 +358,8 @@ const fi: Translations = {
     date: 'Päivämäärä',
     lane: 'Kaista',
     importEvents: 'Tuo {count} tapahtuma(a)',
+    limitHint: 'Enintään 250 tapahtumaa per tuonti',
+    tooManyEvents: 'Olet valinnut {count} tapahtumaa. Jaa tuonti enintään 250 tapahtuman eriin.',
     dropOrClick: 'Pudota kalenteritiedosto tähän tai valitse napsauttamalla',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google-kalenteri-välilehti
