@@ -82,6 +82,8 @@ const fr: Translations = {
     zoomOut: 'Zoom arrière',
     backToToday: "Retour à aujourd'hui",
     editProfile: 'Modifier le profil',
+    hideLena: 'Masquer Lena',
+    showLena: 'Afficher Lena',
     importCalendar: "Importer des événements",
     analytics: 'Analytique',
     small: 'Petit',
@@ -528,11 +530,11 @@ const fr: Translations = {
     aboutButton: 'À propos de LifeLANE',
   },
 
-  lina: {
-    talkToLina: 'Parler à Lina',
+  lena: {
+    talkToLina: 'Parler à Lena',
     aiAssistant: 'Assistant IA',
     messagesLeft: '{count} restant',
-    intro: "Salut\u00a0! Je suis Lina. Parle-moi des événements, des voies ou des chronologies que tu souhaites ajouter.",
+    intro: "Salut\u00a0! Je suis Lena. Parler à Lena des événements, des voies ou des chronologies que tu souhaites ajouter.",
     introHint: 'Essaie\u00a0: "J\'ai déménagé à Berlin en mars 2020"',
     demoNote: 'Démo\u00a0: {limit} messages — inscris-toi pour plus d\'accès.',
     statusAdded: 'Ajouté',
@@ -544,11 +546,11 @@ const fr: Translations = {
     actionCancel: 'Annuler',
     acceptAll: 'Tout accepter',
     demoLimitReached: 'Limite démo atteinte',
-    signUpToContinue: 'Inscris-toi pour continuer avec Lina \u2192',
+    signUpToContinue: 'Inscris-toi pour continuer avec Lena \u2192',
     recording: 'Enregistrement {time}',
     transcribing: 'Transcription\u2026',
-    inputPlaceholder: 'Dis à Lina ce que tu veux ajouter\u2026',
-    demoLimitMessage: "Tu as atteint la limite démo de {limit} messages. Inscris-toi pour plus d'accès et continue à construire ta chronologie avec Lina\u00a0! \uD83C\uDF89",
+    inputPlaceholder: 'Dis à Lena ce que tu veux ajouter\u2026',
+    demoLimitMessage: "Tu as atteint la limite démo de {limit} messages. Inscris-toi pour plus d'accès et continue à construire ta chronologie avec  Lena!u00a0! \uD83C\uDF89",
   },
 
   // ── Demo ──

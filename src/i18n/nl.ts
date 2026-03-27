@@ -82,6 +82,8 @@ const nl: Translations = {
     zoomOut: 'Uitzoomen',
     backToToday: 'Terug naar vandaag',
     editProfile: 'Profiel bewerken',
+    hideLena: 'Lena verbergen',
+    showLena: 'Lena tonen',
     importCalendar: 'Evenementen importeren',
     analytics: 'Analyse',
     small: 'Klein',
@@ -534,11 +536,11 @@ const nl: Translations = {
     aboutButton: 'Over LifeLANE',
   },
 
-  lina: {
-    talkToLina: 'Praat met Lina',
+  lena: {
+    talkToLina: 'Praat met Lena',
     aiAssistant: 'AI-assistent',
     messagesLeft: '{count} over',
-    intro: 'Hoi! Ik ben Lina. Vertel me over gebeurtenissen, banen of tijdlijnen die je wilt toevoegen.',
+    intro: 'Hoi! Ik ben Lena. Vertel me over gebeurtenissen, banen of tijdlijnen die je wilt toevoegen.',
     introHint: 'Probeer: "Ik ben in maart 2020 naar Berlijn verhuisd"',
     demoNote: 'Demo: {limit} berichten — meld je aan voor meer toegang.',
     statusAdded: 'Toegevoegd',
@@ -550,11 +552,11 @@ const nl: Translations = {
     actionCancel: 'Annuleren',
     acceptAll: 'Alles accepteren',
     demoLimitReached: 'Demolimiet bereikt',
-    signUpToContinue: 'Meld je aan om door te gaan met Lina \u2192',
+    signUpToContinue: 'Meld je aan om door te gaan met Lena \u2192',
     recording: 'Opname {time}',
     transcribing: 'Transcriberen\u2026',
-    inputPlaceholder: 'Vertel Lina wat je wilt toevoegen\u2026',
-    demoLimitMessage: 'Je hebt de demolimiet van {limit} berichten bereikt. Meld je aan voor meer toegang en bouw verder aan je tijdlijn met Lina! \uD83C\uDF89',
+    inputPlaceholder: 'Vertel Lena wat je wilt toevoegen\u2026',
+    demoLimitMessage: 'Je hebt de demolimiet van {limit} berichten bereikt. Meld je aan voor meer toegang en bouw verder aan je tijdlijn met  Lena! \uD83C\uDF89',
   },
 
   // ── Demo ──

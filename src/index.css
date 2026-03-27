@@ -32,7 +32,7 @@ body {
   @apply border-border;
 }
 
-@keyframes lina-pulse {
+@keyframes lena-pulse {
   0%, 100% {
     filter: drop-shadow(0 0 6px rgba(251,191,36,0.5)) drop-shadow(0 4px 16px rgba(0,0,0,0.18));
     transform: scale(1);
@@ -93,51 +93,51 @@ em-emoji-picker {
 /* ── Lina avatar animations ───────────────────────────────────────────────── */
 
 /* Blink: eyelids drop down briefly */
-@keyframes lina-blink {
+@keyframes lena-blink {
   0%, 91%, 100% { transform: scaleY(0); }
   93%, 97%      { transform: scaleY(1); }
 }
-.lina-lid {
+.lena-lid {
   transform-box: fill-box;
   transform-origin: 50% 0%;
   transform: scaleY(0);
-  animation: lina-blink 4s ease-in-out infinite;
+  animation: lena-blink 4s ease-in-out infinite;
   animation-fill-mode: both;
 }
-.lina-lid-r {
+.lena-lid-r {
   animation-delay: 0.04s;
 }
 
 /* Talk: open mouth ellipse pulses */
-@keyframes lina-talk {
+@keyframes lena-talk {
   0%, 55%, 100% { transform: scaleY(0); opacity: 0; }
   62%           { transform: scaleY(1);   opacity: 1; }
   70%           { transform: scaleY(0.5); opacity: 0.7; }
   78%           { transform: scaleY(1);   opacity: 1; }
   90%           { transform: scaleY(0);   opacity: 0; }
 }
-.lina-mouth-open {
+.lena-mouth-open {
   transform-box: fill-box;
   transform-origin: 50% 0%;
   transform: scaleY(0);
   opacity: 0;
-  animation: lina-talk 6s ease-in-out infinite;
+  animation: lena-talk 6s ease-in-out infinite;
   animation-delay: 2.5s;
   animation-fill-mode: both;
 }
 
 /* Tilt: gentle head rock */
-@keyframes lina-tilt {
+@keyframes lena-tilt {
   0%, 60%, 100% { transform: rotate(0deg); }
   65%           { transform: rotate(-6deg); }
   75%           { transform: rotate(5deg); }
   83%           { transform: rotate(-2deg); }
   90%           { transform: rotate(0deg); }
 }
-.lina-tilt-group {
+.lena-tilt-group {
   transform-box: fill-box;
   transform-origin: 50% 82%;
-  animation: lina-tilt 9s ease-in-out infinite;
+  animation: lena-tilt 9s ease-in-out infinite;
   animation-delay: 1.5s;
   animation-fill-mode: both;
 }

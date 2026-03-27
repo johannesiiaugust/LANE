@@ -82,6 +82,8 @@ const fi: Translations = {
     zoomOut: 'Loitonna',
     backToToday: 'Takaisin tähän päivään',
     editProfile: 'Muokkaa profiilia',
+    hideLena: 'Piilota Lena',
+    showLena: 'Näytä Lena',
     importCalendar: 'Tuo tapahtumia',
     analytics: 'Analytiikka',
     small: 'Pieni',
@@ -532,11 +534,11 @@ const fi: Translations = {
     aboutButton: 'Tietoa LifeLANEstä',
   },
 
-  lina: {
-    talkToLina: 'Puhu Linalle',
+  lena: {
+    talkToLina: 'Puhu Lenalle',
     aiAssistant: 'Tekoälyavustaja',
     messagesLeft: '{count} jäljellä',
-    intro: 'Hei! Olen Lina. Kerro tapahtumista, radoista tai aikajanoja, joita haluat lisätä.',
+    intro: 'Hei! Olen Lena. Kerro tapahtumista, radoista tai aikajanoja, joita haluat lisätä.',
     introHint: 'Kokeile: "Muutin Berliiniin maaliskuussa 2020"',
     demoNote: 'Demo: {limit} viestiä — rekisteröidy lisäkäytön saamiseksi.',
     statusAdded: 'Lisätty',
@@ -548,11 +550,11 @@ const fi: Translations = {
     actionCancel: 'Peruuta',
     acceptAll: 'Hyväksy kaikki',
     demoLimitReached: 'Demo-raja saavutettu',
-    signUpToContinue: 'Rekisteröidy jatkaaksesi Linan kanssa \u2192',
+    signUpToContinue: 'Rekisteröidy jatkaaksesi Lenan kanssa \u2192',
     recording: 'Äänitetään {time}',
     transcribing: 'Transkriboidaan\u2026',
-    inputPlaceholder: 'Kerro Linalle mitä lisätä\u2026',
-    demoLimitMessage: 'Olet saavuttanut demon {limit} viestin rajan. Rekisteröidy saadaksesi lisäkäyttöä ja jatkaaksesi aikajanasi rakentamista Linan kanssa! \uD83C\uDF89',
+    inputPlaceholder: 'Kerro Lenalle mitä lisätä\u2026',
+    demoLimitMessage: 'Olet saavuttanut demon {limit} viestin rajan. Rekisteröidy saadaksesi lisäkäyttöä ja jatkaaksesi aikajanasi rakentamista Lenan kanssa! \uD83C\uDF89',
   },
 
   // ── Demo ──
