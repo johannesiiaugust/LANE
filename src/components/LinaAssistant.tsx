@@ -187,6 +187,131 @@ function parseAssistantMessage(content: string): { text: string; proposals: Prop
 
 const DEMO_MESSAGE_LIMIT = 5
 
+// ── Lina SVG Avatar ──────────────────────────────────────────────────────────
+
+function LinaAvatar({ size = 80 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 80 80"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ display: 'block', overflow: 'visible' }}
+    >
+      <defs>
+        <radialGradient id="la-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stopColor="#fbbf24" stopOpacity="0.30" />
+          <stop offset="55%"  stopColor="#fbbf24" stopOpacity="0.10" />
+          <stop offset="100%" stopColor="#fbbf24" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="la-face" cx="50%" cy="42%" r="52%">
+          <stop offset="0%"   stopColor="#fde8cc" />
+          <stop offset="100%" stopColor="#f0b87a" />
+        </radialGradient>
+        <radialGradient id="la-hair" cx="42%" cy="28%" r="58%">
+          <stop offset="0%"   stopColor="#ffe566" />
+          <stop offset="60%"  stopColor="#e8a800" />
+          <stop offset="100%" stopColor="#c47000" />
+        </radialGradient>
+      </defs>
+
+      {/* ── Soft ambient glow halo (behind everything) ── */}
+      <ellipse cx="40" cy="40" rx="44" ry="44" fill="url(#la-glow)" />
+
+      {/* ── Past → Future ambient lines ── */}
+      <line x1="-4" y1="33" x2="16" y2="33" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" opacity="0.30" />
+      <line x1="-4" y1="39" x2="14" y2="39" stroke="#94a3b8" strokeWidth="1"   strokeLinecap="round" opacity="0.18" />
+      <line x1="-4" y1="45" x2="16" y2="45" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" opacity="0.30" />
+
+      <line x1="64" y1="33" x2="84" y2="33" stroke="#fbbf24" strokeWidth="2.4" strokeLinecap="round" opacity="1" />
+      <line x1="66" y1="39" x2="84" y2="39" stroke="#f59e0b" strokeWidth="1.6" strokeLinecap="round" opacity="0.72" />
+      <line x1="64" y1="45" x2="84" y2="45" stroke="#fbbf24" strokeWidth="2.4" strokeLinecap="round" opacity="1" />
+      <polyline points="79,29 84,33 79,37" fill="none" stroke="#fbbf24" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" opacity="1" />
+
+      {/* ── Animated head group (tilts occasionally) ── */}
+      <g className="lina-tilt-group">
+
+        {/* ── Hair ── */}
+        <ellipse cx="40" cy="25" rx="18" ry="19" fill="url(#la-hair)" />
+        {/* Side curtains */}
+        <ellipse cx="21" cy="42" rx="5.5" ry="14" fill="#c47000" />
+        <ellipse cx="59" cy="42" rx="5.5" ry="14" fill="#c47000" />
+        {/* Hair top volume */}
+        <ellipse cx="40" cy="14" rx="13" ry="8.5" fill="#e8a800" />
+        {/* Shine highlights */}
+        <ellipse cx="35" cy="17" rx="8"   ry="3.5" fill="#fff3b0" opacity="0.55" />
+        <ellipse cx="46" cy="20" rx="4"   ry="2"   fill="#fff3b0" opacity="0.30" />
+
+        {/* ── Neck ── */}
+        <rect x="36.5" y="56" width="7" height="9" rx="2.5" fill="#f0b87a" />
+
+        {/* ── Face ── */}
+        <ellipse cx="40" cy="40" rx="15" ry="16.5" fill="url(#la-face)" />
+
+        {/* ── Eyebrows — thick, confident ── */}
+        <path d="M 30 31.5 Q 33.5 29 37.5 30.5" stroke="#7a4820" strokeWidth="2"   fill="none" strokeLinecap="round" />
+        <path d="M 42.5 30.5 Q 46.5 29 50 31.5" stroke="#7a4820" strokeWidth="2"   fill="none" strokeLinecap="round" />
+
+        {/* ── Eyes — whites ── */}
+        <ellipse cx="34" cy="37" rx="3.4" ry="3.0" fill="white" />
+        <ellipse cx="46" cy="37" rx="3.4" ry="3.0" fill="white" />
+        {/* Irises — warm blue */}
+        <ellipse cx="34" cy="37.3" rx="2.3" ry="2.2" fill="#2563b0" />
+        <ellipse cx="46" cy="37.3" rx="2.3" ry="2.2" fill="#2563b0" />
+        {/* Pupils */}
+        <ellipse cx="34" cy="37.3" rx="1.2" ry="1.2" fill="#111827" />
+        <ellipse cx="46" cy="37.3" rx="1.2" ry="1.2" fill="#111827" />
+        {/* Sparkles */}
+        <circle cx="35.1" cy="36.2" r="0.8" fill="white" />
+        <circle cx="47.1" cy="36.2" r="0.8" fill="white" />
+
+        {/* ── Eyelashes — top row ── */}
+        <line x1="31.5" y1="34.6" x2="30.8" y2="33.2" stroke="#3d2310" strokeWidth="1"   strokeLinecap="round" />
+        <line x1="33.5" y1="34.1" x2="33.2" y2="32.7" stroke="#3d2310" strokeWidth="1"   strokeLinecap="round" />
+        <line x1="35.5" y1="34.0" x2="35.8" y2="32.6" stroke="#3d2310" strokeWidth="1"   strokeLinecap="round" />
+        <line x1="37.0" y1="34.4" x2="37.6" y2="33.1" stroke="#3d2310" strokeWidth="1"   strokeLinecap="round" />
+        <line x1="43.5" y1="34.4" x2="43.0" y2="33.1" stroke="#3d2310" strokeWidth="1"   strokeLinecap="round" />
+        <line x1="45.5" y1="34.0" x2="45.2" y2="32.6" stroke="#3d2310" strokeWidth="1"   strokeLinecap="round" />
+        <line x1="47.5" y1="34.0" x2="47.8" y2="32.6" stroke="#3d2310" strokeWidth="1"   strokeLinecap="round" />
+        <line x1="49.0" y1="34.4" x2="49.7" y2="33.2" stroke="#3d2310" strokeWidth="1"   strokeLinecap="round" />
+
+        {/* ── Glasses — timeline / gantt-bar style ── */}
+        <rect x="28" y="34" width="12.5" height="5.5" rx="0.5" fill="none" stroke="#3b82f6" strokeWidth="1.4" />
+        <line x1="28"  y1="36.75" x2="40.5" y2="36.75" stroke="#3b82f6" strokeWidth="0.6" opacity="0.6" />
+        <rect x="42.5" y="34" width="12.5" height="5.5" rx="0.5" fill="none" stroke="#3b82f6" strokeWidth="1.4" />
+        <line x1="42.5" y1="36.75" x2="55" y2="36.75" stroke="#3b82f6" strokeWidth="0.6" opacity="0.6" />
+        {/* Bridge */}
+        <line x1="40.5" y1="36.75" x2="42.5" y2="36.75" stroke="#3b82f6" strokeWidth="1.4" />
+        {/* Left temple — past, grey */}
+        <line x1="28"   y1="36.75" x2="21"  y2="36.75" stroke="#94a3b8" strokeWidth="1.3" strokeLinecap="round" />
+        {/* Right temple — future, golden */}
+        <line x1="55"   y1="36.75" x2="64"  y2="36.75" stroke="#fbbf24" strokeWidth="1.7" strokeLinecap="round" />
+
+        {/* ── Blink eyelids (animated) ── */}
+        <ellipse cx="34" cy="37" rx="3.4" ry="3.0" fill="#f0b87a" className="lina-lid" />
+        <ellipse cx="46" cy="37" rx="3.4" ry="3.0" fill="#f0b87a" className="lina-lid lina-lid-r" />
+
+        {/* ── Nose ── */}
+        <path d="M 38.5 43 Q 40 45.5 41.5 43" stroke="#c47a56" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+
+        {/* ── Cheeks ── */}
+        <ellipse cx="29.5" cy="46" rx="4.5" ry="2.8" fill="#f9a8d4" opacity="0.35" />
+        <ellipse cx="50.5" cy="46" rx="4.5" ry="2.8" fill="#f9a8d4" opacity="0.35" />
+
+        {/* ── Lips — defined, warm ── */}
+        {/* Upper lip */}
+        <path d="M 34 49 Q 37 47.5 40 48 Q 43 47.5 46 49" stroke="#c0504d" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+        {/* Smile arc */}
+        <path d="M 34 49 Q 40 55.5 46 49" stroke="#c0504d" strokeWidth="1.9" fill="none" strokeLinecap="round" />
+
+        {/* ── Open mouth (animated, shows when "talking") ── */}
+        <ellipse cx="40" cy="51" rx="5" ry="3.2" fill="#8b1a1a" className="lina-mouth-open" />
+
+      </g>
+    </svg>
+  )
+}
+
 export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEvent, addLane, updateLane, deleteLane, createTimeline, demoMode, onSignUp }: LinaAssistantProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
@@ -500,10 +625,11 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-16 right-6 sm:bottom-20 sm:right-8 z-50 flex flex-col items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:shadow-3xl transition-all duration-200 hover:scale-110 active:scale-95 h-20 w-20 sm:h-24 sm:w-24 animate-[lina-pulse_2s_ease-in-out_infinite]"
+          className="fixed bottom-16 right-6 sm:bottom-20 sm:right-8 z-50 flex flex-col items-center gap-1 transition-all duration-200 hover:scale-110 active:scale-95 animate-[lina-pulse_2.5s_ease-in-out_infinite]"
+          title={t('lina.talkToLina')}
         >
-          <span className="text-3xl sm:text-4xl leading-none">👩</span>
-          <span className="text-[10px] sm:text-xs font-bold mt-0.5 leading-tight">{t('lina.talkToLina')}</span>
+          <LinaAvatar size={80} />
+          <span className="text-[10px] sm:text-xs font-semibold text-foreground/80 leading-tight drop-shadow">{t('lina.talkToLina')}</span>
         </button>
       )}
 
@@ -513,7 +639,7 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
           {/* Header */}
           <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-border bg-background">
             <div className="flex items-center gap-2">
-              <span className="text-lg">👩</span>
+              <LinaAvatar size={28} />
               <span className="font-semibold text-foreground">Lina</span>
               <span className="text-xs text-muted-foreground">{t('lina.aiAssistant')}</span>
               {demoMode && (
@@ -534,7 +660,7 @@ export function LinaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
             {messages.length === 0 && (
               <div className="text-center py-8">
-                <span className="text-4xl block mx-auto mb-3">👩</span>
+                <div className="flex justify-center mb-3"><LinaAvatar size={56} /></div>
                 <p className="text-sm text-muted-foreground">
                   {t('lina.intro')}
                 </p>
