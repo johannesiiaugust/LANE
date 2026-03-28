@@ -607,15 +607,15 @@ const en = {
     step3Text: 'Create and modify timelines for family, friends and others. Import from CVs, social networks, calendars and other sources \u2014 simply copy-paste any text with our AI, or by voice.',
     step4Title: 'Add life events & plan with AI',
     step4Text: 'Add events across all LANEs of life \u2014 work, where you lived, health, and more. Describe a future you want and our AI gives you concrete ways to reach it.',
-    startYourOwnStory: 'Start with your own story',
-    addFewEvents: "Add a few events and we'll build your personal timeline.",
+    startYourOwnStory: 'Start your own story',
+    addFewEvents: "Add a few events and build your personal timeline.",
     birthDate: 'Birth date',
     yourLifeEvents: 'Your life events',
     placeholderPlace: 'e.g. New York',
     placeholderWork: 'e.g. Software Engineer at Google',
     addAnotherEvent: 'Add another event',
     fillRequiredFields: 'Please fill in all required fields',
-    continueWithExample: 'Continue with the example →',
+    continueWithExample: 'Continue with a made up life example →',
     next: 'Next',
   },
 
@@ -656,7 +656,7 @@ const en = {
 
   // ── Demo ──
   demo: {
-    comparingYouVs: 'Comparing \u2014 You vs. Albert Einstein',
+    comparingYouVs: 'Comparing \u2014 You vs. Donald Trump',
     yourTimeline: 'YOUR TIMELINE',
     work: 'Work',
     ageAligned: '(age-aligned)',

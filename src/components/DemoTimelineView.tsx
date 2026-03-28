@@ -93,19 +93,19 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
     setPersonaDisplayMode,
   } = usePersonas(DEMO_BIRTH_YEAR)
 
-  // Auto-activate Einstein with age alignment and separate display on first load
-  const einsteinInitRef = useRef(false)
+  // Auto-activate Trump with age alignment and separate display on first load
+  const trumpInitRef = useRef(false)
   useEffect(() => {
-    if (einsteinInitRef.current) return
+    if (trumpInitRef.current) return
     if (personas.length === 0) return
-    einsteinInitRef.current = true
-    const einstein = personas.find(p => p.name.toLowerCase().includes('einstein'))
-    if (einstein) {
-      if (!activePersonaIds.has(einstein.id)) togglePersona(einstein.id)
-      if (!alignedPersonaIds.has(einstein.id)) togglePersonaAlignment(einstein.id)
-      // Always default Einstein to separate timeline on the demo page
-      if (personaDisplayModes.get(einstein.id) !== 'separate') {
-        setPersonaDisplayMode(einstein.id, 'separate')
+    trumpInitRef.current = true
+    const trump = personas.find(p => p.name.toLowerCase().includes('trump'))
+    if (trump) {
+      if (!activePersonaIds.has(trump.id)) togglePersona(trump.id)
+      if (!alignedPersonaIds.has(trump.id)) togglePersonaAlignment(trump.id)
+      // Always default Trump to separate timeline on the demo page
+      if (personaDisplayModes.get(trump.id) !== 'separate') {
+        setPersonaDisplayMode(trump.id, 'separate')
       }
     }
   }, [personas, activePersonaIds, alignedPersonaIds, personaDisplayModes, togglePersona, togglePersonaAlignment, setPersonaDisplayMode])
@@ -201,7 +201,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
     const count = parseInt(localStorage.getItem('timeline_guide_auto_count') ?? '0', 10)
     if (count >= 2) return
     localStorage.setItem('timeline_guide_auto_count', String(count + 1))
-    const timer = setTimeout(() => setGuideOpen(true), 5000)
+    const timer = setTimeout(() => setGuideOpen(true), 8500)
     return () => clearTimeout(timer)
   }, [welcomeDone])
 
@@ -514,7 +514,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
 
         {/* How to use */}
         <Button variant="outline" size="sm" onClick={() => setGuideOpen(true)} title={t('selector.howToUse')} className="px-2 text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950">
-          <span className="font-bold text-base leading-none">?</span>
+          <span className="font-bold text-base leading-none">?!</span>
         </Button>
 
         {/* Add dropdown */}

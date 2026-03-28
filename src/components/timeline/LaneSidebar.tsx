@@ -113,7 +113,7 @@ export function LaneSidebar({
       >
         {timelineName && (
           <span
-            className="font-bold truncate text-foreground"
+            className="font-bold truncate text-foreground underline"
             style={{ fontSize: SIDEBAR_FONT }}
           >
             {timelineName}
@@ -161,7 +161,7 @@ export function LaneSidebar({
 
               {/* Action buttons — absolute overlay on hover, no layout cost when hidden */}
               <div
-                className="absolute inset-y-0 right-0 flex items-center opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity"
+                className="absolute inset-y-0 right-0 flex items-center pointer-events-auto"
                 style={{
                   paddingRight: Math.round(W * 0.02),
                   paddingLeft: ICON_SIZE * 2,
@@ -321,7 +321,7 @@ export function LaneSidebar({
               gap: Math.round(ICON_SIZE / 6),
             }}
           >
-            <span className="font-semibold text-muted-foreground truncate" style={{ fontSize: SIDEBAR_FONT }}>
+            <span className="font-semibold text-muted-foreground truncate underline" style={{ fontSize: SIDEBAR_FONT }}>
               {section.name}
             </span>
             <span
@@ -376,7 +376,7 @@ export function LaneSidebar({
               gap: Math.round(ICON_SIZE / 6),
             }}
           >
-            <span className="font-semibold text-muted-foreground truncate" style={{ fontSize: SIDEBAR_FONT }}>
+            <span className="font-semibold text-muted-foreground truncate underline" style={{ fontSize: SIDEBAR_FONT }}>
               {section.name}
             </span>
           </div>
