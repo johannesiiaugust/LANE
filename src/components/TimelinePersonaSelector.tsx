@@ -536,23 +536,22 @@ export function TimelinePersonaSelector({
             {/* Main (selected) timeline */}
             {currentTimeline && (
               <div
-                className="flex items-center rounded-md px-2 py-1 cursor-pointer hover:bg-accent group bg-accent"
-                onClick={() => selectTimeline(currentTimeline.id)}
+                className="flex items-center rounded-md px-2 py-1 hover:bg-accent group bg-accent"
               >
                 <Star className="h-3 w-3 shrink-0 text-primary mr-1.5" />
                 {currentTimeline.emoji && (
                   <span className="text-base leading-none mr-1 shrink-0">{currentTimeline.emoji}</span>
                 )}
-                <span className="flex-1 text-sm font-semibold truncate">{currentTimeline.name}</span>
+                <span className="flex-1 text-sm font-semibold truncate cursor-pointer" onClick={e => handleEdit(currentTimeline.id, e)}>{currentTimeline.name}</span>
                 <button
-                  className="p-0.5 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"
+                  className="p-0.5 text-muted-foreground hover:text-foreground"
                   onClick={e => handleEdit(currentTimeline.id, e)}
                 >
                   <Pencil className="h-3 w-3" />
                 </button>
                 {timelines.length > 1 && (
                   <button
-                    className="p-0.5 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100"
+                    className="p-0.5 text-muted-foreground hover:text-destructive"
                     onClick={e => handleDelete(currentTimeline.id, e)}
                   >
                     <Trash2 className="h-3 w-3" />
