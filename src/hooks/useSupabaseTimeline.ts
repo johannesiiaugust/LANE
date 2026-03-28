@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import type { Lane, TimelineEvent } from '@/types/timeline'
 import {
   fetchLanes,
   fetchEvents,
+  fetchEventsWindowed,
   insertLane,
   updateLaneDb,
   deleteLaneDb,
@@ -18,8 +19,22 @@ import {
   TIMELINE_YEAR_MIN,
   TIMELINE_YEAR_MAX,
   resolveEventLinks,
+  getCurrentYearFraction,
 } from '@/lib/constants'
 import { pushEvent } from '@/lib/analytics'
+
+// ── Windowed-fetch configuration ─────────────────────────────────────────────
+// Fetch this many extra years beyond the visible range on each side so panning
+// doesn't immediately trigger a new request.
+const PRELOAD_BUFFER_YEARS = 20
+
+// Half-width of the initial fetch window, centred on today.  120 years covers
+// almost every personal life timeline on first load.
+const INITIAL_WINDOW_HALF = 60
+
+// Don't bother expanding the fetched range unless the new target extends it by
+// at least this many years (avoids micro-fetches during tiny pans).
+const MIN_EXPAND_THRESHOLD = 5
 
 export function useSupabaseTimeline(timelineId: string | null) {
   const [lanes, setLanes] = useState<Lane[]>([])
@@ -32,6 +47,16 @@ export function useSupabaseTimeline(timelineId: string | null) {
   const yearStart = TIMELINE_YEAR_MIN
   const yearEnd = TIMELINE_YEAR_MAX
 
+  // Tracks what year range has been fetched for the current timeline.
+  // Stored as a ref to avoid causing re-renders on update.
+  const fetchedRangeRef = useRef<{ start: number; end: number } | null>(null)
+
+  // Lets expandWindow detect a mid-flight timeline switch and discard stale results.
+  const activeTimelineIdRef = useRef<string | null>(null)
+
+  // Debounce timer for notifyVisibleWindow — cancelled on timeline switch.
+  const windowCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   // Resolve dependency links (e.g. "start 2 years after event X")
   const resolvedEvents = useMemo(() => resolveEventLinks(events), [events])
 
@@ -42,32 +67,118 @@ export function useSupabaseTimeline(timelineId: string | null) {
   const dataYearMin = allYears.length > 0 ? Math.floor(Math.min(...allYears)) - 2 : 1990
   const dataYearMax = allYears.length > 0 ? Math.ceil(Math.max(...allYears)) + 2 : 2026
 
-  // Fetch lanes + events when timeline changes
+  // Initial load: fetch an INITIAL_WINDOW_HALF-year window centred on today.
+  // On refreshTimeline() the same currently-fetched window is re-fetched.
   useEffect(() => {
+    // Cancel any pending window-expansion debounce from the previous timeline.
+    if (windowCheckTimerRef.current) {
+      clearTimeout(windowCheckTimerRef.current)
+      windowCheckTimerRef.current = null
+    }
+
     if (!timelineId) {
       setLanes([])
       setEvents([])
+      fetchedRangeRef.current = null
+      activeTimelineIdRef.current = null
       return
     }
 
+    activeTimelineIdRef.current = timelineId
     let cancelled = false
     setLoading(true)
+
+    const now = getCurrentYearFraction()
+    // On a plain refresh (same timelineId), re-use the existing fetched range so
+    // we don't lose events the user has scrolled to.  On a timeline switch (new
+    // timelineId), fetchedRangeRef was already reset to null by the previous
+    // cleanup, so we fall through to the initial window.
+    const prevRange = fetchedRangeRef.current
+    const fetchStart = prevRange ? prevRange.start : now - INITIAL_WINDOW_HALF
+    const fetchEnd   = prevRange ? prevRange.end   : now + INITIAL_WINDOW_HALF
+
+    // Clear before async work so any concurrent notifyVisibleWindow calls don't
+    // try to expand a range that is mid-flight.
+    fetchedRangeRef.current = null
 
     async function load() {
       const [dbLanes, dbEvents] = await Promise.all([
         fetchLanes(timelineId!),
-        fetchEvents(timelineId!),
+        fetchEventsWindowed(timelineId!, fetchStart, fetchEnd),
       ])
       if (cancelled) return
       setLanes(dbLanes.map(mapDbLane))
       setEvents(dbEvents.map(mapDbEvent))
+      fetchedRangeRef.current = { start: fetchStart, end: fetchEnd }
       setLoading(false)
     }
 
     load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+      // Reset fetched range so the next effect (new timeline) always starts fresh.
+      fetchedRangeRef.current = null
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timelineId, refreshKey])
+
+  /**
+   * Incrementally expand the fetched range to cover [targetStart, targetEnd].
+   * Fetches only the slices that haven't been loaded yet, then merges them into
+   * the existing events state (dedup by id).
+   */
+  const expandWindow = useCallback(async (targetStart: number, targetEnd: number) => {
+    if (!timelineId) return
+    const fetched = fetchedRangeRef.current
+
+    // Determine how far we actually need to extend on each side.
+    const needLeft  = !fetched || targetStart < fetched.start - MIN_EXPAND_THRESHOLD
+    const needRight = !fetched || targetEnd   > fetched.end   + MIN_EXPAND_THRESHOLD
+    if (!needLeft && !needRight) return
+
+    // Compute the new slices to fetch (avoid re-fetching the already-covered middle).
+    const slices: Array<[number, number]> = []
+    if (needLeft)  slices.push([targetStart, fetched ? fetched.start : targetEnd])
+    if (needRight) slices.push([fetched ? fetched.end : targetStart, targetEnd])
+
+    const newFetchedStart = Math.min(targetStart, fetched?.start ?? targetStart)
+    const newFetchedEnd   = Math.max(targetEnd,   fetched?.end   ?? targetEnd)
+
+    // Fetch all new slices in parallel.
+    const results = await Promise.all(
+      slices.map(([s, e]) => fetchEventsWindowed(timelineId, s, e)),
+    )
+
+    // Guard: discard results if the timeline changed while we were fetching.
+    if (timelineId !== activeTimelineIdRef.current) return
+
+    const newMapped = results.flat().map(mapDbEvent)
+
+    // Merge: add only genuinely new events (dedup by id).
+    setEvents(prev => {
+      const existingIds = new Set(prev.map(e => e.id))
+      const toAdd = newMapped.filter(e => !existingIds.has(e.id))
+      if (toAdd.length === 0) return prev  // no change — avoid re-render
+      return [...prev, ...toAdd]
+    })
+
+    fetchedRangeRef.current = { start: newFetchedStart, end: newFetchedEnd }
+  }, [timelineId])
+
+  /**
+   * Called by TimelineContainer whenever the visible year range changes
+   * (scroll, zoom, resize).  Debounced to 400 ms to avoid fetching on every
+   * animation frame during a pan.
+   *
+   * The hook fetches the visible range plus PRELOAD_BUFFER_YEARS on each side
+   * so panning doesn't trigger an immediate new request.
+   */
+  const notifyVisibleWindow = useCallback((visStart: number, visEnd: number) => {
+    if (windowCheckTimerRef.current) clearTimeout(windowCheckTimerRef.current)
+    windowCheckTimerRef.current = setTimeout(() => {
+      expandWindow(visStart - PRELOAD_BUFFER_YEARS, visEnd + PRELOAD_BUFFER_YEARS)
+    }, 400)
+  }, [expandWindow])
 
   // ---- Event CRUD ----
 
@@ -143,9 +254,12 @@ export function useSupabaseTimeline(timelineId: string | null) {
       if (ok) {
         pushEvent('click', window.location.pathname, 'edit_event')
       } else {
-        // Rollback: re-fetch
+        // Rollback: re-fetch the currently cached window (not the full timeline)
         if (timelineId) {
-          const dbEvents = await fetchEvents(timelineId)
+          const fetched = fetchedRangeRef.current
+          const dbEvents = fetched
+            ? await fetchEventsWindowed(timelineId, fetched.start, fetched.end)
+            : await fetchEvents(timelineId)
           setEvents(dbEvents.map(mapDbEvent))
         }
       }
@@ -316,5 +430,8 @@ export function useSupabaseTimeline(timelineId: string | null) {
     toggleLaneVisibility,
     refreshTimeline,
     loading,
+    /** Notify the hook of the current visible year range so it can prefetch
+     *  surrounding data.  Call this from TimelineContainer on scroll/zoom. */
+    notifyVisibleWindow,
   }
 }

@@ -38,6 +38,9 @@ function eventRange(e: TimelineEvent): [number, number] {
 }
 
 function hasAnyOverlaps(events: TimelineEvent[]): boolean {
+  // Fast path: a lane with >50 events almost certainly has overlaps.
+  // Avoids O(n²) scan when laneData recomputes after windowed-fetch expansions.
+  if (events.length > 50) return true
   for (let i = 0; i < events.length; i++) {
     const [as, ae] = eventRange(events[i])
     for (let j = i + 1; j < events.length; j++) {
@@ -77,6 +80,7 @@ function assignEventRows(events: TimelineEvent[]): Map<string, number> {
 type GenericEvent = { id: string; display_start_year: number; display_end_year: number | null; type: string }
 
 function hasAnyOverlapsGeneric(events: GenericEvent[]): boolean {
+  if (events.length > 50) return true  // fast path — see hasAnyOverlaps
   for (let i = 0; i < events.length; i++) {
     const as = events[i].display_start_year
     const ae = events[i].display_end_year ?? events[i].display_start_year + 0.5
@@ -141,6 +145,7 @@ interface TimelineContainerProps {
   activeOverlayTimelines?: DbTimeline[]
   onTodayVisibilityChange?: (offScreen: { direction: 'left' | 'right' } | null) => void
   timelineName?: string
+  onVisibleWindowChange?: (start: number, end: number) => void
 }
 
 export function TimelineContainer({
@@ -171,6 +176,7 @@ export function TimelineContainer({
   activeOverlayTimelines = [],
   onTodayVisibilityChange,
   timelineName,
+  onVisibleWindowChange,
 }: TimelineContainerProps) {
   const { sc, size, updateFitScreenConfig } = useSizeConfig()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, TOTAL_ASSETS_HEIGHT } = sc
@@ -201,6 +207,15 @@ export function TimelineContainer({
   const rafRef = useRef<number | null>(null)
   const zoomRafRef = useRef<number | null>(null)
   const shiftingWindowRef = useRef(false)
+
+  // Report visible year range to parent for windowed event fetching.
+  // Round to the nearest integer year so the effect only fires when the visible
+  // window shifts by ≥1 year — not on every pixel of scrolling.
+  const notifyVisStart = Math.round(effectiveYearStart + scrollLeft / pixelsPerYear)
+  const notifyVisEnd = Math.round(notifyVisStart + viewportWidth / pixelsPerYear)
+  useEffect(() => {
+    onVisibleWindowChange?.(notifyVisStart, notifyVisEnd)
+  }, [notifyVisStart, notifyVisEnd, onVisibleWindowChange])
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
@@ -1215,6 +1230,7 @@ export function TimelineContainer({
                 personaSubRowMap={laneData[i].personaSubRowMap}
                 currentYear={currentYear}
                 scrollLeft={scrollLeft}
+                viewportWidth={viewportWidth}
                 draggingEventId={dragPreview?.event.id}
                 onEventMoveStart={handleEventMoveStart}
                 onEventExtendStart={handleEventExtendStart}

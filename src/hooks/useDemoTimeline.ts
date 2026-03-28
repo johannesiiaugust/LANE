@@ -224,5 +224,6 @@ export function useDemoTimeline() {
     toggleLaneVisibility,
     refreshTimeline: () => {},
     dataLoading: false,
+    notifyVisibleWindow: () => {},
   }
 }

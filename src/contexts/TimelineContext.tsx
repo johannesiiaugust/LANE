@@ -37,6 +37,8 @@ interface TimelineContextType {
   toggleLaneVisibility: (id: string) => Promise<void>
   refreshTimeline: () => void
   dataLoading: boolean
+  /** Notify the context of the current visible year range for windowed fetching. */
+  notifyVisibleWindow: (visStart: number, visEnd: number) => void
 }
 
 export const TimelineContext = createContext<TimelineContextType | null>(null)
@@ -75,6 +77,7 @@ export function TimelineProvider({ children }: { children: React.ReactNode }) {
     toggleLaneVisibility,
     refreshTimeline,
     loading: dataLoading,
+    notifyVisibleWindow,
   } = useSupabaseTimeline(selectedTimelineId)
 
   return (
@@ -109,6 +112,7 @@ export function TimelineProvider({ children }: { children: React.ReactNode }) {
         toggleLaneVisibility,
         refreshTimeline,
         dataLoading,
+        notifyVisibleWindow,
       }}
     >
       {children}
