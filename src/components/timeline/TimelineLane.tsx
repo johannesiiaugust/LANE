@@ -1,10 +1,109 @@
-import { useRef, useState, useMemo } from 'react'
+import { useRef, useState, useMemo, useEffect } from 'react'
 import type { Lane, TimelineEvent } from '@/types/timeline'
 import type { AlignedPersonaEvent, OverlayTimelineEvent } from '@/types/database'
 import { TimelineEventBar } from './TimelineEvent'
 import { PersonaEventBar } from './PersonaEventBar'
 import { OverlayEventBar } from './OverlayEventBar'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
+
+// ── Viewport culling ──────────────────────────────────────────────────────────
+/** Extra viewport-widths of buffer on each side of the visible area. */
+const CULL_BUFFER_SCREENS = 1
+/**
+ * Culling recomputes only when scrollLeft moves by at least this many pixels.
+ * Prevents per-animation-frame useMemo invalidation during smooth scrolling.
+ */
+const CULL_SCROLL_BUCKET_PX = 100
+
+// ── Zoom-aware clustering ─────────────────────────────────────────────────────
+/** px/year threshold below which clustering is even considered. */
+const CLUSTER_PPY_THRESHOLD = 5
+/** Events whose screen-space gap is smaller than this (px) are candidates for clustering. */
+const CLUSTER_GAP_PX = 20
+/** Only form a cluster badge when a group has MORE than this many events — clusters are a
+ *  last-resort fallback for unusually dense lanes, not a routine zoom-out summary. */
+const CLUSTER_MIN_SIZE = 10
+
+type SingleItem = { kind: 'single'; event: TimelineEvent }
+type ClusterItem = { kind: 'cluster'; count: number; startYear: number; endYear: number; color: string }
+type RenderItem = SingleItem | ClusterItem
+
+function buildRenderItems(
+  events: TimelineEvent[],
+  pixelsPerYear: number,
+  laneColor: string,
+  draggingEventId?: string | null,
+): RenderItem[] {
+  if (pixelsPerYear >= CLUSTER_PPY_THRESHOLD || events.length === 0) {
+    return events.map(e => ({ kind: 'single' as const, event: e }))
+  }
+  const gapYears = CLUSTER_GAP_PX / pixelsPerYear
+  const sorted = [...events].sort((a, b) => a.startYear - b.startYear)
+  const items: RenderItem[] = []
+  let group: TimelineEvent[] = []
+  let groupEnd = -Infinity
+
+  function flushGroup() {
+    if (group.length === 0) return
+    // Always break clusters that contain the dragged event into singles.
+    // Also render as singles unless the group exceeds CLUSTER_MIN_SIZE — clustering
+    // is a last-resort fallback for unusually dense lanes, not a default zoom summary.
+    const hasDragged = draggingEventId != null && group.some(e => e.id === draggingEventId)
+    if (group.length <= CLUSTER_MIN_SIZE || hasDragged) {
+      group.forEach(e => items.push({ kind: 'single', event: e }))
+    } else {
+      items.push({ kind: 'cluster', count: group.length, startYear: group[0].startYear, endYear: groupEnd, color: laneColor })
+    }
+    group = []
+    groupEnd = -Infinity
+  }
+
+  for (const ev of sorted) {
+    const evEnd = ev.type === 'range' ? (ev.endYear ?? ev.startYear + 1) : ev.startYear
+    if (group.length === 0 || ev.startYear <= groupEnd + gapYears) {
+      group.push(ev)
+      groupEnd = Math.max(groupEnd, evEnd)
+    } else {
+      flushGroup()
+      group = [ev]
+      groupEnd = evEnd
+    }
+  }
+  flushGroup()
+  return items
+}
+
+/** Compact summary bar rendered in place of a dense cluster of events. */
+function ClusterBar({
+  item, yearStart, pixelsPerYear, baseHeight,
+}: {
+  item: ClusterItem
+  yearStart: number
+  pixelsPerYear: number
+  baseHeight: number
+}) {
+  const left = (item.startYear - yearStart) * pixelsPerYear
+  const width = Math.max((item.endYear - item.startYear) * pixelsPerYear, 28)
+  return (
+    <div
+      title={`${item.count} events`}
+      className="absolute rounded-sm flex items-center justify-center font-bold pointer-events-none select-none"
+      style={{
+        left,
+        width,
+        top: 4,
+        height: Math.max(baseHeight - 8, 12),
+        backgroundColor: item.color,
+        opacity: 0.55,
+        zIndex: 10,
+        fontSize: 11,
+        color: '#fff',
+      }}
+    >
+      {item.count}
+    </div>
+  )
+}
 
 /** For collapsed lanes: map event id → how many overlapping events end later (0 = front of stack). */
 function computeStackDepths(events: TimelineEvent[]): Map<string, number> {
@@ -47,6 +146,7 @@ interface TimelineLaneProps {
   personaSubRowMap: Map<string, number>
   currentYear: number
   scrollLeft: number
+  viewportWidth: number
   draggingEventId?: string | null
   onEventMoveStart?: (event: TimelineEvent, clientX: number, clientY: number, origin: 'longpress' | 'contextmenu') => void
   onEventExtendStart?: (event: TimelineEvent, direction: 'forward' | 'backward', clientX: number) => void
@@ -74,6 +174,7 @@ export function TimelineLane({
   personaSubRowMap,
   currentYear,
   scrollLeft,
+  viewportWidth,
   draggingEventId,
   onEventMoveStart,
   onEventExtendStart,
@@ -190,10 +291,45 @@ export function TimelineLane({
   }
 
   // Stack depths for collapsed overlapping events (empty map when expanded)
+  // NOTE: computed from ALL events so stacking is correct even for culled events
   const stackDepthMap = useMemo(() => {
     if (eventRowMap && eventRowMap.size > 0) return new Map<string, number>()
     return computeStackDepths(events)
   }, [events, eventRowMap])
+
+  // ── Viewport culling ────────────────────────────────────────────────────────
+  // Bucket scrollLeft so this memo invalidates at most once per CULL_SCROLL_BUCKET_PX
+  // pixels of scrolling — not on every animation frame.
+  const scrollBucket = Math.round(scrollLeft / CULL_SCROLL_BUCKET_PX)
+  const culledEvents = useMemo(() => {
+    if (viewportWidth <= 0 || pixelsPerYear <= 0) return events
+    const effectiveScrollLeft = scrollBucket * CULL_SCROLL_BUCKET_PX
+    const bufferYears = (CULL_BUFFER_SCREENS * viewportWidth) / pixelsPerYear
+    const visStart = yearStart + effectiveScrollLeft / pixelsPerYear
+    const cullStart = visStart - bufferYears
+    const cullEnd = visStart + viewportWidth / pixelsPerYear + bufferYears
+    return events.filter(ev => {
+      if (ev.id === draggingEventId) return true // always render dragged event
+      const evEnd = ev.type === 'range' ? (ev.endYear ?? ev.startYear + 1) : ev.startYear
+      return evEnd >= cullStart && ev.startYear <= cullEnd
+    })
+  }, [events, yearStart, scrollBucket, viewportWidth, pixelsPerYear, draggingEventId])
+
+  // ── Zoom-aware clustering ───────────────────────────────────────────────────
+  const renderItems = useMemo(
+    () => buildRenderItems(culledEvents, pixelsPerYear, lane.color, draggingEventId),
+    [culledEvents, pixelsPerYear, lane.color, draggingEventId],
+  )
+
+  // ── Debug instrumentation ───────────────────────────────────────────────────
+  // Enable by running: window.__TIMELINE_PERF_DEBUG = true  in browser console
+  useEffect(() => {
+    if (typeof window === 'undefined' || !(window as unknown as Record<string, unknown>).__TIMELINE_PERF_DEBUG) return
+    const clusters = renderItems.filter(r => r.kind === 'cluster').length
+    console.debug(
+      `[Timeline perf | lane "${lane.name}"] total=${events.length} rendered=${culledEvents.length} clusters=${clusters}`,
+    )
+  }, [events.length, culledEvents.length, renderItems, lane.name])
 
   // ── Render ───────────────────────────────────────────────────────────────
   // Separator is only drawn at the boundary between event rows and persona sub-rows,
@@ -236,23 +372,33 @@ export function TimelineLane({
         />
       )}
 
-      {events.map(event => (
-        <TimelineEventBar
-          key={event.id}
-          event={event}
-          yearStart={yearStart}
-          pixelsPerYear={pixelsPerYear}
-          laneColor={lane.color}
-          onClick={onEventClick}
-          currentYear={currentYear}
-          topOffset={(eventRowMap?.get(event.id) ?? 0) * BASE_LANE_HEIGHT}
-          stackDepth={stackDepthMap.get(event.id)}
-          scrollLeft={scrollLeft}
-          isDragging={draggingEventId === event.id}
-          onMoveStart={onEventMoveStart}
-          onExtendStart={onEventExtendStart}
-        />
-      ))}
+      {renderItems.map(item =>
+        item.kind === 'single' ? (
+          <TimelineEventBar
+            key={item.event.id}
+            event={item.event}
+            yearStart={yearStart}
+            pixelsPerYear={pixelsPerYear}
+            laneColor={lane.color}
+            onClick={onEventClick}
+            currentYear={currentYear}
+            topOffset={(eventRowMap?.get(item.event.id) ?? 0) * BASE_LANE_HEIGHT}
+            stackDepth={stackDepthMap.get(item.event.id)}
+            scrollLeft={scrollLeft}
+            isDragging={draggingEventId === item.event.id}
+            onMoveStart={onEventMoveStart}
+            onExtendStart={onEventExtendStart}
+          />
+        ) : (
+          <ClusterBar
+            key={`cluster-${item.startYear}-${item.count}`}
+            item={item}
+            yearStart={yearStart}
+            pixelsPerYear={pixelsPerYear}
+            baseHeight={BASE_LANE_HEIGHT}
+          />
+        )
+      )}
       {personaEvents.map(pe => (
         <PersonaEventBar
           key={pe.id}

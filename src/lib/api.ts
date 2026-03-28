@@ -459,6 +459,40 @@ export async function fetchEvents(timelineId: string): Promise<DbEvent[]> {
   return data ?? []
 }
 
+/**
+ * Windowed event fetch — returns only events that overlap [startYear, endYear].
+ *
+ * Two cases are handled via OR:
+ *   Range events  (end_time NOT NULL): start_time ≤ windowEnd AND end_time ≥ windowStart
+ *   Point events  (end_time IS NULL):  start_time ≥ windowStart AND start_time ≤ windowEnd
+ *
+ * Falls back to a full timeline fetch when no window is supplied.
+ */
+export async function fetchEventsWindowed(
+  timelineId: string,
+  startYear?: number,
+  endYear?: number,
+): Promise<DbEvent[]> {
+  let query = supabase.from('events').select('*').eq('timeline_id', timelineId)
+
+  if (startYear != null && endYear != null) {
+    const startISO = fracYearToDbTime(startYear)
+    const endISO   = fracYearToDbTime(endYear)
+    // PostgREST nested-filter syntax: two AND-groups joined by OR.
+    query = query.or(
+      `and(start_time.lte.${endISO},end_time.gte.${startISO}),` +
+      `and(end_time.is.null,start_time.gte.${startISO},start_time.lte.${endISO})`,
+    )
+  }
+
+  const { data, error } = await query
+  if (error) {
+    console.error('fetchEventsWindowed error:', error)
+    return []
+  }
+  return data ?? []
+}
+
 export async function insertEvent(
   timelineId: string,
   event: {

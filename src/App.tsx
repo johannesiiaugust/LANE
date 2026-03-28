@@ -151,6 +151,7 @@ function TimelineView() {
     isFirstLogin,
     clearFirstLogin,
     createTimeline,
+    notifyVisibleWindow,
   } = useTimelineContext()
 
   const selectedTimeline = timelines.find(t => t.id === selectedTimelineId)
@@ -514,6 +515,7 @@ function TimelineView() {
               overlayDisplayModes={mergedOverlayDisplayModes}
               activeOverlayTimelines={[...activeOverlayTimelines, ...externalOverlayTimelines]}
               timelineName={selectedTimeline?.name}
+              onVisibleWindowChange={notifyVisibleWindow}
             />
 
             {/* Event popover */}
