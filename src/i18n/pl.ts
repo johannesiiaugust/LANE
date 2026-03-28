@@ -403,10 +403,10 @@ const pl: Translations = {
     searchPersonas: 'Szukaj person\u2026',
     noResults: 'Brak wyników',
     recentlyViewed: 'Ostatnio oglądane',
-    ageAlignedTooltip: 'Wyrównane wiekowo \u2014 kliknij dla rzeczywistych lat',
-    realYearsTooltip: 'Rzeczywiste lata \u2014 kliknij dla wyrównania wiekowego',
-    showingAgeAligned: 'Wyrównane wiekowo \u2014 kliknij dla rzeczywistych lat',
-    showingRealYears: 'Rzeczywiste lata \u2014 kliknij dla wyrównania wiekowego',
+    ageAlignedTooltip: '~{year} dopasowane wiekowo \u2014 kliknij dla prawdziwych lat',
+    realYearsTooltip: 'Prawdziwe lata \u2014 kliknij, aby dopasować od ~{year}',
+    showingAgeAligned: '~{year} dopasowane wiekowo \u2014 kliknij dla prawdziwych lat',
+    showingRealYears: 'Prawdziwe lata \u2014 kliknij, aby dopasować od ~{year}',
     deselectAll: 'Odznacz wszystkie',
   },
 
@@ -453,6 +453,10 @@ const pl: Translations = {
     startDate: 'Data rozpoczęcia',
     loadingLanes: 'Ładowanie\u2026',
     noLanesFound: 'Nie znaleziono torów.',
+    startYearAligned: '~{year} rok startowy dopasowany \u2014 kliknij dla prawdziwych lat',
+    realYearsClickAlign: 'Prawdziwe lata \u2014 kliknij, aby dopasować od ~{year}',
+    startYearAlignedShort: '~{year} rok startowy dopasowany',
+    realYearsShort: 'Prawdziwe lata',
   },
 
   languages: {

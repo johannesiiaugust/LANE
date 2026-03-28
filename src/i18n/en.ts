@@ -428,10 +428,10 @@ const en = {
     searchPersonas: 'Search personas\u2026',
     noResults: 'No results',
     recentlyViewed: 'Recently viewed',
-    ageAlignedTooltip: 'Age-aligned \u2014 click for real years',
-    realYearsTooltip: 'Real years \u2014 click to age-align',
-    showingAgeAligned: 'Showing age-aligned \u2014 click for real years',
-    showingRealYears: 'Showing real years \u2014 click to age-align',
+    ageAlignedTooltip: '~{year} age-aligned \u2014 click for real years',
+    realYearsTooltip: 'Real years \u2014 click to align from ~{year}',
+    showingAgeAligned: '~{year} age-aligned \u2014 click for real years',
+    showingRealYears: 'Real years \u2014 click to align from ~{year}',
     deselectAll: 'Deselect all',
   },
 
@@ -479,6 +479,10 @@ const en = {
     startDate: 'Start date',
     loadingLanes: 'Loading\u2026',
     noLanesFound: 'No lanes found.',
+    startYearAligned: '~{year} start-year aligned \u2014 click for real years',
+    realYearsClickAlign: 'Real years \u2014 click to align from ~{year}',
+    startYearAlignedShort: '~{year} start-year aligned',
+    realYearsShort: 'Real years',
   },
 
   // ── Language names ──

@@ -427,10 +427,10 @@ const no: Translations = {
     searchPersonas: 'Søk personas…',
     noResults: 'Ingen resultater',
     recentlyViewed: 'Nylig sett',
-    ageAlignedTooltip: 'Aldersjustert — klikk for ekte år',
-    realYearsTooltip: 'Ekte år — klikk for aldersjustering',
-    showingAgeAligned: 'Aldersjustert — klikk for ekte år',
-    showingRealYears: 'Ekte år — klikk for aldersjustering',
+    ageAlignedTooltip: '~{year} alderstilpasset \u2014 klikk for virkelige år',
+    realYearsTooltip: 'Virkelige år \u2014 klikk for å tilpasse fra ~{year}',
+    showingAgeAligned: '~{year} alderstilpasset \u2014 klikk for virkelige år',
+    showingRealYears: 'Virkelige år \u2014 klikk for å tilpasse fra ~{year}',
     deselectAll: 'Fjern alle valg',
   },
   // ── Selektor ──
@@ -477,6 +477,10 @@ const no: Translations = {
     startDate: 'Startdato',
     loadingLanes: 'Laster…',
     noLanesFound: 'Ingen spor funnet.',
+    startYearAligned: '~{year} startår tilpasset \u2014 klikk for virkelige år',
+    realYearsClickAlign: 'Virkelige år \u2014 klikk for å tilpasse fra ~{year}',
+    startYearAlignedShort: '~{year} startår tilpasset',
+    realYearsShort: 'Virkelige år',
   },
   // ── Språknavn ──
   languages: {

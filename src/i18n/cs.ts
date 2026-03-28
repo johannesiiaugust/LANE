@@ -403,10 +403,10 @@ const cs: Translations = {
     searchPersonas: 'Hledat persony\u2026',
     noResults: '\u017d\u00e1dn\u00e9 v\u00fdsledky',
     recentlyViewed: 'Naposledy zobrazen\u00e9',
-    ageAlignedTooltip: 'V\u011bkov\u011b zarovn\u00e1no \u2014 klikn\u011bte pro skute\u010dn\u00e9 roky',
-    realYearsTooltip: 'Skute\u010dn\u00e9 roky \u2014 klikn\u011bte pro v\u011bkov\u00e9 zarovn\u00e1n\u00ed',
-    showingAgeAligned: 'Zobrazeno v\u011bkov\u011b zarovn\u00e1no \u2014 klikn\u011bte pro skute\u010dn\u00e9 roky',
-    showingRealYears: 'Zobrazeny skute\u010dn\u00e9 roky \u2014 klikn\u011bte pro v\u011bkov\u00e9 zarovn\u00e1n\u00ed',
+    ageAlignedTooltip: '~{year} v\u011bkov\u011b zarovn\u00e1no \u2014 klikn\u011bte pro skute\u010dn\u00e9 roky',
+    realYearsTooltip: 'Skute\u010dn\u00e9 roky \u2014 klikn\u011bte pro zarovn\u00e1n\u00ed od ~{year}',
+    showingAgeAligned: '~{year} v\u011bkov\u011b zarovn\u00e1no \u2014 klikn\u011bte pro skute\u010dn\u00e9 roky',
+    showingRealYears: 'Skute\u010dn\u00e9 roky \u2014 klikn\u011bte pro zarovn\u00e1n\u00ed od ~{year}',
     deselectAll: 'Zru\u0161it v\u0161echny v\u00fdb\u011bry',
   },
 
@@ -453,6 +453,10 @@ const cs: Translations = {
     startDate: 'Po\u010d\u00e1te\u010dn\u00ed datum',
     loadingLanes: 'Na\u010d\u00edt\u00e1n\u00ed\u2026',
     noLanesFound: '\u017d\u00e1dn\u00e9 d\u00e1hy nenalezeny.',
+    startYearAligned: '~{year} po\u010d\u00e1te\u010dn\u00ed rok zarovn\u00e1n \u2014 klikn\u011bte pro skute\u010dn\u00e9 roky',
+    realYearsClickAlign: 'Skute\u010dn\u00e9 roky \u2014 klikn\u011bte pro zarovn\u00e1n\u00ed od ~{year}',
+    startYearAlignedShort: '~{year} po\u010d\u00e1te\u010dn\u00ed rok zarovn\u00e1n',
+    realYearsShort: 'Skute\u010dn\u00e9 roky',
   },
 
   languages: {

@@ -427,10 +427,10 @@ const lv: Translations = {
     searchPersonas: 'Meklēt personāžus…',
     noResults: 'Nav rezultātu',
     recentlyViewed: 'Nesen skatīti',
-    ageAlignedTooltip: 'Pēc vecuma — noklikšķiniet, lai rēdžētu īstos gadus',
-    realYearsTooltip: 'Ĭstie gadi — noklikšķiniet vecuma izlīdzināšanai',
-    showingAgeAligned: 'Pēc vecuma — noklikšķiniet, lai rēdžētu īstos gadus',
-    showingRealYears: 'Ĭstie gadi — noklikšķiniet vecuma izlīdzināšanai',
+    ageAlignedTooltip: '~{year} vecuma līmenis \u2014 noklikšķiniet, lai rādītu īstos gadus',
+    realYearsTooltip: 'Īstie gadi \u2014 noklikšķiniet, lai izlīdzinātu no ~{year}',
+    showingAgeAligned: '~{year} vecuma līmenis \u2014 noklikšķiniet, lai rādītu īstos gadus',
+    showingRealYears: 'Īstie gadi \u2014 noklikšķiniet, lai izlīdzinātu no ~{year}',
     deselectAll: 'Noņemt atziņmi visiem',
   },
 
@@ -478,6 +478,10 @@ const lv: Translations = {
     startDate: 'Sākuma datums',
     loadingLanes: 'Ielādē…',
     noLanesFound: 'Joslas nav atrastas.',
+    startYearAligned: '~{year} sākuma gads izlīdzināts \u2014 noklikšķiniet, lai rādītu īstos gadus',
+    realYearsClickAlign: 'Īstie gadi \u2014 noklikšķiniet, lai izlīdzinātu no ~{year}',
+    startYearAlignedShort: '~{year} sākuma gads izlīdzināts',
+    realYearsShort: 'Īstie gadi',
   },
 
   // ── Language names ──

@@ -397,7 +397,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
                             <div className="flex items-center gap-1.5 shrink-0">
                               {isActive && (
                                 <button onClick={() => togglePersonaAlignment(p.id)}
-                                  title={aligned ? t('personas.ageAlignedTooltip') : t('personas.realYearsTooltip')}
+                                  title={aligned ? t('personas.ageAlignedTooltip', { year: Math.round(DEMO_BIRTH_YEAR) }) : t('personas.realYearsTooltip', { year: Math.round(DEMO_BIRTH_YEAR) })}
                                   className={cn('p-1 rounded transition-colors', aligned ? 'text-primary bg-primary/10 hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted')}>
                                   {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
                                 </button>
@@ -435,7 +435,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
                                 <div className="flex items-center gap-1.5 shrink-0">
                                   {isActive && (
                                     <button onClick={() => togglePersonaAlignment(p.id)}
-                                      title={aligned ? t('personas.ageAlignedTooltip') : t('personas.realYearsTooltip')}
+                                      title={aligned ? t('personas.ageAlignedTooltip', { year: Math.round(DEMO_BIRTH_YEAR) }) : t('personas.realYearsTooltip', { year: Math.round(DEMO_BIRTH_YEAR) })}
                                       className={cn('p-1 rounded transition-colors', aligned ? 'text-primary bg-primary/10 hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted')}>
                                       {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
                                     </button>
@@ -470,7 +470,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
                               <div className="flex items-center gap-1.5 shrink-0">
                                 {isActive && (
                                   <button onClick={() => togglePersonaAlignment(p.id)}
-                                    title={aligned ? t('personas.ageAlignedTooltip') : t('personas.realYearsTooltip')}
+                                    title={aligned ? t('personas.ageAlignedTooltip', { year: Math.round(DEMO_BIRTH_YEAR) }) : t('personas.realYearsTooltip', { year: Math.round(DEMO_BIRTH_YEAR) })}
                                     className={cn('p-1 rounded transition-colors', aligned ? 'text-primary bg-primary/10 hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted')}>
                                     {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
                                   </button>
