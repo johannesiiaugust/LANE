@@ -421,10 +421,10 @@ const es: Translations = {
     searchPersonas: 'Buscar personajes\u2026',
     noResults: 'Sin resultados',
     recentlyViewed: 'Vistos recientemente',
-    ageAlignedTooltip: 'Alineado por edad \u2014 haz clic para años reales',
-    realYearsTooltip: 'Años reales \u2014 haz clic para alinear por edad',
-    showingAgeAligned: 'Mostrando alineado por edad \u2014 haz clic para años reales',
-    showingRealYears: 'Mostrando años reales \u2014 haz clic para alinear por edad',
+    ageAlignedTooltip: '~{year} alineado por edad \u2014 haz clic para años reales',
+    realYearsTooltip: 'Años reales \u2014 haz clic para alinear desde ~{year}',
+    showingAgeAligned: '~{year} alineado por edad \u2014 haz clic para años reales',
+    showingRealYears: 'Años reales \u2014 haz clic para alinear desde ~{year}',
     deselectAll: 'Deseleccionar todo',
   },
 
@@ -472,6 +472,10 @@ const es: Translations = {
     startDate: 'Fecha de inicio',
     loadingLanes: 'Cargando\u2026',
     noLanesFound: 'No se encontraron carriles.',
+    startYearAligned: '~{year} año de inicio alineado \u2014 haz clic para años reales',
+    realYearsClickAlign: 'Años reales \u2014 haz clic para alinear desde ~{year}',
+    startYearAlignedShort: '~{year} año de inicio alineado',
+    realYearsShort: 'Años reales',
   },
 
   // ── Language names ──

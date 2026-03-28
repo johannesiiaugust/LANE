@@ -427,10 +427,10 @@ const sv: Translations = {
     searchPersonas: 'S\u00f6k personas\u2026',
     noResults: 'Inga resultat',
     recentlyViewed: 'Nyligen visade',
-    ageAlignedTooltip: '\u00c5ldersjusterad \u2014 klicka f\u00f6r riktiga \u00e5r',
-    realYearsTooltip: 'Riktiga \u00e5r \u2014 klicka f\u00f6r \u00e5ldersjustering',
-    showingAgeAligned: '\u00c5ldersjusterad \u2014 klicka f\u00f6r riktiga \u00e5r',
-    showingRealYears: 'Riktiga \u00e5r \u2014 klicka f\u00f6r \u00e5ldersjustering',
+    ageAlignedTooltip: '~{year} åldersanpassad \u2014 klicka för riktiga år',
+    realYearsTooltip: 'Riktiga år \u2014 klicka för att anpassa från ~{year}',
+    showingAgeAligned: '~{year} åldersanpassad \u2014 klicka för riktiga år',
+    showingRealYears: 'Riktiga år \u2014 klicka för att anpassa från ~{year}',
     deselectAll: 'Avmarkera alla',
   },
 
@@ -478,6 +478,10 @@ const sv: Translations = {
     startDate: 'Startdatum',
     loadingLanes: 'Laddar\u2026',
     noLanesFound: 'Inga sp\u00e5r hittades.',
+    startYearAligned: '~{year} startår anpassat \u2014 klicka för riktiga år',
+    realYearsClickAlign: 'Riktiga år \u2014 klicka för att anpassa från ~{year}',
+    startYearAlignedShort: '~{year} startår anpassat',
+    realYearsShort: 'Riktiga år',
   },
 
   // ── Spr\u00e5knamn ──

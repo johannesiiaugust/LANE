@@ -128,8 +128,8 @@ export function PersonaEventBar({
       )}
       <p className="text-xs text-primary-foreground opacity-70">
         {event.type === 'point'
-          ? <>Year: {event.start_year}{event.display_start_year !== event.start_year && ` (aligned: ${event.display_start_year})`}</>
-          : <>{event.start_year}–{event.end_year ?? '?'}{event.display_start_year !== event.start_year && <> (aligned: {event.display_start_year}–{event.display_end_year ?? '?'})</>}</>
+          ? <>Year: {event.start_year}{event.display_start_year !== event.start_year && ` (aligned: ~${Math.round(event.display_start_year)})`}</>
+          : <>{event.start_year}–{event.end_year ?? '?'}{event.display_start_year !== event.start_year && <> (aligned: ~{Math.round(event.display_start_year)}–{event.display_end_year != null ? `~${Math.round(event.display_end_year)}` : '?'})</>}</>
         }
       </p>
     </div>,

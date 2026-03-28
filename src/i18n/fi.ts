@@ -427,10 +427,10 @@ const fi: Translations = {
     searchPersonas: 'Etsi hahmoja…',
     noResults: 'Ei tuloksia',
     recentlyViewed: 'Äskettäin katsottu',
-    ageAlignedTooltip: 'Ikäkohdistettu — napsauta oikeita vuosia varten',
-    realYearsTooltip: 'Oikeat vuodet — napsauta ikäkohdistusta varten',
-    showingAgeAligned: 'Ikäkohdistettu — napsauta oikeita vuosia varten',
-    showingRealYears: 'Oikeat vuodet — napsauta ikäkohdistusta varten',
+    ageAlignedTooltip: '~{year} ikäkohdistettu \u2014 napsauta todellisia vuosia varten',
+    realYearsTooltip: 'Todelliset vuodet \u2014 napsauta kohdistusta vuodesta ~{year}',
+    showingAgeAligned: '~{year} ikäkohdistettu \u2014 napsauta todellisia vuosia varten',
+    showingRealYears: 'Todelliset vuodet \u2014 napsauta kohdistusta vuodesta ~{year}',
     deselectAll: 'Poista kaikki valinnat',
   },
   // ── Valitsin ──
@@ -477,6 +477,10 @@ const fi: Translations = {
     startDate: 'Aloituspaivä',
     loadingLanes: 'Ladataan…',
     noLanesFound: 'Kaistoja ei löytynyt.',
+    startYearAligned: '~{year} aloitusvuosi kohdistettu \u2014 napsauta todellisia vuosia varten',
+    realYearsClickAlign: 'Todelliset vuodet \u2014 napsauta kohdistusta vuodesta ~{year}',
+    startYearAlignedShort: '~{year} aloitusvuosi kohdistettu',
+    realYearsShort: 'Todelliset vuodet',
   },
   // ── Kielten nimet ──
   languages: {

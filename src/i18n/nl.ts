@@ -427,10 +427,10 @@ const nl: Translations = {
     searchPersonas: 'Persona\u2019s zoeken\u2026',
     noResults: 'Geen resultaten',
     recentlyViewed: 'Recent bekeken',
-    ageAlignedTooltip: 'Leeftijdsuitgelijnd \u2014 klik voor echte jaren',
-    realYearsTooltip: 'Echte jaren \u2014 klik voor leeftijdsuitlijning',
-    showingAgeAligned: 'Leeftijdsuitgelijnd \u2014 klik voor echte jaren',
-    showingRealYears: 'Echte jaren \u2014 klik voor leeftijdsuitlijning',
+    ageAlignedTooltip: '~{year} leeftijdsuitgelijnd \u2014 klik voor echte jaren',
+    realYearsTooltip: 'Echte jaren \u2014 klik om uit te lijnen vanaf ~{year}',
+    showingAgeAligned: '~{year} leeftijdsuitgelijnd \u2014 klik voor echte jaren',
+    showingRealYears: 'Echte jaren \u2014 klik om uit te lijnen vanaf ~{year}',
     deselectAll: 'Alles deselecteren',
   },
 
@@ -478,6 +478,10 @@ const nl: Translations = {
     startDate: 'Startdatum',
     loadingLanes: 'Laden\u2026',
     noLanesFound: 'Geen sporen gevonden.',
+    startYearAligned: '~{year} startjaar uitgelijnd \u2014 klik voor echte jaren',
+    realYearsClickAlign: 'Echte jaren \u2014 klik om uit te lijnen vanaf ~{year}',
+    startYearAlignedShort: '~{year} startjaar uitgelijnd',
+    realYearsShort: 'Echte jaren',
   },
 
   // ── Taalnamen ──

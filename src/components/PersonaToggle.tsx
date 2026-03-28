@@ -64,7 +64,7 @@ export function PersonaToggle({
                     <>
                       <button
                         onClick={() => onToggleAlignment(p.id)}
-                        title={aligned ? 'Showing age-aligned — click for real years' : 'Showing real years — click to age-align'}
+                        title={aligned ? 'Age-aligned — click for real years' : 'Real years — click to age-align'}
                         className={cn(
                           'p-1 rounded transition-colors',
                           aligned

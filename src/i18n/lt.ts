@@ -427,10 +427,10 @@ const lt: Translations = {
     searchPersonas: 'Ieškoti personąžų…',
     noResults: 'Nėra rezultatų',
     recentlyViewed: 'Neseniai žiūrėta',
-    ageAlignedTooltip: 'Pagal amžių — spauskite tikrus metus',
-    realYearsTooltip: 'Tikri metai — spauskite amžiaus lygiavimui',
-    showingAgeAligned: 'Pagal amžių — spauskite tikrus metus',
-    showingRealYears: 'Tikri metai — spauskite amžiaus lygiavimui',
+    ageAlignedTooltip: '~{year} amžiaus lygiuojama \u2014 spustelėkite tikrų metų',
+    realYearsTooltip: 'Tikri metai \u2014 spustelėkite lygiuoti nuo ~{year}',
+    showingAgeAligned: '~{year} amžiaus lygiuojama \u2014 spustelėkite tikrų metų',
+    showingRealYears: 'Tikri metai \u2014 spustelėkite lygiuoti nuo ~{year}',
     deselectAll: 'Panaikinti visų pasirinkima',
   },
   // ── Selektorius ──
@@ -477,6 +477,10 @@ const lt: Translations = {
     startDate: 'Pradžios data',
     loadingLanes: 'Kraunama…',
     noLanesFound: 'Takų nerasta.',
+    startYearAligned: '~{year} pradžios metai sulygiuoti \u2014 spustelėkite tikrų metų',
+    realYearsClickAlign: 'Tikri metai \u2014 spustelėkite lygiuoti nuo ~{year}',
+    startYearAlignedShort: '~{year} pradžios metai sulygiuoti',
+    realYearsShort: 'Tikri metai',
   },
   // ── Kalbų pavadinimai ──
   languages: {

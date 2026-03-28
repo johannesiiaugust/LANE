@@ -41,6 +41,7 @@ function PersonaRow({
   alignedPersonaIds,
   onToggle,
   onToggleAlignment,
+  mainStartYear,
   t,
 }: {
   p: DbPersona
@@ -48,10 +49,12 @@ function PersonaRow({
   alignedPersonaIds: Set<string>
   onToggle: (id: string) => void
   onToggleAlignment: (id: string) => void
-  t: (key: string) => string
+  mainStartYear?: number | null
+  t: (key: string, params?: Record<string, string | number>) => string
 }) {
   const isActive = activePersonaIds.has(p.id)
   const aligned = alignedPersonaIds.has(p.id)
+  const alignYear = mainStartYear != null ? Math.round(mainStartYear) : p.birth_year
   return (
     <div className="rounded-md px-2 py-1.5 hover:bg-accent">
       <div className="flex items-center justify-between gap-2">
@@ -63,7 +66,7 @@ function PersonaRow({
           {isActive && (
             <button
               onClick={() => onToggleAlignment(p.id)}
-              title={aligned ? t('personas.showingAgeAligned') : t('personas.showingRealYears')}
+              title={aligned ? t('personas.showingAgeAligned', { year: alignYear }) : t('personas.showingRealYears', { year: alignYear })}
               className={cn('p-1 rounded transition-colors', aligned ? 'text-primary bg-primary/10 animate-blink-fast hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted')}
             >
               {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
@@ -561,25 +564,28 @@ export function TimelinePersonaSelector({
             )}
 
             {/* Other timelines — switchable as overlays */}
-            {otherTimelines.map(t => {
-              const isActive = activeOverlayIds.has(t.id)
-              const aligned = overlayAlignedIds.has(t.id)
+            {otherTimelines.map(tl => {
+              const isActive = activeOverlayIds.has(tl.id)
+              const aligned = overlayAlignedIds.has(tl.id)
+              const overlayAlignYear = mainStartYear != null ? Math.round(mainStartYear) : (tl.start_year != null ? Math.round(tl.start_year) : null)
               return (
-                <div key={t.id} className="rounded-md px-2 py-1.5 hover:bg-accent group">
+                <div key={tl.id} className="rounded-md px-2 py-1.5 hover:bg-accent group">
                   <div className="flex items-center justify-between gap-2">
                     <div
                       className="min-w-0 flex-1 cursor-pointer flex items-center gap-1"
-                      onClick={() => selectTimeline(t.id)}
+                      onClick={() => selectTimeline(tl.id)}
                     >
-                      {t.emoji && <span className="text-base leading-none shrink-0">{t.emoji}</span>}
-                      <p className="text-sm truncate">{t.name}</p>
+                      {tl.emoji && <span className="text-base leading-none shrink-0">{tl.emoji}</span>}
+                      <p className="text-sm truncate">{tl.name}</p>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       {isActive && (
                         <>
                           <button
-                            onClick={() => onToggleOverlayAlignment(t.id)}
-                            title={aligned ? 'Start-year aligned — click for real years' : 'Real years — click to align start years'}
+                            onClick={() => onToggleOverlayAlignment(tl.id)}
+                            title={overlayAlignYear != null
+                              ? (aligned ? t('selector.startYearAligned', { year: overlayAlignYear }) : t('selector.realYearsClickAlign', { year: overlayAlignYear }))
+                              : (aligned ? t('selector.startYearAlignedShort', { year: '' }) : t('selector.realYearsShort'))}
                             className={cn(
                               'p-1 rounded transition-colors',
                               aligned
@@ -594,19 +600,19 @@ export function TimelinePersonaSelector({
                       <div className="flex items-center gap-1">
                         <button
                           className="p-0.5 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"
-                          onClick={e => handleEdit(t.id, e)}
+                          onClick={e => handleEdit(tl.id, e)}
                         >
                           <Pencil className="h-3 w-3" />
                         </button>
                         {timelines.length > 1 && (
                           <button
                             className="p-0.5 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100"
-                            onClick={e => handleDelete(t.id, e)}
+                            onClick={e => handleDelete(tl.id, e)}
                           >
                             <Trash2 className="h-3 w-3" />
                           </button>
                         )}
-                        <Switch checked={isActive} onCheckedChange={() => onToggleOverlay(t.id)} />
+                        <Switch checked={isActive} onCheckedChange={() => onToggleOverlay(tl.id)} />
                       </div>
                     </div>
                   </div>
@@ -655,7 +661,7 @@ export function TimelinePersonaSelector({
                 {/* Top 5 most popular */}
                 <div className="px-2 pb-1">
                   <p className="text-[10px] font-medium text-muted-foreground mb-1">{t('personas.popular')}</p>
-                  {top5Personas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} t={t} />)}
+                  {top5Personas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} mainStartYear={mainStartYear} t={t} />)}
                 </div>
 
                 {/* Search field */}
@@ -675,7 +681,7 @@ export function TimelinePersonaSelector({
                   </div>
                   {searchResults.length > 0 && (
                     <div className="mt-1 space-y-0.5">
-                      {searchResults.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} t={t} />)}
+                      {searchResults.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} mainStartYear={mainStartYear} t={t} />)}
                     </div>
                   )}
                   {searchTrimmed.length > 0 && searchResults.length === 0 && (
@@ -687,7 +693,7 @@ export function TimelinePersonaSelector({
                 {recentPersonas.length > 0 && searchTrimmed.length === 0 && (
                   <div className="px-2 pt-1.5 border-t">
                     <p className="text-[10px] font-medium text-muted-foreground mb-1">{t('personas.recentlyViewed')}</p>
-                    {recentPersonas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} t={t} />)}
+                    {recentPersonas.map(p => <PersonaRow key={p.id} p={p} activePersonaIds={activePersonaIds} alignedPersonaIds={alignedPersonaIds} onToggle={handleTogglePersona} onToggleAlignment={onTogglePersonaAlignment} mainStartYear={mainStartYear} t={t} />)}
                   </div>
                 )}
               </>
@@ -751,6 +757,7 @@ export function TimelinePersonaSelector({
                   const isActive = externalActiveIds.has(info.timelineId)
                   const aligned = externalAlignedIds.has(info.timelineId)
                   const canAlign = info.startYear != null && mainStartYear != null
+                  const extAlignYear = mainStartYear != null ? Math.round(mainStartYear) : (info.startYear != null ? Math.round(info.startYear) : null)
                   return (
                     <div key={info.timelineId} className="rounded-md px-1 py-1.5 hover:bg-accent">
                       <div className="flex items-center justify-between gap-2">
@@ -763,7 +770,9 @@ export function TimelinePersonaSelector({
                             <>
                               {canAlign && (
                                 <button onClick={() => onToggleExternalAlignment?.(info.timelineId)}
-                                  title={aligned ? 'Start-year aligned' : 'Real years'}
+                                  title={extAlignYear != null
+                                    ? (aligned ? t('selector.startYearAligned', { year: extAlignYear }) : t('selector.realYearsClickAlign', { year: extAlignYear }))
+                                    : (aligned ? t('selector.startYearAlignedShort', { year: '' }) : t('selector.realYearsShort'))}
                                   className={cn('p-1 rounded transition-colors', aligned ? 'text-primary bg-primary/10 hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted')}>
                                   {aligned ? <Link2 className="h-3 w-3" /> : <Link2Off className="h-3 w-3" />}
                                 </button>

@@ -403,10 +403,10 @@ const da: Translations = {
     searchPersonas: 'Søg personas\u2026',
     noResults: 'Ingen resultater',
     recentlyViewed: 'For nylig set',
-    ageAlignedTooltip: 'Aldersjusteret \u2014 klik for rigtige år',
-    realYearsTooltip: 'Rigtige år \u2014 klik for aldersjustering',
-    showingAgeAligned: 'Aldersjusteret \u2014 klik for rigtige år',
-    showingRealYears: 'Rigtige år \u2014 klik for aldersjustering',
+    ageAlignedTooltip: '~{year} alderstilpasset \u2014 klik for rigtige år',
+    realYearsTooltip: 'Rigtige år \u2014 klik for at tilpasse fra ~{year}',
+    showingAgeAligned: '~{year} alderstilpasset \u2014 klik for rigtige år',
+    showingRealYears: 'Rigtige år \u2014 klik for at tilpasse fra ~{year}',
     deselectAll: 'Fravælg alle',
   },
 
@@ -453,6 +453,10 @@ const da: Translations = {
     startDate: 'Startdato',
     loadingLanes: 'Indlæser\u2026',
     noLanesFound: 'Ingen baner fundet.',
+    startYearAligned: '~{year} startår tilpasset \u2014 klik for rigtige år',
+    realYearsClickAlign: 'Rigtige år \u2014 klik for at tilpasse fra ~{year}',
+    startYearAlignedShort: '~{year} startår tilpasset',
+    realYearsShort: 'Rigtige år',
   },
 
   languages: {

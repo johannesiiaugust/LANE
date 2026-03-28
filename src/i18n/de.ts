@@ -427,10 +427,10 @@ const de: Translations = {
     searchPersonas: 'Personas suchen\u2026',
     noResults: 'Keine Ergebnisse',
     recentlyViewed: 'Zuletzt angesehen',
-    ageAlignedTooltip: 'Altersangepasst \u2014 klicken f\u00fcr echte Jahre',
-    realYearsTooltip: 'Echte Jahre \u2014 klicken f\u00fcr Altersausrichtung',
-    showingAgeAligned: 'Altersangepasst \u2014 klicken f\u00fcr echte Jahre',
-    showingRealYears: 'Echte Jahre \u2014 klicken f\u00fcr Altersausrichtung',
+    ageAlignedTooltip: '~{year} altersangepasst \u2014 klicken für echte Jahre',
+    realYearsTooltip: 'Echte Jahre \u2014 klicken zum Anpassen ab ~{year}',
+    showingAgeAligned: '~{year} altersangepasst \u2014 klicken für echte Jahre',
+    showingRealYears: 'Echte Jahre \u2014 klicken zum Anpassen ab ~{year}',
     deselectAll: 'Alle abw\u00e4hlen',
   },
 
@@ -478,6 +478,10 @@ const de: Translations = {
     startDate: 'Startdatum',
     loadingLanes: 'Wird geladen\u2026',
     noLanesFound: 'Keine Spuren gefunden.',
+    startYearAligned: '~{year} Startjahr angepasst \u2014 klicken für echte Jahre',
+    realYearsClickAlign: 'Echte Jahre \u2014 klicken zum Anpassen ab ~{year}',
+    startYearAlignedShort: '~{year} Startjahr angepasst',
+    realYearsShort: 'Echte Jahre',
   },
 
   // ── Sprachnamen ──
