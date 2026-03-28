@@ -335,13 +335,13 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
             </div>
             <div className="px-1 pb-1">
               {!tlEditOpen ? (
-                <div className="flex items-center rounded-md px-2 py-1.5 bg-accent group gap-2">
+                <div className="flex items-center rounded-md px-2 py-1.5 bg-accent gap-2">
                   {currentTimeline?.color && (
                     <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: currentTimeline.color }} />
                   )}
-                  <span className="flex-1 text-sm font-semibold truncate">{currentTimeline?.name ?? t('selector.myTimeline')}</span>
+                  <span className="flex-1 text-sm font-semibold truncate cursor-pointer" onClick={openTlEdit}>{currentTimeline?.name ?? t('selector.myTimeline')}</span>
                   <button
-                    className="p-0.5 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"
+                    className="p-0.5 text-muted-foreground hover:text-foreground"
                     onClick={openTlEdit}
                     title="Edit timeline"
                   >
