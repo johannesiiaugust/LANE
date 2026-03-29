@@ -24,6 +24,59 @@ export function getZoomMode(ppy: number): ZoomMode {
   return 'year'
 }
 
+/**
+ * Coarse zoom bands used to gate fetch/render behavior.
+ * More fine-grained display formatting uses ZoomMode / getZoomMode().
+ *
+ * overview — ppy < 5        — whole-life summary; cluster badges active
+ * year     — 5 ≤ ppy < 120  — normal life-event scale
+ * detail   — 120 ≤ ppy < 43800 — month/day precision
+ * deep     — ppy ≥ 43800    — hour/minute deep-dive
+ */
+export type ZoomBand = 'overview' | 'year' | 'detail' | 'deep'
+
+export function getZoomBand(ppy: number): ZoomBand {
+  if (ppy >= 43_800) return 'deep'
+  if (ppy >= 120)    return 'detail'
+  if (ppy >= 5)      return 'year'
+  return 'overview'
+}
+
+/**
+ * How many years to pre-fetch beyond each side of the visible range.
+ * Scales down at deep zoom so we don't fetch decades when viewing a single day.
+ *
+ * deep    → ~2.5 weeks buffer  (0.05 yr)
+ * detail  → ~2 years buffer
+ * year    → 15 years buffer
+ * overview→ 20 years buffer
+ */
+export function getPreloadBuffer(ppy: number): number {
+  const band = getZoomBand(ppy)
+  if (band === 'deep')   return 0.05
+  if (band === 'detail') return 2
+  if (band === 'year')   return 15
+  return 20
+}
+
+/**
+ * Minimum years by which the fetched range must be extended before a new
+ * network request fires.  Prevents micro-fetches from tiny pan/zoom movements.
+ * Must be strictly less than getPreloadBuffer() for its band.
+ *
+ * deep    → ~2.6 days  (0.005 yr)
+ * detail  → ~2.5 months (0.2 yr)
+ * year    → 2 years
+ * overview→ 5 years
+ */
+export function getExpandThreshold(ppy: number): number {
+  const band = getZoomBand(ppy)
+  if (band === 'deep')   return 0.005
+  if (band === 'detail') return 0.2
+  if (band === 'year')   return 2
+  return 5
+}
+
 /** Hour tick interval (in hours) for the header at a given zoom level. */
 export function getHourInterval(ppy: number): number {
   if (ppy >= 876_000)  return 1   // ≥ 100 px/hr

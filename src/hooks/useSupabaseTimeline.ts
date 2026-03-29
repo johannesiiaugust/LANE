@@ -20,21 +20,19 @@ import {
   TIMELINE_YEAR_MAX,
   resolveEventLinks,
   getCurrentYearFraction,
+  getPreloadBuffer,
+  getExpandThreshold,
+  getZoomBand,
 } from '@/lib/constants'
 import { pushEvent } from '@/lib/analytics'
 
 // ── Windowed-fetch configuration ─────────────────────────────────────────────
-// Fetch this many extra years beyond the visible range on each side so panning
-// doesn't immediately trigger a new request.
-const PRELOAD_BUFFER_YEARS = 20
-
 // Half-width of the initial fetch window, centred on today.  120 years covers
 // almost every personal life timeline on first load.
 const INITIAL_WINDOW_HALF = 60
 
-// Don't bother expanding the fetched range unless the new target extends it by
-// at least this many years (avoids micro-fetches during tiny pans).
-const MIN_EXPAND_THRESHOLD = 5
+// Preload buffer and expand threshold are now zoom-band-dependent.
+// See getPreloadBuffer() and getExpandThreshold() in constants.ts.
 
 export function useSupabaseTimeline(timelineId: string | null) {
   const [lanes, setLanes] = useState<Lane[]>([])
@@ -57,15 +55,30 @@ export function useSupabaseTimeline(timelineId: string | null) {
   // Debounce timer for notifyVisibleWindow — cancelled on timeline switch.
   const windowCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Ref so fetch callbacks always read the latest pixelsPerYear without
+  // needing it in useCallback deps (avoids stale closures after zoom changes).
+  const pixelsPerYearRef = useRef(pixelsPerYear)
+  useEffect(() => { pixelsPerYearRef.current = pixelsPerYear }, [pixelsPerYear])
+
   // Resolve dependency links (e.g. "start 2 years after event X")
   const resolvedEvents = useMemo(() => resolveEventLinks(events), [events])
 
-  // Compute data range from events (for scroll-to-center)
-  const allYears = resolvedEvents.flatMap(e =>
-    e.endYear != null ? [e.startYear, e.endYear] : [e.startYear],
-  )
-  const dataYearMin = allYears.length > 0 ? Math.floor(Math.min(...allYears)) - 2 : 1990
-  const dataYearMax = allYears.length > 0 ? Math.ceil(Math.max(...allYears)) + 2 : 2026
+  // Compute data range from events (for scroll-to-center).
+  // Memoized to avoid O(n) inline work + stack-unsafe spread on every render.
+  const { dataYearMin, dataYearMax } = useMemo(() => {
+    if (resolvedEvents.length === 0) return { dataYearMin: 1990, dataYearMax: 2026 }
+    let min = resolvedEvents[0].startYear
+    let max = resolvedEvents[0].startYear
+    for (const e of resolvedEvents) {
+      if (e.startYear < min) min = e.startYear
+      if (e.startYear > max) max = e.startYear
+      if (e.endYear != null) {
+        if (e.endYear < min) min = e.endYear
+        if (e.endYear > max) max = e.endYear
+      }
+    }
+    return { dataYearMin: Math.floor(min) - 2, dataYearMax: Math.ceil(max) + 2 }
+  }, [resolvedEvents])
 
   // Initial load: fetch an INITIAL_WINDOW_HALF-year window centred on today.
   // On refreshTimeline() the same currently-fetched window is re-fetched.
@@ -132,9 +145,15 @@ export function useSupabaseTimeline(timelineId: string | null) {
     const fetched = fetchedRangeRef.current
 
     // Determine how far we actually need to extend on each side.
-    const needLeft  = !fetched || targetStart < fetched.start - MIN_EXPAND_THRESHOLD
-    const needRight = !fetched || targetEnd   > fetched.end   + MIN_EXPAND_THRESHOLD
+    // Threshold is zoom-band-dependent — tight at deep zoom, loose at overview.
+    const threshold = getExpandThreshold(pixelsPerYearRef.current)
+    const needLeft  = !fetched || targetStart < fetched.start - threshold
+    const needRight = !fetched || targetEnd   > fetched.end   + threshold
     if (!needLeft && !needRight) return
+
+    if ((window as unknown as Record<string, unknown>).__TIMELINE_PERF_DEBUG) {
+      console.log(`[expandWindow] band=${getZoomBand(pixelsPerYearRef.current)} ppy=${pixelsPerYearRef.current.toFixed(1)} threshold=${threshold} needLeft=${needLeft} needRight=${needRight} target=[${targetStart.toFixed(2)},${targetEnd.toFixed(2)}]`)
+    }
 
     // Compute the new slices to fetch (avoid re-fetching the already-covered middle).
     const slices: Array<[number, number]> = []
@@ -176,7 +195,12 @@ export function useSupabaseTimeline(timelineId: string | null) {
   const notifyVisibleWindow = useCallback((visStart: number, visEnd: number) => {
     if (windowCheckTimerRef.current) clearTimeout(windowCheckTimerRef.current)
     windowCheckTimerRef.current = setTimeout(() => {
-      expandWindow(visStart - PRELOAD_BUFFER_YEARS, visEnd + PRELOAD_BUFFER_YEARS)
+      const ppy = pixelsPerYearRef.current
+      const buffer = getPreloadBuffer(ppy)
+      if ((window as unknown as Record<string, unknown>).__TIMELINE_PERF_DEBUG) {
+        console.log(`[notifyVisibleWindow] band=${getZoomBand(ppy)} ppy=${ppy.toFixed(1)} buffer=${buffer} vis=[${visStart.toFixed(2)},${visEnd.toFixed(2)}]`)
+      }
+      expandWindow(visStart - buffer, visEnd + buffer)
     }, 400)
   }, [expandWindow])
 

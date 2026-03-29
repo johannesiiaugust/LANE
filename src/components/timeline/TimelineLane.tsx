@@ -5,6 +5,7 @@ import { TimelineEventBar } from './TimelineEvent'
 import { PersonaEventBar } from './PersonaEventBar'
 import { OverlayEventBar } from './OverlayEventBar'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
+import { getZoomBand } from '@/lib/constants'
 
 // ── Viewport culling ──────────────────────────────────────────────────────────
 /** Extra viewport-widths of buffer on each side of the visible area. */
@@ -327,7 +328,7 @@ export function TimelineLane({
     if (typeof window === 'undefined' || !(window as unknown as Record<string, unknown>).__TIMELINE_PERF_DEBUG) return
     const clusters = renderItems.filter(r => r.kind === 'cluster').length
     console.debug(
-      `[Timeline perf | lane "${lane.name}"] total=${events.length} rendered=${culledEvents.length} clusters=${clusters}`,
+      `[Timeline perf | lane "${lane.name}"] band=${getZoomBand(pixelsPerYear)} ppy=${pixelsPerYear.toFixed(1)} total=${events.length} rendered=${culledEvents.length} clusters=${clusters}`,
     )
   }, [events.length, culledEvents.length, renderItems, lane.name])
 
