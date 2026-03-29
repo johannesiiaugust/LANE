@@ -408,6 +408,7 @@ export function TimelineLane({
           laneColor={lane.color}
           subRowIndex={(personaSubRowMap.get(pe.persona_id) ?? 0) + (personaEventRowMaps?.get(pe.persona_id)?.get(pe.id) ?? 0)}
           currentYear={currentYear}
+          scrollLeft={scrollLeft}
         />
       ))}
       {overlayEvents.map(oe => {
@@ -426,6 +427,7 @@ export function TimelineLane({
             rowTop={overlayBaseOffset + (baseSubRow + eventRow) * PERSONA_SUB_ROW_HEIGHT}
             rowHeight={PERSONA_SUB_ROW_HEIGHT}
             currentYear={currentYear}
+            scrollLeft={scrollLeft}
           />
         )
       })}
