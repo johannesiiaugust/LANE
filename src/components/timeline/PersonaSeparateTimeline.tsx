@@ -147,6 +147,7 @@ export function PersonaSeparateTimeline({
                 laneColor={laneColor}
                 currentYear={currentYear}
                 rowTopOffset={eventRowMap ? (eventRowMap.get(e.id) ?? 0) * BASE_LANE_HEIGHT : undefined}
+                scrollLeft={scrollLeft}
               />
             ))}
           </div>

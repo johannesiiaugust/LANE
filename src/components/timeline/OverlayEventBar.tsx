@@ -14,6 +14,7 @@ interface OverlayEventBarProps {
   rowTop: number          // absolute y offset where this sub-row starts (within parent div)
   rowHeight: number       // height of the sub-row for centering
   currentYear: number
+  scrollLeft?: number
 }
 
 const TOOLTIP_MAX_WIDTH = 280
@@ -29,9 +30,10 @@ export function OverlayEventBar({
   rowTop,
   rowHeight,
   currentYear,
+  scrollLeft = 0,
 }: OverlayEventBarProps) {
   const { sc } = useSizeConfig()
-  const { BAR_HEIGHT, DOT_SIZE, EVENT_FONT, EVENT_LINE_HEIGHT } = sc
+  const { BAR_HEIGHT, DOT_SIZE, EVENT_FONT, EVENT_LINE_HEIGHT, SIDEBAR_WIDTH } = sc
 
   const [open, setOpen] = useState(false)
   const [pinned, setPinned] = useState(false)
@@ -138,7 +140,7 @@ export function OverlayEventBar({
     return (
       <>
         <div
-          className="absolute rounded-full border-2 border-dashed border-white/60 cursor-pointer transition-all hover:scale-125 hover:shadow-lg"
+          className="absolute rounded-full cursor-pointer transition-all hover:scale-125 hover:shadow-lg"
           style={{
             left: left - DOT_SIZE / 2,
             top,
@@ -161,10 +163,13 @@ export function OverlayEventBar({
   const barHeight = BAR_HEIGHT
   const top = rowTop + (rowHeight - barHeight) / 2
 
+  // Sticky label: clamp so text stays visible at the left edge of the viewport
+  const textLeft = Math.max(4, scrollLeft - left + SIDEBAR_WIDTH + 4)
+
   return (
     <>
       <div
-        className="absolute rounded-lg border-2 border-dashed border-white/60 overflow-hidden cursor-pointer transition-all hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50"
+        className="absolute rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50"
         style={{
           left,
           top,
@@ -181,8 +186,8 @@ export function OverlayEventBar({
         <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 55%)' }} />
         {width > EVENT_FONT * 5 && (
           <span
-            className="absolute px-1 text-white/80 font-medium truncate drop-shadow-[0_0_2px_rgba(0,0,0,0.5)]"
-            style={{ fontSize: Math.round(EVENT_FONT * 0.9), lineHeight: `${EVENT_LINE_HEIGHT}px` }}
+            className="absolute text-white font-bold whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]"
+            style={{ left: textLeft, fontSize: Math.round(EVENT_FONT * 0.9) + 1, lineHeight: `${EVENT_LINE_HEIGHT}px` }}
           >
             <span className="inline-flex items-center gap-1">
               <span className="inline-block rounded-full shrink-0" style={{ width: 7, height: 7, backgroundColor: bulletColor }} />

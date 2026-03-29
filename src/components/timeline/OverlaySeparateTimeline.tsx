@@ -151,6 +151,7 @@ export function OverlaySeparateTimeline({
                 rowTop={eventRowMap ? (eventRowMap.get(e.id) ?? 0) * BASE_LANE_HEIGHT : 0}
                 rowHeight={BASE_LANE_HEIGHT}
                 currentYear={currentYear}
+                scrollLeft={scrollLeft}
               />
             ))}
           </div>

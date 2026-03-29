@@ -13,6 +13,7 @@ interface PersonaEventBarProps {
   /** Pixel offset from top of container for the row this event occupies (separate-mode multi-row) */
   rowTopOffset?: number
   currentYear: number
+  scrollLeft?: number
 }
 
 const TOOLTIP_MAX_WIDTH = 280
@@ -26,9 +27,10 @@ export function PersonaEventBar({
   subRowIndex,
   rowTopOffset,
   currentYear,
+  scrollLeft = 0,
 }: PersonaEventBarProps) {
   const { sc } = useSizeConfig()
-  const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, BAR_HEIGHT, DOT_SIZE, EVENT_FONT, EVENT_LINE_HEIGHT } = sc
+  const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, BAR_HEIGHT, DOT_SIZE, EVENT_FONT, EVENT_LINE_HEIGHT, SIDEBAR_WIDTH } = sc
 
   const [open, setOpen] = useState(false)
   const [pinned, setPinned] = useState(false)
@@ -148,7 +150,7 @@ export function PersonaEventBar({
     return (
       <>
         <div
-          className="absolute rounded-full border-2 border-dashed border-white/60 cursor-pointer transition-all hover:scale-125 hover:shadow-lg"
+          className="absolute rounded-full cursor-pointer transition-all hover:scale-125 hover:shadow-lg"
           style={{
             left: left - DOT_SIZE / 2,
             top,
@@ -171,10 +173,13 @@ export function PersonaEventBar({
   const barHeight = rowHeight < BASE_LANE_HEIGHT ? Math.round(BAR_HEIGHT * 0.75) : BAR_HEIGHT
   const top = verticalOffset + (rowHeight - barHeight) / 2
 
+  // Sticky label: clamp so text stays visible at the left edge of the viewport
+  const textLeft = Math.max(4, scrollLeft - left + SIDEBAR_WIDTH + 4)
+
   return (
     <>
       <div
-        className="absolute rounded-lg border-2 border-dashed border-white/60 overflow-hidden cursor-pointer transition-all hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50"
+        className="absolute rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50"
         style={{
           left,
           top,
@@ -191,8 +196,8 @@ export function PersonaEventBar({
         <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 55%)' }} />
         {width > EVENT_FONT * 5 && (
           <span
-            className="absolute px-1 text-white font-bold truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]"
-            style={{ fontSize: Math.round(EVENT_FONT * 0.9), lineHeight: `${EVENT_LINE_HEIGHT}px` }}
+            className="absolute text-white font-bold whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]"
+            style={{ left: textLeft, fontSize: Math.round(EVENT_FONT * 0.9) + 1, lineHeight: `${EVENT_LINE_HEIGHT}px` }}
           >
             {event.title}
           </span>
