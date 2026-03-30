@@ -146,6 +146,7 @@ interface TimelineContainerProps {
   onTodayVisibilityChange?: (offScreen: { direction: 'left' | 'right' } | null) => void
   timelineName?: string
   onVisibleWindowChange?: (start: number, end: number) => void
+  onRemovePersona?: (personaId: string) => void
 }
 
 export function TimelineContainer({
@@ -177,6 +178,7 @@ export function TimelineContainer({
   onTodayVisibilityChange,
   timelineName,
   onVisibleWindowChange,
+  onRemovePersona,
 }: TimelineContainerProps) {
   const { sc, size, updateFitScreenConfig } = useSizeConfig()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, TOTAL_ASSETS_HEIGHT } = sc
@@ -1066,6 +1068,7 @@ export function TimelineContainer({
       return {
         personaId: p.id,
         name: p.name,
+        bio: p.bio || undefined,   // already translated (usePersonas merges persona_translations)
         initials,
         birthYear: p.birth_year,
         deathYear: p.death_year,
@@ -1199,6 +1202,7 @@ export function TimelineContainer({
             onMoveLane={onMoveLane}
             onEditLane={onEditLane}
             onDeleteLane={onDeleteLane}
+            onRemovePersona={onRemovePersona}
             totalAssetsHeight={hasValueEvents ? TOTAL_ASSETS_HEIGHT : undefined}
           />
         </div>

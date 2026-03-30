@@ -124,10 +124,20 @@ export function usePersonas(userBirthYear: number | null = null) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePersonaIds])
 
-  // Build event translation lookup: (persona_id, title_en) → translation row
+  // Build event translation lookup with two-tier keying:
+  //   1. persona_event_id  (reliable — set after migration 040)
+  //   2. persona_id::title_en  (legacy fallback for any rows not yet backfilled)
+  // Both keys are stored in the same Map so the lookup below stays a single .get().
   const eventTranslationMap = useMemo(() => {
     const map = new Map<string, DbPersonaEventTranslation>()
-    for (const tr of eventTranslations) map.set(`${tr.persona_id}::${tr.title_en}`, tr)
+    for (const tr of eventTranslations) {
+      if (tr.persona_event_id) {
+        map.set(tr.persona_event_id, tr)
+      } else {
+        // Legacy path: rows where backfill didn't find a match
+        map.set(`${tr.persona_id}::${tr.title_en}`, tr)
+      }
+    }
     return map
   }, [eventTranslations])
 
@@ -139,8 +149,10 @@ export function usePersonas(userBirthYear: number | null = null) {
     }
 
     return rawPersonaEvents.map((e): AlignedPersonaEvent => {
-      // Apply event translation if available, fall back to original English
-      const tr = eventTranslationMap.get(`${e.persona_id}::${e.title}`)
+      // Apply event translation: try ID-based lookup first (post-migration 040),
+      // then fall back to legacy title key for any rows not yet backfilled.
+      const tr = eventTranslationMap.get(e.id)
+             ?? eventTranslationMap.get(`${e.persona_id}::${e.title}`)
       const translatedEvent = tr
         ? { ...e, title: tr.title ?? e.title, description: tr.description ?? e.description }
         : e

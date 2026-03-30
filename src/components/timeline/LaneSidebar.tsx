@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { ChevronDown, ChevronRight, Eye, EyeOff, MoreHorizontal, Pencil, Trash2, TrendingUp, ArrowUp, ArrowDown } from 'lucide-react'
+import { ChevronDown, ChevronRight, Eye, EyeOff, MoreHorizontal, Pencil, Trash2, TrendingUp, ArrowUp, ArrowDown, X } from 'lucide-react'
 import type { Lane } from '@/types/timeline'
 import {
   DropdownMenu,
@@ -11,10 +11,12 @@ import {
 import { useSizeConfig } from '@/contexts/UiSizeContext'
 import { computeActualSidebarWidth } from '@/lib/constants'
 import { useTranslateLaneName, useTranslation } from '@/i18n'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 
 export interface PersonaSidebarSection {
   personaId: string
   name: string
+  bio?: string              // translated bio (or English fallback) — shown in hover tooltip
   initials: string
   birthYear: number
   deathYear?: number | null
@@ -52,6 +54,7 @@ interface LaneSidebarProps {
   onMoveLane: (id: string, direction: 'up' | 'down') => void
   onEditLane: (lane: Lane) => void
   onDeleteLane: (lane: Lane) => void
+  onRemovePersona?: (personaId: string) => void
   totalAssetsHeight?: number
   timelineName?: string
 }
@@ -79,6 +82,7 @@ export function LaneSidebar({
   onMoveLane,
   onEditLane,
   onDeleteLane,
+  onRemovePersona,
   totalAssetsHeight,
   timelineName,
 }: LaneSidebarProps) {
@@ -322,15 +326,38 @@ export function LaneSidebar({
               gap: Math.round(ICON_SIZE / 6),
             }}
           >
-            <span className="font-semibold text-muted-foreground truncate underline" style={{ fontSize: SIDEBAR_FONT }}>
-              {section.name}
-            </span>
+            {section.bio ? (
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <span className="font-semibold text-muted-foreground truncate underline" style={{ fontSize: SIDEBAR_FONT }}>
+                    {section.name}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-64 whitespace-normal overflow-visible text-left">
+                  <p className="font-semibold mb-0.5">{section.name}</p>
+                  <p className="opacity-90 leading-snug">{section.bio}</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <span className="font-semibold text-muted-foreground truncate underline" style={{ fontSize: SIDEBAR_FONT }}>
+                {section.name}
+              </span>
+            )}
             <span
               className="text-muted-foreground/60 shrink-0 hidden xl:inline"
               style={{ fontSize: Math.round(SIDEBAR_FONT * 0.75) }}
             >
               {section.birthYear}–{section.deathYear ?? 'present'}
             </span>
+            {onRemovePersona && (
+              <button
+                onClick={() => onRemovePersona(section.personaId)}
+                className="ml-auto shrink-0 text-muted-foreground/60 hover:text-foreground transition-colors"
+                style={{ padding: Math.round(ICON_SIZE / 6) }}
+              >
+                <X size={Math.round(ICON_SIZE * 0.75)} />
+              </button>
+            )}
           </div>
           {/* One label row per lane */}
           {section.laneRowData.map(row => {

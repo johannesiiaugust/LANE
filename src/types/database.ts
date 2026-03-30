@@ -116,6 +116,7 @@ export interface DbPersonaTranslation {
 }
 
 export interface DbPersonaEventTranslation {
+  persona_event_id: string | null  // set after migration 040; null = unmatched, falls back to title lookup
   persona_id: string
   title_en: string
   language: string
