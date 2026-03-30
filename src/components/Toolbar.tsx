@@ -221,22 +221,6 @@ export function Toolbar({
 
               <DropdownMenuSeparator />
 
-              {/* Zoom slider + label */}
-              <div className="px-2 py-1.5 flex items-center gap-2">
-                <ZoomOut className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <input
-                  type="range"
-                  min={0}
-                  max={250}
-                  value={sliderValue}
-                  onChange={handleSliderChange}
-                  className="h-1 flex-1 cursor-pointer accent-primary"
-                  onClick={e => e.stopPropagation()}
-                />
-                <ZoomIn className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="text-[10px] text-muted-foreground w-12 text-right shrink-0">{zoomLabel}</span>
-              </div>
-
               {/* Max events */}
               <div className="px-2 py-1.5 flex items-center gap-2">
                 <span className="text-xs text-muted-foreground whitespace-nowrap">{t('toolbar.maxEvents')}</span>

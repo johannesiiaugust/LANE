@@ -573,6 +573,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
           overlayDisplayModes={new Map()}
           activeOverlayTimelines={[]}
           timelineName={localStorage.getItem('timeline_guide_completed') ? (currentTimeline?.name ?? 'My Life') : t('seed.exampleTimelineName')}
+          onRemovePersona={togglePersona}
         />
       </div>
 
