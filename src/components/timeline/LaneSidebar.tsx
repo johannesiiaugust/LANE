@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { useSizeConfig } from '@/contexts/UiSizeContext'
+import { computeActualSidebarWidth } from '@/lib/constants'
 import { useTranslateLaneName, useTranslation } from '@/i18n'
 
 export interface PersonaSidebarSection {
@@ -94,7 +95,7 @@ export function LaneSidebar({
     window.addEventListener('resize', update)
     return () => window.removeEventListener('resize', update)
   }, [])
-  const W = Math.min(SIDEBAR_WIDTH, Math.max(72, Math.round(viewportWidth * 0.28)))
+  const W = computeActualSidebarWidth(SIDEBAR_WIDTH, viewportWidth)
 
   const iconPad = Math.round(ICON_SIZE / 12)
 

@@ -17,6 +17,7 @@ interface PersonaSeparateTimelineProps {
   laneEventRowMaps?: Map<string, Map<string, number>>    // lane name -> event id -> row
   scrollLeft?: number
   viewportWidth?: number
+  sidebarWidth?: number
 }
 
 export function PersonaSeparateTimeline({
@@ -32,6 +33,7 @@ export function PersonaSeparateTimeline({
   laneEventRowMaps,
   scrollLeft = 0,
   viewportWidth = 1200,
+  sidebarWidth,
 }: PersonaSeparateTimelineProps) {
   const { sc } = useSizeConfig()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, MIN_TICK_PX, TICK_FONT } = sc
@@ -148,6 +150,7 @@ export function PersonaSeparateTimeline({
                 currentYear={currentYear}
                 rowTopOffset={eventRowMap ? (eventRowMap.get(e.id) ?? 0) * BASE_LANE_HEIGHT : undefined}
                 scrollLeft={scrollLeft}
+                sidebarWidth={sidebarWidth}
               />
             ))}
           </div>

@@ -17,6 +17,7 @@ interface OverlaySeparateTimelineProps {
   laneEventRowMaps?: Map<string, Map<string, number>>    // lane name -> event id -> row
   scrollLeft?: number
   viewportWidth?: number
+  sidebarWidth?: number
 }
 
 export function OverlaySeparateTimeline({
@@ -32,6 +33,7 @@ export function OverlaySeparateTimeline({
   laneEventRowMaps,
   scrollLeft = 0,
   viewportWidth = 1200,
+  sidebarWidth,
 }: OverlaySeparateTimelineProps) {
   const { sc } = useSizeConfig()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, MIN_TICK_PX, TICK_FONT } = sc
@@ -152,6 +154,7 @@ export function OverlaySeparateTimeline({
                 rowHeight={BASE_LANE_HEIGHT}
                 currentYear={currentYear}
                 scrollLeft={scrollLeft}
+                sidebarWidth={sidebarWidth}
               />
             ))}
           </div>

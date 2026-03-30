@@ -14,6 +14,7 @@ export interface TimelineEventProps {
   topOffset?: number
   stackDepth?: number
   scrollLeft?: number
+  sidebarWidth?: number
   // drag-drop
   isDragging?: boolean
   onMoveStart?: (event: TEvent, clientX: number, clientY: number, origin: 'longpress' | 'contextmenu') => void
@@ -27,10 +28,12 @@ const STACK_PX = 3  // px shift per depth level
 
 export function TimelineEventBar({
   event, yearStart, pixelsPerYear, laneColor, onClick, currentYear, topOffset = 0, stackDepth, scrollLeft = 0,
+  sidebarWidth,
   isDragging, onMoveStart, onExtendStart,
 }: TimelineEventProps) {
   const { sc } = useSizeConfig()
   const { BASE_LANE_HEIGHT, BAR_HEIGHT, DOT_SIZE, EVENT_FONT, EVENT_LINE_HEIGHT } = sc
+  const effectiveSidebarWidth = sidebarWidth ?? sc.SIDEBAR_WIDTH
   const color = event.color || laneColor
   const left = (event.startYear - yearStart) * pixelsPerYear
 
@@ -240,7 +243,7 @@ export function TimelineEventBar({
   const roundedClass = hasFadeIn && hasFadeOut ? '' : hasFadeIn ? 'rounded-r-lg' : hasFadeOut ? 'rounded-l-lg' : 'rounded-lg'
 
   // Sticky label stays inside the solid core
-  const textLeft = Math.max(4, scrollLeft - mainBarLeft + sc.SIDEBAR_WIDTH + 4)
+  const textLeft = Math.max(4, scrollLeft - mainBarLeft + effectiveSidebarWidth + 4)
 
   // Sparkline — coordinates relative to barStartYear (full span incl. tails)
   let sparklinePath: string | null = null
