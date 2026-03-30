@@ -516,6 +516,7 @@ function TimelineView() {
               activeOverlayTimelines={[...activeOverlayTimelines, ...externalOverlayTimelines]}
               timelineName={selectedTimeline?.name}
               onVisibleWindowChange={notifyVisibleWindow}
+              onRemovePersona={togglePersona}
             />
 
             {/* Event popover */}

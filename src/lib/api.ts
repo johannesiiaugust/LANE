@@ -628,7 +628,7 @@ export async function fetchPersonaEventTranslations(language: string): Promise<D
   if (!language || language === 'en') return []
   const { data, error } = await supabase
     .from('persona_event_translations')
-    .select('persona_id, title_en, language, title, description')
+    .select('persona_event_id, persona_id, title_en, language, title, description')
     .eq('language', language)
   if (error) {
     console.error('fetchPersonaEventTranslations error:', error)
