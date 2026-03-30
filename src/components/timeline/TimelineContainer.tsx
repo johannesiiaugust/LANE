@@ -11,7 +11,7 @@ import { TimelineEventBar } from './TimelineEvent'
 import { TotalAssetsLane } from './TotalAssetsLane'
 import { PersonaSeparateTimeline } from './PersonaSeparateTimeline'
 import { OverlaySeparateTimeline } from './OverlaySeparateTimeline'
-import { getCurrentYearFraction, MIN_PIXELS_PER_YEAR, MAX_PIXELS_PER_YEAR, fracYearToDateLabel } from '@/lib/constants'
+import { getCurrentYearFraction, MIN_PIXELS_PER_YEAR, MAX_PIXELS_PER_YEAR, fracYearToDateLabel, computeActualSidebarWidth } from '@/lib/constants'
 import { useSizeConfig, scaleSizeConfig, SIZE_PRESETS } from '@/contexts/UiSizeContext'
 
 // ── Dynamic canvas windowing ──────────────────────────────────────────────────
@@ -204,6 +204,9 @@ export function TimelineContainer({
   // Scroll position tracking for viewport-aware header/grid rendering
   const [scrollLeft, setScrollLeft] = useState(0)
   const [viewportWidth, setViewportWidth] = useState(1200)
+  // Actual rendered sidebar width — may be narrower than sc.SIDEBAR_WIDTH on small viewports.
+  // Must match LaneSidebar's W formula so sticky labels anchor exactly at the sidebar right edge.
+  const actualSidebarWidth = computeActualSidebarWidth(sc.SIDEBAR_WIDTH, viewportWidth)
   const rafRef = useRef<number | null>(null)
   const zoomRafRef = useRef<number | null>(null)
   const shiftingWindowRef = useRef(false)
@@ -390,7 +393,7 @@ export function TimelineContainer({
       if (!el) return
       const duration = event.type === 'range' && event.endYear != null
         ? event.endYear - event.startYear : 0
-      const usableWidth = Math.max(200, el.clientWidth - sc.SIDEBAR_WIDTH)
+      const usableWidth = Math.max(200, el.clientWidth - actualSidebarWidth)
       const ONE_WEEK = 1 / 52  // fractional year
       let newPpy: number
       if (duration > 2 * ONE_WEEK) {
@@ -410,7 +413,7 @@ export function TimelineContainer({
       setViewCenterYear(centerYear)
       onZoom(newPpy)
     }
-  }, [scrollToEventRef, yearStart, yearEnd, sc.SIDEBAR_WIDTH, onZoom])
+  }, [scrollToEventRef, yearStart, yearEnd, actualSidebarWidth, onZoom])
 
   // Wheel zoom toward cursor
   useEffect(() => {
@@ -715,11 +718,11 @@ export function TimelineContainer({
     let startClientX = _clientX
     if (scrollEl) {
       const margin = 60
-      const visibleLeft = scrollEl.scrollLeft + sc.SIDEBAR_WIDTH + margin
+      const visibleLeft = scrollEl.scrollLeft + actualSidebarWidth + margin
       const visibleRight = scrollEl.scrollLeft + scrollEl.clientWidth - margin
       if (anchorContentX < visibleLeft || anchorContentX > visibleRight) {
         // Center the anchor in the usable area (right of sidebar)
-        const usableCenter = sc.SIDEBAR_WIDTH + (scrollEl.clientWidth - sc.SIDEBAR_WIDTH) / 2
+        const usableCenter = actualSidebarWidth + (scrollEl.clientWidth - actualSidebarWidth) / 2
         scrollEl.scrollLeft = Math.max(0, anchorContentX - usableCenter)
       }
       const rect = scrollEl.getBoundingClientRect()
@@ -740,7 +743,7 @@ export function TimelineContainer({
     // Commit on mouseup — works for both quick click and click-hold-drag.
     // setTimeout skips the mouseup from the context menu item click itself.
     setTimeout(() => window.addEventListener('mouseup', handleDragCommit, { once: true }), 0)
-  }, [handleDragMove, handleDragCommit, sc.SIDEBAR_WIDTH])
+  }, [handleDragMove, handleDragCommit, actualSidebarWidth])
 
   const visibleLanes = lanes.filter(l => l.visible)
   const hiddenLanes = lanes.filter(l => !l.visible)
@@ -1169,7 +1172,7 @@ export function TimelineContainer({
       {/* Lane sidebar overlay — floats above timeline content, scrolls vertically via sidebarInnerRef */}
       <div
         className="absolute top-0 left-0 overflow-hidden pointer-events-none"
-        style={{ width: sc.SIDEBAR_WIDTH, height: '100%', zIndex: 30 }}
+        style={{ width: actualSidebarWidth, height: '100%', zIndex: 30 }}
       >
         <div ref={sidebarInnerRef} className="pointer-events-auto">
           <LaneSidebar
@@ -1231,6 +1234,7 @@ export function TimelineContainer({
                 currentYear={currentYear}
                 scrollLeft={scrollLeft}
                 viewportWidth={viewportWidth}
+                sidebarWidth={actualSidebarWidth}
                 draggingEventId={dragPreview?.event.id}
                 onEventMoveStart={handleEventMoveStart}
                 onEventExtendStart={handleEventExtendStart}
@@ -1272,6 +1276,7 @@ export function TimelineContainer({
                 laneEventRowMaps={laneEventRowMaps}
                 scrollLeft={scrollLeft}
                 viewportWidth={viewportWidth}
+                sidebarWidth={actualSidebarWidth}
               />
             )
           })}
@@ -1296,6 +1301,7 @@ export function TimelineContainer({
                 laneEventRowMaps={laneEventRowMaps}
                 scrollLeft={scrollLeft}
                 viewportWidth={viewportWidth}
+                sidebarWidth={actualSidebarWidth}
               />
             )
           })}

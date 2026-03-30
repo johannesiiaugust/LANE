@@ -15,6 +15,7 @@ interface OverlayEventBarProps {
   rowHeight: number       // height of the sub-row for centering
   currentYear: number
   scrollLeft?: number
+  sidebarWidth?: number
 }
 
 const TOOLTIP_MAX_WIDTH = 280
@@ -31,9 +32,11 @@ export function OverlayEventBar({
   rowHeight,
   currentYear,
   scrollLeft = 0,
+  sidebarWidth,
 }: OverlayEventBarProps) {
   const { sc } = useSizeConfig()
-  const { BAR_HEIGHT, DOT_SIZE, EVENT_FONT, EVENT_LINE_HEIGHT, SIDEBAR_WIDTH } = sc
+  const { BAR_HEIGHT, DOT_SIZE, EVENT_FONT, EVENT_LINE_HEIGHT } = sc
+  const effectiveSidebarWidth = sidebarWidth ?? sc.SIDEBAR_WIDTH
 
   const [open, setOpen] = useState(false)
   const [pinned, setPinned] = useState(false)
@@ -164,7 +167,7 @@ export function OverlayEventBar({
   const top = rowTop + (rowHeight - barHeight) / 2
 
   // Sticky label: clamp so text stays visible at the left edge of the viewport
-  const textLeft = Math.max(4, scrollLeft - left + SIDEBAR_WIDTH + 4)
+  const textLeft = Math.max(4, scrollLeft - left + effectiveSidebarWidth + 4)
 
   return (
     <>

@@ -14,6 +14,7 @@ interface PersonaEventBarProps {
   rowTopOffset?: number
   currentYear: number
   scrollLeft?: number
+  sidebarWidth?: number
 }
 
 const TOOLTIP_MAX_WIDTH = 280
@@ -28,9 +29,11 @@ export function PersonaEventBar({
   rowTopOffset,
   currentYear,
   scrollLeft = 0,
+  sidebarWidth,
 }: PersonaEventBarProps) {
   const { sc } = useSizeConfig()
-  const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, BAR_HEIGHT, DOT_SIZE, EVENT_FONT, EVENT_LINE_HEIGHT, SIDEBAR_WIDTH } = sc
+  const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, BAR_HEIGHT, DOT_SIZE, EVENT_FONT, EVENT_LINE_HEIGHT } = sc
+  const effectiveSidebarWidth = sidebarWidth ?? sc.SIDEBAR_WIDTH
 
   const [open, setOpen] = useState(false)
   const [pinned, setPinned] = useState(false)
@@ -174,7 +177,7 @@ export function PersonaEventBar({
   const top = verticalOffset + (rowHeight - barHeight) / 2
 
   // Sticky label: clamp so text stays visible at the left edge of the viewport
-  const textLeft = Math.max(4, scrollLeft - left + SIDEBAR_WIDTH + 4)
+  const textLeft = Math.max(4, scrollLeft - left + effectiveSidebarWidth + 4)
 
   return (
     <>

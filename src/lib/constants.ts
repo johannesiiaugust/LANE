@@ -7,6 +7,15 @@ export const TOTAL_ASSETS_HEIGHT = 128  // height of the Total Assets summary la
 export const HEADER_HEIGHT = 48         // sticky timeline header height in px
 export const SIDEBAR_WIDTH = 280        // lane sidebar width in px
 
+/**
+ * Actual rendered sidebar width — narrows on small viewports so more horizontal
+ * space goes to the timeline.  Must match the formula in LaneSidebar.tsx.
+ * Use this everywhere sidebar width is needed for sticky label math.
+ */
+export function computeActualSidebarWidth(configWidth: number, viewportWidth: number): number {
+  return Math.min(configWidth, Math.max(72, Math.round(viewportWidth * 0.28)))
+}
+
 // Zoom & year range
 export const MIN_PIXELS_PER_YEAR = 0.4      // 3 extra zoom-out stops vs old 2.0 (factor ×1.69 each: 0.4→0.68→1.14→1.93≈old min)
 export const MAX_PIXELS_PER_YEAR = 900_000  // 2 extra zoom-in stops vs old 300_000; ≥876_000 switches to 1-hour ticks; dynamic canvas windowing keeps DOM elements safe

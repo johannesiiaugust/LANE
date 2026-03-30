@@ -148,6 +148,7 @@ interface TimelineLaneProps {
   currentYear: number
   scrollLeft: number
   viewportWidth: number
+  sidebarWidth?: number
   draggingEventId?: string | null
   onEventMoveStart?: (event: TimelineEvent, clientX: number, clientY: number, origin: 'longpress' | 'contextmenu') => void
   onEventExtendStart?: (event: TimelineEvent, direction: 'forward' | 'backward', clientX: number) => void
@@ -185,9 +186,11 @@ export function TimelineLane({
   overlayBaseOffset = 0,
   overlayTimelineInfoMap,
   personaEventRowMaps,
+  sidebarWidth,
 }: TimelineLaneProps) {
   const { sc } = useSizeConfig()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT } = sc
+  const effectiveSidebarWidth = sidebarWidth ?? sc.SIDEBAR_WIDTH
   const width = (yearEnd - yearStart) * pixelsPerYear
   const laneRef = useRef<HTMLDivElement>(null)
   const modeRef = useRef<Mode>('idle')
@@ -386,6 +389,7 @@ export function TimelineLane({
             topOffset={(eventRowMap?.get(item.event.id) ?? 0) * BASE_LANE_HEIGHT}
             stackDepth={stackDepthMap.get(item.event.id)}
             scrollLeft={scrollLeft}
+            sidebarWidth={effectiveSidebarWidth}
             isDragging={draggingEventId === item.event.id}
             onMoveStart={onEventMoveStart}
             onExtendStart={onEventExtendStart}
@@ -410,6 +414,7 @@ export function TimelineLane({
           subRowIndex={(personaSubRowMap.get(pe.persona_id) ?? 0) + (personaEventRowMaps?.get(pe.persona_id)?.get(pe.id) ?? 0)}
           currentYear={currentYear}
           scrollLeft={scrollLeft}
+          sidebarWidth={effectiveSidebarWidth}
         />
       ))}
       {overlayEvents.map(oe => {
@@ -429,6 +434,7 @@ export function TimelineLane({
             rowHeight={PERSONA_SUB_ROW_HEIGHT}
             currentYear={currentYear}
             scrollLeft={scrollLeft}
+            sidebarWidth={effectiveSidebarWidth}
           />
         )
       })}
