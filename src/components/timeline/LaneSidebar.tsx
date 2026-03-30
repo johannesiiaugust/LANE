@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronDown, ChevronRight, Eye, EyeOff, MoreHorizontal, Pencil, Trash2, TrendingUp, ArrowUp, ArrowDown, X } from 'lucide-react'
 import type { Lane } from '@/types/timeline'
 import {
@@ -11,7 +12,65 @@ import {
 import { useSizeConfig } from '@/contexts/UiSizeContext'
 import { computeActualSidebarWidth } from '@/lib/constants'
 import { useTranslateLaneName, useTranslation } from '@/i18n'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+
+/** Bio popover — shows on hover (desktop) and click/tap (mobile). Portals to body to avoid overflow clipping. */
+function BioPop({ name, bio, fontSize, children }: { name: string; bio: string; fontSize: number; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const triggerRef = useRef<HTMLSpanElement>(null)
+  const popRef = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState({ top: 0, left: 0 })
+
+  function calcPos() {
+    if (triggerRef.current) {
+      const r = triggerRef.current.getBoundingClientRect()
+      setPos({ top: r.top - 4, left: r.right + 8 })
+    }
+  }
+
+  function show() { calcPos(); setOpen(true) }
+  function hide() { setOpen(false) }
+  function toggle(e: React.MouseEvent) { e.stopPropagation(); open ? hide() : show() }
+
+  // Close when clicking outside
+  useEffect(() => {
+    if (!open) return
+    function onDown(e: MouseEvent | TouchEvent) {
+      const target = e.target as Node
+      if (!triggerRef.current?.contains(target) && !popRef.current?.contains(target)) hide()
+    }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('touchstart', onDown)
+    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('touchstart', onDown) }
+  }, [open])
+
+  return (
+    <>
+      <span
+        ref={triggerRef}
+        className="font-semibold text-muted-foreground truncate underline cursor-pointer select-none"
+        style={{ fontSize }}
+        onMouseEnter={show}
+        onMouseLeave={hide}
+        onClick={toggle}
+      >
+        {children}
+      </span>
+      {open && createPortal(
+        <div
+          ref={popRef}
+          onMouseEnter={show}
+          onMouseLeave={hide}
+          style={{ position: 'fixed', top: pos.top, left: pos.left, zIndex: 9999, maxWidth: 256 }}
+          className="rounded-md border bg-popover text-popover-foreground shadow-lg px-3 py-2 text-xs"
+        >
+          <p className="font-semibold mb-0.5" style={{ fontSize }}>{name}</p>
+          <p className="opacity-90 leading-snug whitespace-normal" style={{ fontSize: fontSize * 0.92 }}>{bio}</p>
+        </div>,
+        document.body,
+      )}
+    </>
+  )
+}
 
 export interface PersonaSidebarSection {
   personaId: string
@@ -327,19 +386,11 @@ export function LaneSidebar({
             }}
           >
             {section.bio ? (
-              <Tooltip delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <span className="font-semibold text-muted-foreground truncate underline" style={{ fontSize: SIDEBAR_FONT }}>
-                    {section.name}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="max-w-64 whitespace-normal overflow-visible text-left">
-                  <p className="font-semibold mb-0.5">{section.name}</p>
-                  <p className="opacity-90 leading-snug">{section.bio}</p>
-                </TooltipContent>
-              </Tooltip>
+              <BioPop name={section.name} bio={section.bio} fontSize={SIDEBAR_FONT}>
+                {section.name}
+              </BioPop>
             ) : (
-              <span className="font-semibold text-muted-foreground truncate underline" style={{ fontSize: SIDEBAR_FONT }}>
+              <span className="font-semibold text-muted-foreground truncate" style={{ fontSize: SIDEBAR_FONT }}>
                 {section.name}
               </span>
             )}
@@ -351,7 +402,7 @@ export function LaneSidebar({
             </span>
             {onRemovePersona && (
               <button
-                onClick={() => onRemovePersona(section.personaId)}
+                onPointerDown={e => { e.stopPropagation(); onRemovePersona(section.personaId) }}
                 className="ml-auto shrink-0 text-muted-foreground/60 hover:text-foreground transition-colors"
                 style={{ padding: Math.round(ICON_SIZE / 6) }}
               >
