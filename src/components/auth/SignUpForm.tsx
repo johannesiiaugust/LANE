@@ -24,7 +24,7 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProp
   const [confirmPassword, setConfirmPassword] = useState('')
   const [username, setUsername] = useState('')
   const [usernameError, setUsernameError] = useState<string | null>(null)
-  const [usernameOk, setUsernameOk] = useState(false)
+
   const [bio, setBio] = useState('')
   const [birthDate, setBirthDate] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +32,7 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProp
 
   async function handleUsernameBlur() {
     const val = username.trim().toLowerCase()
-    setUsernameOk(false)
+
     if (!val) return
     if (!USERNAME_RE.test(val)) {
       setUsernameError(t('auth.usernameChars'))
@@ -41,7 +41,7 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProp
     const available = await isUsernameAvailable(val)
     if (available) {
       setUsernameError(null)
-      setUsernameOk(true)
+
     } else {
       setUsernameError(t('auth.usernameAlreadyTaken'))
     }
@@ -130,7 +130,7 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProp
           type="text"
           placeholder="e.g. johndoe"
           value={username}
-          onChange={e => { setUsername(e.target.value.toLowerCase()); setUsernameError(null); setUsernameOk(false) }}
+          onChange={e => { setUsername(e.target.value.toLowerCase()); setUsernameError(null) }}
           onBlur={handleUsernameBlur}
           required
         />
