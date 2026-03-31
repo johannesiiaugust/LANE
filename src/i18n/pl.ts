@@ -549,6 +549,11 @@ const pl: Translations = {
     fillRequiredFields: 'Proszę wypełnić wszystkie wymagane pola',
     continueWithExample: 'Kontynuuj z wymyślonym przykładem życia →',
     next: 'Dalej',
+    endOptional: 'Koniec (opcjonalnie)',
+    endNone: '—',
+    endDate: 'Wybierz datę',
+    endToday: 'Dziś',
+    endOngoing: 'Trwające',
   },
 
   welcome: {

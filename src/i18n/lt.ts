@@ -610,6 +610,11 @@ const lt: Translations = {
     fillRequiredFields: 'Užpildykite visus privalomus laukus',
     continueWithExample: 'Tęsti su sugalvotu gyvenimo pavyzdžiu →',
     next: 'Kitas',
+    endOptional: 'Pabaiga (neprivaloma)',
+    endNone: '—',
+    endDate: 'Pasirinkti datą',
+    endToday: 'Šiandien',
+    endOngoing: 'Tęstinis',
   },
   demo: {
     comparingYouVs: 'Palyginimas — Jūs ir Donaldas Trumpas',

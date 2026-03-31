@@ -606,6 +606,11 @@ const it: Translations = {
     fillRequiredFields: 'Compila tutti i campi obbligatori',
     continueWithExample: 'Continua con un esempio di vita inventato \u2192',
     next: 'Avanti',
+    endOptional: 'Fine (opzionale)',
+    endNone: '—',
+    endDate: 'Scegli data',
+    endToday: 'Oggi',
+    endOngoing: 'In corso',
   },
   demo: {
     comparingYouVs: 'Confronto \u2014 Tu vs. Donald Trump',

@@ -549,6 +549,11 @@ const da: Translations = {
     fillRequiredFields: 'Udfyld venligst alle obligatoriske felter',
     continueWithExample: 'Fortsæt med et opdigtet livseksempel →',
     next: 'Næste',
+    endOptional: 'Slut (valgfrit)',
+    endNone: '—',
+    endDate: 'Vælg dato',
+    endToday: 'I dag',
+    endOngoing: 'Igangværende',
   },
 
   welcome: {

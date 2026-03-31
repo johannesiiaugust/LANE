@@ -612,6 +612,11 @@ const sv: Translations = {
     fillRequiredFields: 'Fyll i alla obligatoriska fält',
     continueWithExample: 'Fortsätt med ett påhittat livsexempel →',
     next: 'Nästa',
+    endOptional: 'Slut (valfritt)',
+    endNone: '—',
+    endDate: 'Välj datum',
+    endToday: 'Idag',
+    endOngoing: 'Pågående',
   },
   demo: {
     comparingYouVs: 'Jämförelse \u2014 Du mot Donald Trump',

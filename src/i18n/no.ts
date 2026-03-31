@@ -610,6 +610,11 @@ const no: Translations = {
     fillRequiredFields: 'Fyll inn alle obligatoriske felt',
     continueWithExample: 'Fortsett med et oppdiktet livseksempel →',
     next: 'Neste',
+    endOptional: 'Slutt (valgfritt)',
+    endNone: '—',
+    endDate: 'Velg dato',
+    endToday: 'I dag',
+    endOngoing: 'Pågående',
   },
   demo: {
     comparingYouVs: 'Sammenligner \u2014 Deg vs. Donald Trump',

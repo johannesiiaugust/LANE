@@ -612,6 +612,11 @@ const lv: Translations = {
     fillRequiredFields: 'Lūdzu, aizpildiet visus obligātos laukus',
     continueWithExample: 'Turpināt ar izdomātu dzīves piemēru →',
     next: 'Nākamais',
+    endOptional: 'Beigas (neobligāti)',
+    endNone: '—',
+    endDate: 'Izvēlēties datumu',
+    endToday: 'Šodien',
+    endOngoing: 'Notiekošs',
   },
   demo: {
     comparingYouVs: 'Salīdzinājums — Jūs pret Donaldu Trampu',

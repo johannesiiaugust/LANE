@@ -637,6 +637,11 @@ const en = {
     fillRequiredFields: 'Please fill in all required fields',
     continueWithExample: 'Continue with a made up life example →',
     next: 'Next',
+    endOptional: 'End (optional)',
+    endNone: '—',
+    endDate: 'Pick date',
+    endToday: 'Today',
+    endOngoing: 'Ongoing',
   },
 
   // ── Welcome Modal ──
