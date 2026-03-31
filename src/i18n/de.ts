@@ -423,6 +423,8 @@ const de: Translations = {
   footer: {
     copyright: '\u00a9 {year} LifeLANE',
     about: 'Über uns',
+    storedInGermany: 'Gespeichert & verschlüsselt in Deutschland',
+    termsShort: 'T&C',
   },
 
   // ── AGB-Seite ──

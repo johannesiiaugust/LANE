@@ -423,6 +423,8 @@ const no: Translations = {
   footer: {
     copyright: '\u00a9 {year} LifeLANE',
     about: 'Om',
+    storedInGermany: 'Lagret & kryptert i Tyskland',
+    termsShort: 'T&C',
   },
 
   // ── Vilkårsside ──

@@ -425,6 +425,8 @@ const en = {
   footer: {
     copyright: '\u00a9 {year} LifeLANE',
     about: 'About',
+    storedInGermany: 'Stored & encrypted in Germany',
+    termsShort: 'T&C',
   },
 
   // ── Terms Page ──

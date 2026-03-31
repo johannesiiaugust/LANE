@@ -43,10 +43,9 @@ function AuthHeader({ onOpenAuth, onOpenSearch }: { onOpenAuth: () => void; onOp
       </div>
 
       {/* Short description — hidden on small screens */}
-      <div className="hidden sm:flex flex-col items-center flex-1 max-w-md">
-        <p className="text-sm text-muted-foreground text-center leading-snug">{t('auth.visualizeLives')}</p>
-        <p className="text-xs text-muted-foreground/60 text-center mt-0.5">{t('auth.securelyStored')}</p>
-      </div>
+      <p className="hidden sm:block text-sm text-muted-foreground text-center flex-1 max-w-md leading-snug">
+        {t('auth.visualizeLives')}
+      </p>
 
       {/* Sign in + 3-dot */}
       <div className="flex items-center gap-2 shrink-0 bg-muted/50 rounded-lg px-1.5 py-0.5">

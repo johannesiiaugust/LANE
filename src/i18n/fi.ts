@@ -423,6 +423,8 @@ const fi: Translations = {
   footer: {
     copyright: '\u00a9 {year} LifeLANE',
     about: 'Tietoja',
+    storedInGermany: 'Tallennettu & salattu Saksassa',
+    termsShort: 'T&C',
   },
 
   // ── Käyttöehdot ──

@@ -423,6 +423,8 @@ const lt: Translations = {
   footer: {
     copyright: '© {year} LifeLANE',
     about: 'Apie',
+    storedInGermany: 'Saugoma & šifruojama Vokietijoje',
+    termsShort: 'T&C',
   },
 
   // ── Sąlygų puslapis ──

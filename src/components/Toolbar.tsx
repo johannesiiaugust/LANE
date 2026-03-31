@@ -179,7 +179,6 @@ export function Toolbar({
         <div className="shrink-0">
           <div className="text-xl font-bold leading-tight">LifeLANE</div>
           <div className="text-xs text-muted-foreground italic">{t('auth.theOSForYourLife')}</div>
-          <div className="text-[10px] text-muted-foreground/60 hidden sm:block">{t('auth.securelyStored')}</div>
         </div>
 
         {/* ── 3-dot menu ── */}
