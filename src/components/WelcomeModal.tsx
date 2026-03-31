@@ -81,6 +81,7 @@ export function WelcomeModal({ currentLang, onDismiss }: WelcomeModalProps) {
           <div className="text-3xl mb-2">👋</div>
           <h2 className="text-xl font-bold">{t('welcome.title')}</h2>
           <p className="text-sm text-muted-foreground mt-1">{t('welcome.subtitle')}</p>
+          <p className="text-xs text-muted-foreground/70 mt-2">🔒 {t('welcome.secureStorage')}</p>
         </div>
 
         {/* Language selector */}

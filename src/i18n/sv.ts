@@ -66,6 +66,7 @@ const sv: Translations = {
     createAccountBlank: 'Skapa konto (tom tidslinje)',
     theOSForYourLife: 'Operativsystemet för ditt liv',
     visualizeLives: 'Visualisera liv. Jämför med andra. Forma din framtid.',
+    securelyStored: 'Livet säkert lagrat och krypterat i Tyskland',
     enterEmailResetPassword: 'Ange din e-postadress så skickar vi en länk för att återställa ditt lösenord.',
     resetPasswordError: 'Användarnamn: 3\u201332 tecken, gemener, siffror och understreck',
   },
@@ -550,6 +551,7 @@ const sv: Translations = {
   welcome: {
     title: 'Välkommen till LifeLANE',
     subtitle: 'Din personliga livstidslinje — visualisera var du har varit och vart du är på väg.',
+    secureStorage: 'Dina uppgifter lagras och krypteras säkert i Tyskland. Bara du kan se dina privata tidslinjer.',
     chooseLanguage: 'Välj ditt språk',
     cookieLabel: 'Acceptera analytiska cookies',
     cookieDescription: 'Avbockat innebär endast nödvändiga cookies. Se våra',

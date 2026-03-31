@@ -66,6 +66,7 @@ const fr: Translations = {
     createAccountBlank: 'Créer un compte (chronologie vide)',
     theOSForYourLife: "Le système d'exploitation de votre vie",
     visualizeLives: 'Visualisez votre vie. Comparez avec les autres. Façonnez votre avenir.',
+    securelyStored: 'Vie stockée et chiffrée en toute sécurité en Allemagne',
     enterEmailResetPassword: 'Entrez votre e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.',
     resetPasswordError: "Nom d'utilisateur : 3\u201332 caractères, lettres minuscules, chiffres, underscores uniquement",
   },
@@ -544,6 +545,7 @@ const fr: Translations = {
   welcome: {
     title: 'Bienvenue sur LifeLANE',
     subtitle: 'Ta chronologie de vie personnelle — visualise d\'où tu viens et où tu vas.',
+    secureStorage: "Vos données sont stockées et chiffrées en toute sécurité en Allemagne. Vous seul pouvez voir vos chronologies privées.",
     chooseLanguage: 'Choisir ta langue',
     cookieLabel: 'Accepter les cookies analytiques',
     cookieDescription: 'Non coché signifie cookies essentiels uniquement. Voir nos',

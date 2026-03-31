@@ -64,6 +64,7 @@ const da: Translations = {
     createAccountBlank: 'Opret konto (tom tidslinje)',
     theOSForYourLife: 'Operativsystemet til dit liv',
     visualizeLives: 'Visualiser liv. Sammenlign med andre. Form din fremtid.',
+    securelyStored: 'Livet sikkert gemt og krypteret i Tyskland',
     enterEmailResetPassword: 'Indtast din e-mail, og vi sender dig et link til at nulstille din adgangskode.',
     resetPasswordError: 'Brugernavn: 3\u201332 tegn, kun små bogstaver, tal og underscores',
   },
@@ -559,6 +560,7 @@ const da: Translations = {
   welcome: {
     title: 'Velkommen til LifeLANE',
     subtitle: 'Din personlige livstidslinje — visualiser, hvor du har været, og hvor du er på vej hen.',
+    secureStorage: 'Dine data er sikkert gemt og krypteret i Tyskland. Kun du kan se dine private tidslinjer.',
     chooseLanguage: 'Vælg dit sprog',
     cookieLabel: 'Accepter analytiske cookies',
     cookieDescription: 'Ikke afkrydset betyder kun nødvendige cookies. Se vores',

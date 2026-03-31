@@ -66,6 +66,7 @@ const nl: Translations = {
     createAccountBlank: 'Account aanmaken (lege tijdlijn)',
     theOSForYourLife: 'Het besturingssysteem voor je leven',
     visualizeLives: 'Visualiseer levens. Vergelijk met anderen. Vorm je toekomst.',
+    securelyStored: 'Leven veilig opgeslagen en versleuteld in Duitsland',
     enterEmailResetPassword: 'Voer je e-mailadres in en we sturen je een koppeling om je wachtwoord te herstellen.',
     resetPasswordError: 'Gebruikersnaam: 3\u201332 tekens, kleine letters, cijfers en underscores',
   },
@@ -550,6 +551,7 @@ const nl: Translations = {
   welcome: {
     title: 'Welkom bij LifeLANE',
     subtitle: 'Jouw persoonlijke levenslijn — visualiseer waar je bent geweest en waar je naartoe gaat.',
+    secureStorage: 'Uw gegevens worden veilig opgeslagen en versleuteld in Duitsland. Alleen u kunt uw privé-tijdlijnen zien.',
     chooseLanguage: 'Kies je taal',
     cookieLabel: 'Analytische cookies accepteren',
     cookieDescription: 'Niet aangevinkt betekent alleen essentiële cookies. Zie onze',
