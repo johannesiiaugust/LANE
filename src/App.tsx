@@ -245,7 +245,7 @@ function TimelineView() {
   const [requestCreateTimeline, setRequestCreateTimeline] = useState(false)
 
   // Max-events filter: show the N longest-duration events (point events have duration 0)
-  const [maxEvents, setMaxEvents] = useState(100)
+  const [maxEvents, setMaxEvents] = useState(1000)
   const [navigatedEventId, setNavigatedEventId] = useState<string | null>(null)
   const displayedEvents = useMemo(() => {
     const sorted = [...events].sort((a, b) => {

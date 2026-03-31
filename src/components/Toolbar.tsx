@@ -49,8 +49,6 @@ interface ToolbarProps {
   events: TimelineEvent[]
   addEvent: (event: Omit<TimelineEvent, 'id'>) => Promise<TimelineEvent | null>
   addLane: (lane: Omit<Lane, 'id' | 'order' | 'isDefault'>) => Promise<Lane | null>
-  maxEvents: number
-  onMaxEventsChange: (v: number) => void
   onSearchNavigate: (event: TimelineEvent) => void
   activeOverlayIds: Set<string>
   onToggleOverlay: (id: string) => void
@@ -109,8 +107,6 @@ export function Toolbar({
   events,
   addEvent,
   addLane,
-  maxEvents,
-  onMaxEventsChange,
   onSearchNavigate,
   activeOverlayIds,
   onToggleOverlay,
@@ -149,6 +145,9 @@ export function Toolbar({
   const [importTab, setImportTab] = useState<ImportTab>('text')
   const [searchOpen, setSearchOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const closeMenu = () => setMenuOpen(false)
 
   const logMin = useMemo(() => Math.log(MIN_PIXELS_PER_YEAR), [])
   const logMax = useMemo(() => Math.log(MAX_PIXELS_PER_YEAR), [])
@@ -204,7 +203,7 @@ export function Toolbar({
         </div>
 
         {/* ── 3-dot menu ── */}
-        <DropdownMenu>
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="px-2">
               <MoreHorizontal className="h-4 w-4" />
@@ -214,27 +213,10 @@ export function Toolbar({
             <div className="max-h-[85vh] overflow-y-auto">
 
               {/* Search */}
-              <DropdownMenuItem onClick={() => setSearchOpen(true)}>
+              <DropdownMenuItem onClick={() => { setSearchOpen(true); closeMenu() }}>
                 <Search className="h-4 w-4 mr-2" />
                 {t('toolbar.searchEvents')}
               </DropdownMenuItem>
-
-              <DropdownMenuSeparator />
-
-              {/* Max events */}
-              <div className="px-2 py-1.5 flex items-center gap-2">
-                <span className="text-xs text-muted-foreground whitespace-nowrap">{t('toolbar.maxEvents')}</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={99999}
-                  value={maxEvents}
-                  onChange={e => { const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1) onMaxEventsChange(v) }}
-                  onClick={e => e.stopPropagation()}
-                  className="w-16 h-7 rounded-md border border-input bg-background px-2 text-xs text-center ml-auto"
-                  title={t('toolbar.maxEventsTooltip')}
-                />
-              </div>
 
               <DropdownMenuSeparator />
 
@@ -242,7 +224,7 @@ export function Toolbar({
               {(['small', 'large', 'fitscreen'] as UiSize[]).map(s => (
                 <DropdownMenuItem
                   key={s}
-                  onClick={() => setSize(s)}
+                  onClick={() => { setSize(s); closeMenu() }}
                   className={size === s ? 'font-semibold' : ''}
                 >
                   {SIZE_NAMES[s]}
@@ -255,20 +237,20 @@ export function Toolbar({
               {SKINS.filter(s => ['classic', 'dark', 'sepia'].includes(s.id)).map(s => (
                 <DropdownMenuItem
                   key={s.id}
-                  onClick={() => handleSelectSkin(s.id)}
+                  onClick={() => { handleSelectSkin(s.id); closeMenu() }}
                   className={`gap-2 ${skinId === s.id ? 'font-semibold' : ''}`}
                 >
                   <SkinSwatch bg={s.bgColor} accent={s.accentColor} />
                   {s.name}
                 </DropdownMenuItem>
               ))}
-              <DropdownMenuItem onClick={() => handleSelectSkin('custom')} className={`gap-2 ${skinId === 'custom' ? 'font-semibold' : ''}`}>
+              <DropdownMenuItem onClick={() => { handleSelectSkin('custom'); closeMenu() }} className={`gap-2 ${skinId === 'custom' ? 'font-semibold' : ''}`}>
                 <SkinSwatch bg={swatchBg} accent={swatchAccent} />
                 {skinId === 'custom' ? skinLabel : t('toolbar.custom')}
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
-              <LanguageSwitcherInline />
+              <LanguageSwitcherInline onSelect={closeMenu} />
 
               {/* User section */}
               {showUserMenu && user && (
@@ -280,12 +262,12 @@ export function Toolbar({
                     </span>
                     {displayName || user.email}
                   </div>
-                  <DropdownMenuItem onClick={() => setProfileOpen(true)}>
+                  <DropdownMenuItem onClick={() => { setProfileOpen(true); closeMenu() }}>
                     <UserPen className="h-4 w-4 mr-2" />
                     {t('toolbar.editProfile')}
                   </DropdownMenuItem>
                   {onToggleLena && (
-                    <DropdownMenuItem onClick={onToggleLena}>
+                    <DropdownMenuItem onClick={() => { onToggleLena(); closeMenu() }}>
                       {lenaEnabled
                         ? <EyeOff className="h-4 w-4 mr-2" />
                         : <Eye className="h-4 w-4 mr-2" />
@@ -293,7 +275,7 @@ export function Toolbar({
                       {lenaEnabled ? t('toolbar.hideLena') : t('toolbar.showLena')}
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem onClick={signOut}>
+                  <DropdownMenuItem onClick={() => { signOut(); closeMenu() }}>
                     <LogOut className="h-4 w-4 mr-2" />
                     {t('auth.signOut')}
                   </DropdownMenuItem>

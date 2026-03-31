@@ -22,7 +22,7 @@ function switchLang(lang: string) {
 }
 
 /** Inline row of flag buttons — fits inside a dropdown menu or navbar */
-export function LanguageSwitcherInline() {
+export function LanguageSwitcherInline({ onSelect }: { onSelect?: () => void } = {}) {
   const { lang } = useTranslation()
 
   return (
@@ -34,7 +34,7 @@ export function LanguageSwitcherInline() {
         return (
           <button
             key={l}
-            onClick={() => switchLang(l)}
+            onClick={() => { switchLang(l); onSelect?.() }}
             title={info.name}
             className={`flex items-center justify-center w-8 h-8 rounded transition-colors text-xl leading-none ${
               isActive
