@@ -60,7 +60,6 @@ interface CalendarFileTabProps {
   onDone: () => void
 }
 
-const IMPORT_LIMIT = 250
 const CALENDAR_IMPORT_LIMIT = 50
 
 function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabProps) {

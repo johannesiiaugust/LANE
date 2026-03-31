@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useGoogleTranslate } from '@/components/TranslateMenu'
 import { LanguageSwitcherInline } from '@/components/LanguageSwitcher'
 import { useTranslation } from '@/i18n'
@@ -149,31 +149,10 @@ export function Toolbar({
 
   const closeMenu = () => setMenuOpen(false)
 
-  const logMin = useMemo(() => Math.log(MIN_PIXELS_PER_YEAR), [])
-  const logMax = useMemo(() => Math.log(MAX_PIXELS_PER_YEAR), [])
-
   const stepZoom = useCallback((factor: number) => {
     const next = Math.max(MIN_PIXELS_PER_YEAR, Math.min(MAX_PIXELS_PER_YEAR, pixelsPerYear * factor))
     onPixelsPerYearChange(Math.round(next * 10) / 10)
   }, [pixelsPerYear, onPixelsPerYearChange])
-
-  const sliderValue = useMemo(() => {
-    const v = (Math.log(pixelsPerYear) - logMin) / (logMax - logMin) * 250
-    return Math.round(v)
-  }, [pixelsPerYear, logMin, logMax])
-
-  const handleSliderChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const v = Number(e.target.value)
-      const ppy = Math.exp(logMin + (v / 250) * (logMax - logMin))
-      onPixelsPerYearChange(Math.round(ppy * 10) / 10)
-    },
-    [logMin, logMax, onPixelsPerYearChange],
-  )
-
-  const zoomLabel = pixelsPerYear >= 10
-    ? `${Math.round(pixelsPerYear)} px/yr`
-    : `${pixelsPerYear.toFixed(1)} px/yr`
 
   const currentSkin = SKINS.find(s => s.id === skinId)
   const swatchBg = currentSkin?.bgColor ?? customInput.background
