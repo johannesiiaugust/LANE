@@ -635,7 +635,10 @@ export function LenaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[420px] sm:h-[600px] sm:max-h-[80vh] z-50 flex flex-col bg-background sm:rounded-2xl sm:border sm:border-border sm:shadow-2xl overflow-hidden">
+        <>
+          {/* Mobile backdrop — shows app dimly behind the panel */}
+          <div className="fixed inset-0 z-40 bg-black/40 sm:hidden" onClick={() => setOpen(false)} />
+        <div className="fixed inset-x-3 bottom-3 top-14 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[420px] sm:h-[600px] sm:max-h-[80vh] z-50 flex flex-col bg-background rounded-2xl border border-border shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-border bg-background">
             <div className="flex items-center gap-2">
@@ -878,6 +881,7 @@ export function LenaAssistant({ lanes, events, addEvent, updateEvent, deleteEven
             </div>
           </div>
         </div>
+        </>
       )}
     </>
   )
