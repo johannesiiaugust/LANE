@@ -358,8 +358,8 @@ const nl: Translations = {
     date: 'Datum',
     lane: 'Baan',
     importEvents: '{count} gebeurtenis(sen) importeren',
-    limitHint: 'Maximaal 250 evenementen per import',
-    tooManyEvents: 'Je hebt {count} evenementen geselecteerd. Verdeel de import in batches van 250 of minder.',
+    limitHint: 'Maximaal 50 evenementen per kalenderbestandsimport',
+    tooManyEvents: 'Je hebt {count} evenementen geselecteerd. Selecteer maximaal 50.',
     dropOrClick: 'Sleep een agendabestand hierheen of klik om te selecteren',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google Agenda-tabblad
@@ -369,14 +369,20 @@ const nl: Translations = {
     importSelected: 'Geselecteerde importeren',
     // Tekst-tabblad
     pasteText: 'Plak tekst die je levensgebeurtenissen beschrijft',
+    dialogTitle: 'Evenementen importeren',
+    textInputHint: 'Beschrijf je gebeurtenis… of kopieer & plak vanuit je cv of een socialmediaprofiel.',
+    textHintNatural: 'Beschrijf gebeurtenissen in gewone taal. Datums, periodes en beschrijvingen worden automatisch herkend.',
     textPlaceholder: 'Bijv.: Ik ben in 2019 naar Berlijn verhuisd. In maart 2020 begonnen bij Google...',
-    parseWithAI: 'Verwerken met AI',
+    parseWithAI: 'Verwerken & importeren',
     parsing: 'Verwerken...',
     // Spraak-tabblad
     recordVoice: 'Neem je stem op',
     startRecording: 'Opname starten',
     stopRecording: 'Opname stoppen',
     transcribing: 'Transcriberen...',
+    reRecord: 'Opnieuw opnemen',
+    parseEvents: 'Gebeurtenissen verwerken',
+    recordAnother: 'Nog een opnemen',
   },
 
   // ── Kanbanbord ──

@@ -358,8 +358,8 @@ const lv: Translations = {
     date: 'Datums',
     lane: 'Josla',
     importEvents: 'Importēt {count} notikumu(-s)',
-    limitHint: 'Maksimums 250 notikumi vienā importā',
-    tooManyEvents: 'Esat atlasījis {count} notikumus. Sadaliet importu partijās līdz 250.',
+    limitHint: 'Maksimums 50 notikumi kalendāra faila importā',
+    tooManyEvents: 'Esat atlasījis {count} notikumus. Atlasiet ne vairāk kā 50.',
     dropOrClick: 'Ievelciet kalendāra failu šeit vai noklikšķiniet, lai izvēlētos',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google Calendar tab
@@ -369,14 +369,20 @@ const lv: Translations = {
     importSelected: 'Importēt atlasītos',
     // Text tab
     pasteText: 'Ielīmējiet tekstu, kas apraksta jūsu dzīves notikumus',
+    dialogTitle: 'Importēt notikumus',
+    textInputHint: 'Apraksti savu notikumu… vai kopē & ielīmē no sava CV vai sociālo mediju profila.',
+    textHintNatural: 'Apraksti notikumus dabiskā valodā. Datumi, datumu diapazoni un apraksti tiks atpazīti automātiski.',
     textPlaceholder: 'Piem.: Es pārcēlos uz Berlīni 2019. gadā. Sāku strādāt Google 2020. gada martā...',
-    parseWithAI: 'Apstrādāt ar MI',
+    parseWithAI: 'Apstrādāt un importēt',
     parsing: 'Apstrādā...',
     // Voice tab
     recordVoice: 'Ierakstiet savu balsi',
     startRecording: 'Sākt ierakstu',
     stopRecording: 'Apturēt ierakstu',
     transcribing: 'Transkribē...',
+    reRecord: 'Ierakstīt vēlreiz',
+    parseEvents: 'Analizēt notikumus',
+    recordAnother: 'Ierakstīt vēl vienu',
   },
 
   // ── Kanban Board ──

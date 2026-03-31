@@ -358,8 +358,8 @@ const no: Translations = {
     date: 'Dato',
     lane: 'Bane',
     importEvents: 'Importer {count} hendelse(r)',
-    limitHint: 'Maksimalt 250 hendelser per import',
-    tooManyEvents: 'Du har valgt {count} hendelser. Del importen i porsjoner på 250 eller færre.',
+    limitHint: 'Maksimalt 50 hendelser per kalenderfilimport',
+    tooManyEvents: 'Du har valgt {count} hendelser. Velg 50 eller færre.',
     dropOrClick: 'Slipp en kalenderfil her, eller klikk for å velge',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google Kalender-fane
@@ -369,14 +369,20 @@ const no: Translations = {
     importSelected: 'Importer valgte',
     // Tekst-fane
     pasteText: 'Lim inn tekst som beskriver livshendelsene dine',
+    dialogTitle: 'Importer hendelser',
+    textInputHint: 'Beskriv hendelsen din… eller kopier & lim inn fra CV-en din eller en sosial medieprofil.',
+    textHintNatural: 'Beskriv hendelser på naturlig språk. Datoer, datointervaller og beskrivelser analyseres automatisk.',
     textPlaceholder: 'F.eks.: Jeg flyttet til Berlin i 2019. Begynte å jobbe hos Google i mars 2020...',
-    parseWithAI: 'Tolk med KI',
+    parseWithAI: 'Tolk & importer',
     parsing: 'Tolker...',
     // Tale-fane
     recordVoice: 'Spill inn stemmen din',
     startRecording: 'Start opptak',
     stopRecording: 'Stopp opptak',
     transcribing: 'Transkriberer...',
+    reRecord: 'Ta opp igjen',
+    parseEvents: 'Analyser hendelser',
+    recordAnother: 'Ta opp en til',
   },
 
   // ── Kanban-tavle ──

@@ -146,7 +146,7 @@ export function Toolbar({
   const { profile } = useProfile()
   const [skinDialogOpen, setSkinDialogOpen] = useState(false)
   const [importDialogOpen, setImportDialogOpen] = useState(false)
-  const [importTab, setImportTab] = useState<ImportTab>('calendar-file')
+  const [importTab, setImportTab] = useState<ImportTab>('text')
   const [searchOpen, setSearchOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
 
@@ -380,7 +380,7 @@ export function Toolbar({
                 {t('toolbar.addTimeline')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => openImport('calendar-file')}>
+              <DropdownMenuItem onClick={() => openImport('text')}>
                 <CalendarSearch className="h-4 w-4 mr-2" />
                 {t('toolbar.importCalendar')}
               </DropdownMenuItem>

@@ -358,8 +358,8 @@ const sv: Translations = {
     date: 'Datum',
     lane: 'Bana',
     importEvents: 'Importera {count} händelse(r)',
-    limitHint: 'Maximalt 250 händelser per import',
-    tooManyEvents: 'Du har valt {count} händelser. Dela upp importen i omgångar om högst 250.',
+    limitHint: 'Maximalt 50 händelser per kalenderfilsimport',
+    tooManyEvents: 'Du har valt {count} händelser. Välj högst 50.',
     dropOrClick: 'Släpp en kalenderfil här, eller klicka för att välja',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google Kalender-flik
@@ -369,14 +369,20 @@ const sv: Translations = {
     importSelected: 'Importera valda',
     // Textflik
     pasteText: 'Klistra in text som beskriver dina livshändelser',
+    dialogTitle: 'Importera händelser',
+    textInputHint: 'Beskriv din händelse… eller kopiera & klistra in från ditt CV eller en social medieprofil.',
+    textHintNatural: 'Beskriv händelser på naturligt språk. Datum, datumintervall och beskrivningar tolkas automatiskt.',
     textPlaceholder: 'T.ex.: Jag flyttade till Berlin 2019. Började jobba på Google i mars 2020...',
-    parseWithAI: 'Tolka med AI',
+    parseWithAI: 'Tolka & importera',
     parsing: 'Tolkar...',
     // Röstflik
     recordVoice: 'Spela in din röst',
     startRecording: 'Starta inspelning',
     stopRecording: 'Stoppa inspelning',
     transcribing: 'Transkriberar...',
+    reRecord: 'Spela in igen',
+    parseEvents: 'Analysera händelser',
+    recordAnother: 'Spela in en till',
   },
 
   // ── Kanban-tavla ──

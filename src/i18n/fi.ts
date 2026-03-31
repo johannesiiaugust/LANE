@@ -358,8 +358,8 @@ const fi: Translations = {
     date: 'Päivämäärä',
     lane: 'Kaista',
     importEvents: 'Tuo {count} tapahtuma(a)',
-    limitHint: 'Enintään 250 tapahtumaa per tuonti',
-    tooManyEvents: 'Olet valinnut {count} tapahtumaa. Jaa tuonti enintään 250 tapahtuman eriin.',
+    limitHint: 'Enintään 50 tapahtumaa kalenteritiedoston tuonnissa',
+    tooManyEvents: 'Olet valinnut {count} tapahtumaa. Valitse enintään 50.',
     dropOrClick: 'Pudota kalenteritiedosto tähän tai valitse napsauttamalla',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google-kalenteri-välilehti
@@ -369,14 +369,20 @@ const fi: Translations = {
     importSelected: 'Tuo valitut',
     // Teksti-välilehti
     pasteText: 'Liitä teksti, joka kuvaa elämäntapahtumiasi',
+    dialogTitle: 'Tuo tapahtumia',
+    textInputHint: 'Kuvaile tapahtumaasi… tai kopioi & liitä ansioluettelostasi tai sosiaalisen median profiilista.',
+    textHintNatural: 'Kuvaile tapahtumat luonnollisella kielellä. Päivämäärät, aikavälit ja kuvaukset tunnistetaan automaattisesti.',
     textPlaceholder: 'Esim.: Muutin Berliiniin vuonna 2019. Aloitin Googlella maaliskuussa 2020...',
-    parseWithAI: 'Jäsennä tekoälyllä',
+    parseWithAI: 'Jäsennä & tuo',
     parsing: 'Jäsennetään...',
     // Ääni-välilehti
     recordVoice: 'Tallenna äänesi',
     startRecording: 'Aloita nauhoitus',
     stopRecording: 'Lopeta nauhoitus',
     transcribing: 'Litteroidaan...',
+    reRecord: 'Äänitä uudelleen',
+    parseEvents: 'Analysoi tapahtumat',
+    recordAnother: 'Äänitä toinen',
   },
 
   // ── Kanban-taulu ──
