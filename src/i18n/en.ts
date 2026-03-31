@@ -65,6 +65,7 @@ const en = {
     createAccountBlank: 'Create account (blank timeline)',
     theOSForYourLife: 'The operating system for your life',
     visualizeLives: 'Visualize lives. Compare with others. Shape your future.',
+    securelyStored: 'Life securely stored and encrypted in Germany',
     enterEmailResetPassword: "Enter your email and we'll send you a link to reset your password.",
     resetPasswordError: 'Username: 3\u201332 chars, lowercase letters, numbers, underscores only',
   },
@@ -648,6 +649,7 @@ const en = {
   welcome: {
     title: 'Welcome to LifeLANE',
     subtitle: 'Your personal life timeline — visualize where you\u2019ve been and where you\u2019re going.',
+    secureStorage: 'Your data is securely stored and encrypted in Germany. Only you can see your private timelines.',
     chooseLanguage: 'Choose your language',
     cookieLabel: 'Accept analytics cookies',
     cookieDescription: 'Unticked means essential cookies only. See our',

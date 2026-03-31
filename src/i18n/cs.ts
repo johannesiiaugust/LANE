@@ -64,6 +64,7 @@ const cs: Translations = {
     createAccountBlank: 'Vytvo\u0159it \u00fa\u010det (pr\u00e1zdn\u00e1 \u010dasov\u00e1 osa)',
     theOSForYourLife: 'Opera\u010dn\u00ed syst\u00e9m pro v\u00e1\u0161 \u017eivot',
     visualizeLives: 'Vizualizujte \u017eivoty. Porovn\u00e1vejte s ostatn\u00edmi. Formujte svou budoucnost.',
+    securelyStored: 'Život bezpečně uložen a šifrován v Německu',
     enterEmailResetPassword: 'Zadejte sv\u016fj e-mail a p\u0159e\u0161leme v\u00e1m odkaz pro obnovu hesla.',
     resetPasswordError: 'U\u017eivatelsk\u00e9 jm\u00e9no: 3\u201332 znak\u016f, pouze mal\u00e1 p\u00edsmena, \u010d\u00edsla a podtr\u017e\u00edtka',
   },
@@ -559,6 +560,7 @@ const cs: Translations = {
   welcome: {
     title: 'Vítejte v LifeLANE',
     subtitle: 'Tvoje osobní životní osa — vizualizuj, kde jsi byl/a a kam směřuješ.',
+    secureStorage: 'Vaše data jsou bezpečně uložena a šifrována v Německu. Pouze vy vidíte své soukromé časové osy.',
     chooseLanguage: 'Vyber si jazyk',
     cookieLabel: 'Přijmout analytické cookies',
     cookieDescription: 'Nezaškrtnuté znamená pouze nezbytné cookies. Viz naše',

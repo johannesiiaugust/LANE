@@ -66,6 +66,7 @@ const lt: Translations = {
     createAccountBlank: 'Sukurti paskyrą (tuščia laiko juosta)',
     theOSForYourLife: 'Operacinė sistema jūsų gyvenimui',
     visualizeLives: 'Vizualizuokite gyvenimus. Palyginkite su kitais. Kurkite savo ateitį.',
+    securelyStored: 'Gyvenimas saugiai saugomas ir šifruojamas Vokietijoje',
     enterEmailResetPassword: 'Įveskite el. paštą ir mes atsiųsime slaptažodžio atkūrimo nuorodą.',
     resetPasswordError: 'Vartotojo vardas: 3–32 simboliai, mažosios raidės, skaičiai, pabraukimai',
   },
@@ -548,6 +549,7 @@ const lt: Translations = {
   welcome: {
     title: 'Sveiki atvykę į LifeLANE',
     subtitle: 'Jūsų asmeninė gyvenimo laiko juosta — vizualizuokite, kur buvote ir kur einate.',
+    secureStorage: 'Jūsų duomenys saugiai saugomi ir šifruojami Vokietijoje. Tik jūs galite matyti savo privačias laiko juostas.',
     chooseLanguage: 'Pasirinkite savo kalbą',
     cookieLabel: 'Priimti analitinius slapukus',
     cookieDescription: 'Nepažymėta reiškia tik būtinus slapukus. Žiūrėti mūsų',

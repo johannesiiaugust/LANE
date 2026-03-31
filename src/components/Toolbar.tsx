@@ -179,9 +179,11 @@ export function Toolbar({
         <div className="shrink-0">
           <div className="text-xl font-bold leading-tight">LifeLANE</div>
           <div className="text-xs text-muted-foreground italic">{t('auth.theOSForYourLife')}</div>
+          <div className="text-[10px] text-muted-foreground/60 hidden sm:block">{t('auth.securelyStored')}</div>
         </div>
 
         {/* ── 3-dot menu ── */}
+        <div className="bg-muted/50 rounded-lg px-1.5 py-0.5">
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="px-2">
@@ -263,10 +265,11 @@ export function Toolbar({
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
       </div>
 
       {/* ── Functional toolbar row ── */}
-      <div className="flex items-center justify-between border-b bg-background px-3 py-2 gap-2">
+      <div className="flex items-center justify-between border-b bg-muted/40 px-3 py-2 gap-2">
         {/* ── Left: timeline selector ── */}
         <div className="flex items-center gap-2 min-w-0">
           <TimelinePersonaSelector
@@ -300,7 +303,7 @@ export function Toolbar({
         </div>
 
         {/* ── Right: lean action bar ── */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0 bg-muted/50 rounded-lg px-1.5 py-0.5">
           {activeView === 'timeline' && (
             <>
               {onScrollToToday && todayOffScreen && (

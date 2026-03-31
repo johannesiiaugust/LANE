@@ -64,6 +64,7 @@ const pl: Translations = {
     createAccountBlank: 'Utwórz konto (pusta oś czasu)',
     theOSForYourLife: 'System operacyjny Twojego życia',
     visualizeLives: 'Wizualizuj życia. Porównuj z innymi. Kształtuj swoją przyszłość.',
+    securelyStored: 'Życie bezpiecznie przechowywane i szyfrowane w Niemczech',
     enterEmailResetPassword: 'Podaj swój e-mail, a wyślemy Ci link do zresetowania hasła.',
     resetPasswordError: 'Nazwa użytkownika: 3\u201332 znaki, tylko małe litery, cyfry i podkreślenia',
   },
@@ -559,6 +560,7 @@ const pl: Translations = {
   welcome: {
     title: 'Witamy w LifeLANE',
     subtitle: 'Twoja osobista oś czasu życia — wizualizuj, gdzie byłeś i dokąd zmierzasz.',
+    secureStorage: 'Twoje dane są bezpiecznie przechowywane i szyfrowane w Niemczech. Tylko Ty możesz zobaczyć swoje prywatne osie czasu.',
     chooseLanguage: 'Wybierz swój język',
     cookieLabel: 'Zaakceptuj analityczne pliki cookie',
     cookieDescription: 'Niezaznaczone oznacza tylko niezbędne pliki cookie. Zobacz nasze',

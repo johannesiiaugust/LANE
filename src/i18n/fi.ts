@@ -66,6 +66,7 @@ const fi: Translations = {
     createAccountBlank: 'Luo tili (tyhjä aikajana)',
     theOSForYourLife: 'Elämäsi käyttöjärjestelmä',
     visualizeLives: 'Visualisoi elämiä. Vertaa muihin. Muotoile tulevaisuutesi.',
+    securelyStored: 'Elämä turvallisesti tallennettu ja salattu Saksassa',
     enterEmailResetPassword: 'Syötä sähköpostiosoitteesi, niin lähetämme sinulle salasanan palautuslinkin.',
     resetPasswordError: 'Käyttäjänimi: 3\u201332 merkkiä, pienet kirjaimet, numerot ja alaviivat',
   },
@@ -548,6 +549,7 @@ const fi: Translations = {
   welcome: {
     title: 'Tervetuloa LifeLANEen',
     subtitle: 'Henkilökohtainen elämäsi aikajana — visualisoi missä olet ollut ja minne olet menossa.',
+    secureStorage: 'Tietosi tallennetaan ja salataan turvallisesti Saksassa. Vain sinä näet yksityiset aikajanasi.',
     chooseLanguage: 'Valitse kielesi',
     cookieLabel: 'Hyväksy analytiikkaevästeet',
     cookieDescription: 'Valitsematta jättäminen tarkoittaa vain välttämättömiä evästeitä. Katso meidän',

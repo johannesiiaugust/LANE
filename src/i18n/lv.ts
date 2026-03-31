@@ -66,6 +66,7 @@ const lv: Translations = {
     createAccountBlank: 'Izveidot kontu (tukša laika līnija)',
     theOSForYourLife: 'Operētājsistēma jūsu dzīvei',
     visualizeLives: 'Vizualizējiet dzīves. Salīdziniet ar citiem. Veidojiet savu nākotni.',
+    securelyStored: 'Dzīve droši glabāta un šifrēta Vācijā',
     enterEmailResetPassword: 'Ievadiet savu e-pastu, un mēs nosūtīsim jums paroles atjaunošanas saiti.',
     resetPasswordError: 'Lietotājvārds: 3–32 rakstzīmes, mazie burti, cipari, pasvītrojumi',
   },
@@ -550,6 +551,7 @@ const lv: Translations = {
   welcome: {
     title: 'Laipni lūdzam LifeLANE',
     subtitle: 'Tava personīgā dzīves laika skala — vizualizē, kur esi bijis un kurp dodies.',
+    secureStorage: 'Jūsu dati tiek droši glabāti un šifrēti Vācijā. Tikai jūs varat redzēt savas privātās laika skalas.',
     chooseLanguage: 'Izvēlies savu valodu',
     cookieLabel: 'Pieņemt analītiskās sīkdatnes',
     cookieDescription: 'Neatzīmēts nozīmē tikai nepieciešamās sīkdatnes. Skatīt mūsu',

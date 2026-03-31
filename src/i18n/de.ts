@@ -66,6 +66,7 @@ const de: Translations = {
     createAccountBlank: 'Konto erstellen (leere Zeitleiste)',
     theOSForYourLife: 'Das Betriebssystem für dein Leben',
     visualizeLives: 'Leben visualisieren. Mit anderen vergleichen. Deine Zukunft gestalten.',
+    securelyStored: 'Leben sicher gespeichert und verschlüsselt in Deutschland',
     enterEmailResetPassword: 'Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen deines Passworts.',
     resetPasswordError: 'Benutzername: 3\u201332 Zeichen, Kleinbuchstaben, Zahlen und Unterstriche',
   },
@@ -550,6 +551,7 @@ const de: Translations = {
   welcome: {
     title: 'Willkommen bei LifeLANE',
     subtitle: 'Deine persönliche Lebenszeitachse — visualisiere, wo du warst und wohin du gehst.',
+    secureStorage: 'Deine Daten werden sicher in Deutschland gespeichert und verschlüsselt. Nur du kannst deine privaten Zeitleisten sehen.',
     chooseLanguage: 'Wähle deine Sprache',
     cookieLabel: 'Analyse-Cookies akzeptieren',
     cookieDescription: 'Nicht angehakt bedeutet nur notwendige Cookies. Siehe unsere',
