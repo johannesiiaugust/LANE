@@ -186,7 +186,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
 
   const { size: _size } = useSizeConfig()
   const [importDialogOpen, setImportDialogOpen] = useState(false)
-  const [importTab, setImportTab] = useState<ImportTab>('calendar-file')
+  const [importTab, setImportTab] = useState<ImportTab>('text')
   const [searchOpenInternal, setSearchOpenInternal] = useState(false)
   const searchOpen = searchOpenProp ?? searchOpenInternal
   const setSearchOpen = onSearchOpenChange ?? setSearchOpenInternal
@@ -534,7 +534,7 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
               {t('toolbar.addLane')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => openImport('calendar-file')}>
+            <DropdownMenuItem onClick={() => openImport('text')}>
               <CalendarDays className="h-4 w-4 mr-2" />
               {t('toolbar.importCalendar')}
             </DropdownMenuItem>

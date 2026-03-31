@@ -47,10 +47,10 @@ function formatImportDate(startYear: number, endYear?: number | null): string {
   return `${start} – ${de.getUTCDate()} ${MONTHS[de.getUTCMonth()]} ${de.getUTCFullYear()}`
 }
 
-const TABS: { id: ImportTab; label: string; icon: React.ReactNode }[] = [
-  { id: 'calendar-file', label: 'Calendar File', icon: <CalendarDays className="h-4 w-4" /> },
-  { id: 'text', label: 'Text', icon: <FileText className="h-4 w-4" /> },
-  { id: 'voice', label: 'Voice', icon: <Mic className="h-4 w-4" /> },
+const TABS: { id: ImportTab }[] = [
+  { id: 'text' },
+  { id: 'voice' },
+  { id: 'calendar-file' },
 ]
 
 interface CalendarFileTabProps {
@@ -61,6 +61,7 @@ interface CalendarFileTabProps {
 }
 
 const IMPORT_LIMIT = 250
+const CALENDAR_IMPORT_LIMIT = 50
 
 function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabProps) {
   const { t } = useTranslation()
@@ -111,11 +112,12 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
     reader.onload = (e) => {
       const text = e.target?.result as string
       try {
-        const events = parseCalendarFile(text, file.name)
-        if (events.length === 0) {
+        const rawEvents = parseCalendarFile(text, file.name)
+        if (rawEvents.length === 0) {
           setError('No events found in file')
           return
         }
+        const events = rawEvents.slice(0, CALENDAR_IMPORT_LIMIT)
         setParsedEvents(events)
         // Select all by default
         setSelectedIndices(new Set(events.map((_, i) => i)))
@@ -168,7 +170,7 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
   }
 
   const handleImport = async () => {
-    if (selectedCount > IMPORT_LIMIT) {
+    if (selectedCount > CALENDAR_IMPORT_LIMIT) {
       setTooManyError(true)
       return
     }
@@ -238,10 +240,10 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
     return (
       <div className="flex flex-col items-center gap-4 py-6">
         <CheckCircle2 className="h-12 w-12 text-green-500" />
-        <p className="text-sm font-medium">Imported {importedCount} event{importedCount !== 1 ? 's' : ''}</p>
+        <p className="text-sm font-medium">{t('import.importedEvents', { count: String(importedCount) })}</p>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleReset}>Import Another</Button>
-          <Button size="sm" onClick={onDone}>Done</Button>
+          <Button variant="outline" size="sm" onClick={handleReset}>{t('import.importAnother')}</Button>
+          <Button size="sm" onClick={onDone}>{t('common.done')}</Button>
         </div>
       </div>
     )
@@ -253,7 +255,7 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
       <div className="flex flex-col items-center gap-4 py-8">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <p className="text-sm text-muted-foreground">
-          Importing events... {importProgress}/{selectedCount}
+          {t('import.importingEvents', { progress: String(importProgress), total: String(selectedCount) })}
         </p>
         <div className="w-full bg-muted rounded-full h-2">
           <div
@@ -271,10 +273,10 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
       <div className="flex flex-col gap-3 py-2">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium">
-            {parsedEvents.length} event{parsedEvents.length !== 1 ? 's' : ''} from {fileName}
+            {t('import.eventsFrom', { count: String(parsedEvents.length), fileName })}
           </p>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">{selectedCount} selected</span>
+            <span className="text-xs text-muted-foreground">{t('import.selected', { count: String(selectedCount) })}</span>
             <button onClick={handleReset} className="text-muted-foreground hover:text-foreground">
               <X className="h-4 w-4" />
             </button>
@@ -284,21 +286,21 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
         {/* Bulk lane assignment */}
         <div className="flex flex-col gap-1.5 rounded-md border border-border/50 bg-muted/30 p-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground shrink-0">Assign all selected to:</span>
+            <span className="text-xs text-muted-foreground shrink-0">{t('import.assignAllSelected')}</span>
             <select
               value={bulkLane}
               onChange={(e) => { setBulkLane(e.target.value); setNewLaneName('') }}
               className="flex-1 text-xs bg-background border rounded px-1 py-0.5"
             >
-              <option value="">— keep individual —</option>
+              <option value="">{t('import.keepIndividual')}</option>
               {availableLanes.map(l => (
                 <option key={l.id} value={l.name}>{l.emoji ? `${l.emoji} ` : ''}{l.name}</option>
               ))}
-              <option value="__new__">+ Create new lane…</option>
+              <option value="__new__">{t('import.createNewLane')}</option>
             </select>
             {bulkLane && bulkLane !== '__new__' && (
               <Button size="sm" variant="outline" onClick={applyBulkLane} className="shrink-0 h-6 text-xs px-2">
-                Apply
+                {t('import.apply')}
               </Button>
             )}
           </div>
@@ -308,7 +310,7 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
                 value={newLaneName}
                 onChange={(e) => setNewLaneName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleCreateAndApplyLane() }}
-                placeholder="New lane name…"
+                placeholder={t('import.newLaneName')}
                 className="flex-1 text-xs bg-background border rounded px-2 py-0.5 h-6"
               />
               <Button
@@ -317,7 +319,7 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
                 disabled={!newLaneName.trim()}
                 className="shrink-0 h-6 text-xs px-2"
               >
-                Create & Apply
+                {t('import.createAndApply')}
               </Button>
             </div>
           )}
@@ -342,9 +344,9 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
                     className="accent-primary"
                   />
                 </th>
-                <th className="text-left px-2 py-1.5 font-medium">Event</th>
-                <th className="text-left px-2 py-1.5 font-medium">Date</th>
-                <th className="text-left px-2 py-1.5 font-medium w-28">Lane</th>
+                <th className="text-left px-2 py-1.5 font-medium">{t('import.event')}</th>
+                <th className="text-left px-2 py-1.5 font-medium">{t('import.date')}</th>
+                <th className="text-left px-2 py-1.5 font-medium w-28">{t('import.lane')}</th>
               </tr>
             </thead>
             <tbody>
@@ -382,7 +384,7 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
         </div>
 
         <Button onClick={handleImport} disabled={selectedCount === 0} className="w-full">
-          Import {selectedCount} Event{selectedCount !== 1 ? 's' : ''}
+          {t('import.importEvents', { count: String(selectedCount) })}
         </Button>
         {tooManyError && (
           <div className="flex items-start gap-2 text-sm text-destructive">
@@ -410,10 +412,10 @@ function CalendarFileTab({ lanes, addEvent, addLane, onDone }: CalendarFileTabPr
       >
         <Upload className={`h-8 w-8 mb-2 ${isDragging ? 'text-primary' : 'text-muted-foreground/50'}`} />
         <p className="text-sm text-muted-foreground">
-          {isDragging ? 'Drop file here' : 'Drop calendar file or click to browse'}
+          {isDragging ? t('import.dropHere') : t('import.dropOrClick')}
         </p>
         <p className="text-xs text-muted-foreground/60 mt-1">
-          Supports ICS, VCS, CSV, JSON, XML, TSV
+          {t('import.supportedFormats')}
         </p>
       </div>
       <input
@@ -522,6 +524,7 @@ interface TextTabProps {
 }
 
 function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
+  const { t } = useTranslation()
   const [text, setText] = useState('')
   const [phase, setPhase] = useState<'input' | 'parsing' | 'preview' | 'importing' | 'success'>('input')
   const [error, setError] = useState('')
@@ -651,10 +654,7 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
     return (
       <div className="flex flex-col items-center gap-3 py-6">
         <FileText className="h-10 w-10 text-muted-foreground/40" />
-        <p className="text-sm text-muted-foreground text-center">
-          Text import requires an OpenAI API key.<br />
-          Set <code className="text-xs bg-muted px-1 py-0.5 rounded">OPENAI_API_KEY</code> in your .env file.
-        </p>
+        <p className="text-sm text-muted-foreground text-center">{t('import.openaiRequired')}</p>
       </div>
     )
   }
@@ -663,10 +663,10 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
     return (
       <div className="flex flex-col items-center gap-4 py-6">
         <CheckCircle2 className="h-12 w-12 text-green-500" />
-        <p className="text-sm font-medium">Imported {importedCount} event{importedCount !== 1 ? 's' : ''}</p>
+        <p className="text-sm font-medium">{t('import.importedEvents', { count: String(importedCount) })}</p>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleReset}>Import More</Button>
-          <Button size="sm" onClick={onDone}>Done</Button>
+          <Button variant="outline" size="sm" onClick={handleReset}>{t('import.importMore')}</Button>
+          <Button size="sm" onClick={onDone}>{t('common.done')}</Button>
         </div>
       </div>
     )
@@ -677,7 +677,7 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
       <div className="flex flex-col items-center gap-4 py-8">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <p className="text-sm text-muted-foreground">
-          Importing events... {importProgress}/{selectedCount}
+          {t('import.importingEvents', { progress: String(importProgress), total: String(selectedCount) })}
         </p>
         <div className="w-full bg-muted rounded-full h-2">
           <div
@@ -693,7 +693,7 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
     return (
       <div className="flex flex-col items-center gap-4 py-8">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">Parsing events with AI...</p>
+        <p className="text-sm text-muted-foreground">{t('import.parsingWithAI')}</p>
       </div>
     )
   }
@@ -703,10 +703,10 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
       <div className="flex flex-col gap-3 py-2">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium">
-            {parsedEvents.length} event{parsedEvents.length !== 1 ? 's' : ''} found
+            {t('import.eventsFound', { count: String(parsedEvents.length) })}
           </p>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">{selectedCount} selected</span>
+            <span className="text-xs text-muted-foreground">{t('import.selected', { count: String(selectedCount) })}</span>
             <button onClick={handleReset} className="text-muted-foreground hover:text-foreground">
               <X className="h-4 w-4" />
             </button>
@@ -716,21 +716,21 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
         {/* Bulk lane assignment */}
         <div className="flex flex-col gap-1.5 rounded-md border border-border/50 bg-muted/30 p-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground shrink-0">Assign all selected to:</span>
+            <span className="text-xs text-muted-foreground shrink-0">{t('import.assignAllSelected')}</span>
             <select
               value={bulkLane}
               onChange={(e) => { setBulkLane(e.target.value); setNewLaneName('') }}
               className="flex-1 text-xs bg-background border rounded px-1 py-0.5"
             >
-              <option value="">— keep individual —</option>
+              <option value="">{t('import.keepIndividual')}</option>
               {availableLanes.map(l => (
                 <option key={l.id} value={l.name}>{l.emoji ? `${l.emoji} ` : ''}{l.name}</option>
               ))}
-              <option value="__new__">+ Create new lane…</option>
+              <option value="__new__">{t('import.createNewLane')}</option>
             </select>
             {bulkLane && bulkLane !== '__new__' && (
               <Button size="sm" variant="outline" onClick={applyBulkLane} className="shrink-0 h-6 text-xs px-2">
-                Apply
+                {t('import.apply')}
               </Button>
             )}
           </div>
@@ -740,7 +740,7 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
                 value={newLaneName}
                 onChange={(e) => setNewLaneName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleCreateAndApplyLane() }}
-                placeholder="New lane name…"
+                placeholder={t('import.newLaneName')}
                 className="flex-1 text-xs bg-background border rounded px-2 py-0.5 h-6"
               />
               <Button
@@ -749,7 +749,7 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
                 disabled={!newLaneName.trim()}
                 className="shrink-0 h-6 text-xs px-2"
               >
-                Create & Apply
+                {t('import.createAndApply')}
               </Button>
             </div>
           )}
@@ -774,9 +774,9 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
                     className="accent-primary"
                   />
                 </th>
-                <th className="text-left px-2 py-1.5 font-medium">Event</th>
-                <th className="text-left px-2 py-1.5 font-medium">Date</th>
-                <th className="text-left px-2 py-1.5 font-medium w-28">Lane</th>
+                <th className="text-left px-2 py-1.5 font-medium">{t('import.event')}</th>
+                <th className="text-left px-2 py-1.5 font-medium">{t('import.date')}</th>
+                <th className="text-left px-2 py-1.5 font-medium w-28">{t('import.lane')}</th>
               </tr>
             </thead>
             <tbody>
@@ -814,7 +814,7 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
         </div>
 
         <Button onClick={handleImport} disabled={selectedCount === 0} className="w-full">
-          Import {selectedCount} Event{selectedCount !== 1 ? 's' : ''}
+          {t('import.importEvents', { count: String(selectedCount) })}
         </Button>
       </div>
     )
@@ -824,13 +824,13 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
   return (
     <div className="flex flex-col gap-4 py-4">
       <Textarea
-        placeholder={"Describe your events...\n\ne.g. \"I lived in NYC from 2015 to 2019, worked at Google from 2016 to 2020, graduated MIT in 2015\""}
+        placeholder={`${t('import.textInputHint')}\n\n${t('import.textPlaceholder')}`}
         className="min-h-[140px] resize-none"
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
       <p className="text-xs text-muted-foreground">
-        Describe events in natural language. Dates, date ranges, and descriptions will be parsed automatically.
+        {t('import.textHintNatural')}
       </p>
       {error && (
         <div className="flex items-center gap-2 text-sm text-destructive">
@@ -838,7 +838,7 @@ function TextTab({ lanes, addEvent, addLane, onDone }: TextTabProps) {
           {error}
         </div>
       )}
-      <Button onClick={handleParse} disabled={!text.trim()} className="w-full">Parse &amp; Import</Button>
+      <Button onClick={handleParse} disabled={!text.trim()} className="w-full">{t('import.parseWithAI')}</Button>
     </div>
   )
 }
@@ -853,6 +853,7 @@ interface VoiceTabProps {
 type VoicePhase = 'idle' | 'recording' | 'transcribing' | 'review' | 'parsing' | 'preview' | 'importing' | 'success'
 
 function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
+  const { t } = useTranslation()
   const [phase, setPhase] = useState<VoicePhase>('idle')
   const [error, setError] = useState('')
   const [transcript, setTranscript] = useState('')
@@ -1077,10 +1078,7 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
     return (
       <div className="flex flex-col items-center gap-3 py-6">
         <Mic className="h-10 w-10 text-muted-foreground/40" />
-        <p className="text-sm text-muted-foreground text-center">
-          Voice import requires an OpenAI API key.<br />
-          Set <code className="text-xs bg-muted px-1 py-0.5 rounded">OPENAI_API_KEY</code> in your .env file.
-        </p>
+        <p className="text-sm text-muted-foreground text-center">{t('import.openaiRequired')}</p>
       </div>
     )
   }
@@ -1089,10 +1087,10 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
     return (
       <div className="flex flex-col items-center gap-4 py-6">
         <CheckCircle2 className="h-12 w-12 text-green-500" />
-        <p className="text-sm font-medium">Imported {importedCount} event{importedCount !== 1 ? 's' : ''}</p>
+        <p className="text-sm font-medium">{t('import.importedEvents', { count: String(importedCount) })}</p>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleReset}>Record Another</Button>
-          <Button size="sm" onClick={onDone}>Done</Button>
+          <Button variant="outline" size="sm" onClick={handleReset}>{t('import.recordAnother')}</Button>
+          <Button size="sm" onClick={onDone}>{t('common.done')}</Button>
         </div>
       </div>
     )
@@ -1103,7 +1101,7 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
       <div className="flex flex-col items-center gap-4 py-8">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <p className="text-sm text-muted-foreground">
-          Importing events... {importProgress}/{selectedCount}
+          {t('import.importingEvents', { progress: String(importProgress), total: String(selectedCount) })}
         </p>
         <div className="w-full bg-muted rounded-full h-2">
           <div
@@ -1119,7 +1117,7 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
     return (
       <div className="flex flex-col items-center gap-4 py-8">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">Transcribing audio...</p>
+        <p className="text-sm text-muted-foreground">{t('import.transcribingAudio')}</p>
       </div>
     )
   }
@@ -1128,7 +1126,7 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
     return (
       <div className="flex flex-col items-center gap-4 py-8">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">Parsing events with AI...</p>
+        <p className="text-sm text-muted-foreground">{t('import.parsingWithAI')}</p>
       </div>
     )
   }
@@ -1138,10 +1136,10 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
       <div className="flex flex-col gap-3 py-2">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium">
-            {parsedEvents.length} event{parsedEvents.length !== 1 ? 's' : ''} found
+            {t('import.eventsFound', { count: String(parsedEvents.length) })}
           </p>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">{selectedCount} selected</span>
+            <span className="text-xs text-muted-foreground">{t('import.selected', { count: String(selectedCount) })}</span>
             <button onClick={handleReset} className="text-muted-foreground hover:text-foreground">
               <X className="h-4 w-4" />
             </button>
@@ -1151,21 +1149,21 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
         {/* Bulk lane assignment */}
         <div className="flex flex-col gap-1.5 rounded-md border border-border/50 bg-muted/30 p-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground shrink-0">Assign all selected to:</span>
+            <span className="text-xs text-muted-foreground shrink-0">{t('import.assignAllSelected')}</span>
             <select
               value={bulkLane}
               onChange={(e) => { setBulkLane(e.target.value); setNewLaneName('') }}
               className="flex-1 text-xs bg-background border rounded px-1 py-0.5"
             >
-              <option value="">— keep individual —</option>
+              <option value="">{t('import.keepIndividual')}</option>
               {availableLanes.map(l => (
                 <option key={l.id} value={l.name}>{l.emoji ? `${l.emoji} ` : ''}{l.name}</option>
               ))}
-              <option value="__new__">+ Create new lane…</option>
+              <option value="__new__">{t('import.createNewLane')}</option>
             </select>
             {bulkLane && bulkLane !== '__new__' && (
               <Button size="sm" variant="outline" onClick={applyBulkLane} className="shrink-0 h-6 text-xs px-2">
-                Apply
+                {t('import.apply')}
               </Button>
             )}
           </div>
@@ -1175,7 +1173,7 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
                 value={newLaneName}
                 onChange={(e) => setNewLaneName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleCreateAndApplyLane() }}
-                placeholder="New lane name…"
+                placeholder={t('import.newLaneName')}
                 className="flex-1 text-xs bg-background border rounded px-2 py-0.5 h-6"
               />
               <Button
@@ -1184,7 +1182,7 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
                 disabled={!newLaneName.trim()}
                 className="shrink-0 h-6 text-xs px-2"
               >
-                Create & Apply
+                {t('import.createAndApply')}
               </Button>
             </div>
           )}
@@ -1209,9 +1207,9 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
                     className="accent-primary"
                   />
                 </th>
-                <th className="text-left px-2 py-1.5 font-medium">Event</th>
-                <th className="text-left px-2 py-1.5 font-medium">Date</th>
-                <th className="text-left px-2 py-1.5 font-medium w-28">Lane</th>
+                <th className="text-left px-2 py-1.5 font-medium">{t('import.event')}</th>
+                <th className="text-left px-2 py-1.5 font-medium">{t('import.date')}</th>
+                <th className="text-left px-2 py-1.5 font-medium w-28">{t('import.lane')}</th>
               </tr>
             </thead>
             <tbody>
@@ -1249,7 +1247,7 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
         </div>
 
         <Button onClick={handleImport} disabled={selectedCount === 0} className="w-full">
-          Import {selectedCount} Event{selectedCount !== 1 ? 's' : ''}
+          {t('import.importEvents', { count: String(selectedCount) })}
         </Button>
       </div>
     )
@@ -1262,7 +1260,7 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
           value={transcript}
           onChange={(e) => setTranscript(e.target.value)}
           className="min-h-[120px] resize-none"
-          placeholder="Transcript will appear here..."
+          placeholder={t('import.transcribing')}
         />
         {error && (
           <div className="flex items-center gap-2 text-sm text-destructive">
@@ -1271,8 +1269,8 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
           </div>
         )}
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleReset} className="flex-1">Re-record</Button>
-          <Button onClick={handleParse} disabled={!transcript.trim()} className="flex-1">Parse Events</Button>
+          <Button variant="outline" onClick={handleReset} className="flex-1">{t('import.reRecord')}</Button>
+          <Button onClick={handleParse} disabled={!transcript.trim()} className="flex-1">{t('import.parseEvents')}</Button>
         </div>
       </div>
     )
@@ -1289,9 +1287,9 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
           </div>
         </div>
         <p className="text-sm font-medium tabular-nums">{formatTime(elapsed)}</p>
-        <p className="text-xs text-muted-foreground">Recording...</p>
+        <p className="text-xs text-muted-foreground">{t('import.recording')}</p>
         <Button variant="destructive" size="sm" className="gap-2" onClick={stopRecording}>
-          Stop Recording
+          {t('import.stopRecording')}
         </Button>
       </div>
     )
@@ -1305,10 +1303,10 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
       </div>
       <Button variant="outline" className="gap-2" onClick={startRecording}>
         <Mic className="h-4 w-4" />
-        Start Recording
+        {t('import.startRecording')}
       </Button>
       <p className="text-xs text-muted-foreground text-center">
-        Dictate your life events and they&apos;ll be transcribed and added to your timeline
+        {t('import.dictateHint')}
       </p>
       {error && (
         <div className="flex items-center gap-2 text-sm text-destructive">
@@ -1320,7 +1318,14 @@ function VoiceTab({ lanes, addEvent, addLane, onDone }: VoiceTabProps) {
   )
 }
 
-export function ImportDialog({ open, onOpenChange, defaultTab = 'calendar-file', lanes, addEvent, addLane }: ImportDialogProps) {
+const TAB_ICONS: Record<ImportTab, React.ReactNode> = {
+  text: <FileText className="h-4 w-4" />,
+  voice: <Mic className="h-4 w-4" />,
+  'calendar-file': <CalendarDays className="h-4 w-4" />,
+}
+
+export function ImportDialog({ open, onOpenChange, defaultTab = 'text', lanes, addEvent, addLane }: ImportDialogProps) {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<ImportTab>(defaultTab)
 
   // Sync defaultTab when dialog opens with a different tab
@@ -1329,13 +1334,17 @@ export function ImportDialog({ open, onOpenChange, defaultTab = 'calendar-file',
     onOpenChange(v)
   }
 
-  const isWide = true
+  const TAB_LABELS: Record<ImportTab, string> = {
+    text: t('import.text'),
+    voice: t('import.voice'),
+    'calendar-file': t('import.calendarFile'),
+  }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className={isWide ? 'sm:max-w-2xl' : 'sm:max-w-md'}>
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Import Events</DialogTitle>
+          <DialogTitle>{t('import.dialogTitle')}</DialogTitle>
         </DialogHeader>
 
         {/* Tab navigation */}
@@ -1350,17 +1359,17 @@ export function ImportDialog({ open, onOpenChange, defaultTab = 'calendar-file',
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {tab.icon}
-              <span className="hidden sm:inline">{tab.label}</span>
+              {TAB_ICONS[tab.id]}
+              <span className="hidden sm:inline">{TAB_LABELS[tab.id]}</span>
             </button>
           ))}
         </div>
 
+        {activeTab === 'text' && <TextTab lanes={lanes} addEvent={addEvent} addLane={addLane} onDone={() => onOpenChange(false)} />}
+        {activeTab === 'voice' && <VoiceTab lanes={lanes} addEvent={addEvent} addLane={addLane} onDone={() => onOpenChange(false)} />}
         {activeTab === 'calendar-file' && (
           <CalendarFileTab lanes={lanes} addEvent={addEvent} addLane={addLane} onDone={() => onOpenChange(false)} />
         )}
-{activeTab === 'text' && <TextTab lanes={lanes} addEvent={addEvent} addLane={addLane} onDone={() => onOpenChange(false)} />}
-        {activeTab === 'voice' && <VoiceTab lanes={lanes} addEvent={addEvent} addLane={addLane} onDone={() => onOpenChange(false)} />}
       </DialogContent>
     </Dialog>
   )

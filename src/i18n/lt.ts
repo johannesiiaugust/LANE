@@ -358,8 +358,8 @@ const lt: Translations = {
     date: 'Data',
     lane: 'Juosta',
     importEvents: 'Importuoti įvykių: {count}',
-    limitHint: 'Daugiausiai 250 įvykių vienu importu',
-    tooManyEvents: 'Pasirinkote {count} įvykius. Paskirstykite importą į paketus po ne daugiau kaip 250.',
+    limitHint: 'Daugiausiai 50 įvykių importuojant kalendoriaus failą',
+    tooManyEvents: 'Pasirinkote {count} įvykius. Pasirinkite ne daugiau kaip 50.',
     dropOrClick: 'Vilkite kalendoriaus failą čia arba paspauskite, kad pasirinktumėte',
     supportedFormats: 'ICS, VCS, CSV, JSON, XML, TSV',
     // Google kalendoriaus skirtukas
@@ -369,14 +369,20 @@ const lt: Translations = {
     importSelected: 'Importuoti pasirinktus',
     // Teksto skirtukas
     pasteText: 'Įklijuokite tekstą, aprašantį jūsų gyvenimo įvykius',
+    dialogTitle: 'Importuoti įvykius',
+    textInputHint: 'Aprašyk savo įvykį… arba kopijuok & įklijuok iš savo CV arba socialinio tinklo profilio.',
+    textHintNatural: 'Aprašyk įvykius natūralia kalba. Datos, datų intervalai ir aprašymai bus atpažinti automatiškai.',
     textPlaceholder: 'Pvz.: 2019 m. persikėliau į Berlyną. 2020 m. kovą pradėjau dirbti „Google"...',
-    parseWithAI: 'Analizuoti su DI',
+    parseWithAI: 'Analizuoti ir importuoti',
     parsing: 'Analizuojama...',
     // Balso skirtukas
     recordVoice: 'Įrašykite savo balsą',
     startRecording: 'Pradėti įrašymą',
     stopRecording: 'Sustabdyti įrašymą',
     transcribing: 'Transkribuojama...',
+    reRecord: 'Įrašyti iš naujo',
+    parseEvents: 'Analizuoti įvykius',
+    recordAnother: 'Įrašyti kitą',
   },
 
   // ── Kanban lenta ──
