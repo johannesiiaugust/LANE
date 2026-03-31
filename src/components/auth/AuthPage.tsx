@@ -31,6 +31,8 @@ function AuthHeader({ onOpenAuth, onOpenSearch }: { onOpenAuth: () => void; onOp
   const { size, setSize } = useSizeConfig()
   const { skinId, setSkinId } = useSkin()
   const SIZE_NAMES: Record<UiSize, string> = { small: t('toolbar.small'), medium: t('toolbar.medium'), large: t('toolbar.large'), fitscreen: t('toolbar.fitScreen') }
+  const [menuOpen, setMenuOpen] = useState(false)
+  const closeMenu = () => setMenuOpen(false)
 
   return (
     <div className="shrink-0 border-b shadow-sm bg-background px-4 py-3 flex items-center justify-between gap-4">
@@ -49,7 +51,7 @@ function AuthHeader({ onOpenAuth, onOpenSearch }: { onOpenAuth: () => void; onOp
       <div className="flex items-center gap-2 shrink-0">
         <Button size="sm" onClick={onOpenAuth}>{t('auth.signIn')}</Button>
 
-        <DropdownMenu>
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="px-2">
               <MoreHorizontal className="h-4 w-4" />
@@ -57,26 +59,26 @@ function AuthHeader({ onOpenAuth, onOpenSearch }: { onOpenAuth: () => void; onOp
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             {/* Search */}
-            <DropdownMenuItem onClick={onOpenSearch}>
+            <DropdownMenuItem onClick={() => { onOpenSearch(); closeMenu() }}>
               <Search className="h-4 w-4 mr-2" />
               {t('toolbar.searchEvents')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {/* Size */}
             {(['small', 'large', 'fitscreen'] as UiSize[]).map(s => (
-              <DropdownMenuItem key={s} onClick={() => setSize(s)} className={size === s ? 'font-semibold' : ''}>
+              <DropdownMenuItem key={s} onClick={() => { setSize(s); closeMenu() }} className={size === s ? 'font-semibold' : ''}>
                 {SIZE_NAMES[s]}
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
             {/* Theme */}
             {SKINS.filter(s => ['classic', 'dark', 'sepia'].includes(s.id)).map(s => (
-              <DropdownMenuItem key={s.id} onClick={() => setSkinId(s.id as SkinId)} className={skinId === s.id ? 'font-semibold' : ''}>
+              <DropdownMenuItem key={s.id} onClick={() => { setSkinId(s.id as SkinId); closeMenu() }} className={skinId === s.id ? 'font-semibold' : ''}>
                 {s.name}
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <LanguageSwitcherInline />
+            <LanguageSwitcherInline onSelect={closeMenu} />
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

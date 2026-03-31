@@ -624,12 +624,16 @@ export async function fetchPersonaTranslations(language: string): Promise<DbPers
   return data ?? []
 }
 
-export async function fetchPersonaEventTranslations(language: string): Promise<DbPersonaEventTranslation[]> {
+export async function fetchPersonaEventTranslations(language: string, personaIds?: string[]): Promise<DbPersonaEventTranslation[]> {
   if (!language || language === 'en') return []
-  const { data, error } = await supabase
+  let query = supabase
     .from('persona_event_translations')
     .select('persona_event_id, persona_id, title_en, language, title, description')
     .eq('language', language)
+  if (personaIds && personaIds.length > 0) {
+    query = query.in('persona_id', personaIds)
+  }
+  const { data, error } = await query
   if (error) {
     console.error('fetchPersonaEventTranslations error:', error)
     return []
