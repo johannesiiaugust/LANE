@@ -76,19 +76,27 @@ export function usePersonas(userBirthYear: number | null = null) {
     return () => { cancelled = true }
   }, [])
 
-  // Fetch translations whenever language changes (skip for English — base data is already English)
+  // Fetch translations whenever language or active personas change
+  // Pass active persona IDs so we only fetch translations for visible personas,
+  // avoiding Supabase's server-side row cap when fetching the full table.
   useEffect(() => {
     let cancelled = false
+    const activeIds = [...activePersonaIds]
     Promise.all([
       fetchPersonaTranslations(lang),
-      fetchPersonaEventTranslations(lang),
+      fetchPersonaEventTranslations(lang, activeIds.length > 0 ? activeIds : undefined),
     ]).then(([personaRows, eventRows]) => {
       if (cancelled) return
       setTranslations(personaRows)
-      setEventTranslations(eventRows)
+      setEventTranslations(prev => {
+        // Merge: keep translations for other personas, replace for active ones
+        const activeSet = new Set(activeIds)
+        const kept = prev.filter(t => t.persona_id && !activeSet.has(t.persona_id))
+        return [...kept, ...eventRows]
+      })
     })
     return () => { cancelled = true }
-  }, [lang])
+  }, [lang, activePersonaIds])
 
   // Build a translated view of personas: overlay translation fields, fall back to English base data
   const translatedPersonas = useMemo(() => {
