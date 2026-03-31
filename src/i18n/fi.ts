@@ -610,6 +610,11 @@ const fi: Translations = {
     fillRequiredFields: 'Täytä kaikki pakolliset kentät',
     continueWithExample: 'Jatka keksityllä elämänesimerkillä →',
     next: 'Seuraava',
+    endOptional: 'Loppu (valinnainen)',
+    endNone: '—',
+    endDate: 'Valitse päivämäärä',
+    endToday: 'Tänään',
+    endOngoing: 'Jatkuva',
   },
   demo: {
     comparingYouVs: 'Vertailu \u2014 Sinä vs. Donald Trump',

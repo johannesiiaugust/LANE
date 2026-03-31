@@ -134,12 +134,7 @@ export function SignUpForm({ onSwitchToSignIn, onSignUpSuccess }: SignUpFormProp
           onBlur={handleUsernameBlur}
           required
         />
-        {usernameError
-          ? <p className="text-xs text-red-600">{usernameError}</p>
-          : usernameOk
-            ? <p className="text-xs text-green-600">{t('auth.usernameAvailableAt')} /{username}</p>
-            : <p className="text-xs text-muted-foreground">{t('auth.publicPageAt')} /{username || 'username'}</p>
-        }
+        {usernameError && <p className="text-xs text-red-600">{usernameError}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="email">{t('common.email')} <span className="text-red-500">*</span></Label>

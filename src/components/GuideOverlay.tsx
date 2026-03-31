@@ -25,16 +25,19 @@ const TIP_W  = 288
 
 // ─── Onboarding form types ───────────────────────────────────────────────────
 
+type EndMode = 'none' | 'date' | 'today' | 'ongoing'
+
 interface UserEventRow {
   id: string
   laneId: string
   title: string
   fromYear: string
   toYear: string
+  endMode: EndMode
 }
 
 function makeRow(laneId: string): UserEventRow {
-  return { id: crypto.randomUUID(), laneId, title: '', fromYear: '', toYear: '' }
+  return { id: crypto.randomUUID(), laneId, title: '', fromYear: '', toYear: '', endMode: 'none' }
 }
 
 // ─── Main component ──────────────────────────────────────────────────────────
@@ -224,15 +227,34 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
     const validRows = rows.filter(r => r.title.trim() && r.fromYear.trim())
     if (!birthDate || validRows.length === 0) return
 
-    const newEvents: TimelineEvent[] = validRows.map(r => ({
-      id: crypto.randomUUID(),
-      laneId: r.laneId,
-      title: r.title.trim(),
-      description: '',
-      type: 'range' as const,
-      startYear: dateStrToFracYear(r.fromYear),
-      endYear: r.toYear.trim() ? dateStrToFracYear(r.toYear) : undefined,
-    }))
+    const now = new Date()
+    const currentFracYear = now.getFullYear() + (now.getMonth() / 12) + (now.getDate() / 365.25)
+
+    const newEvents: TimelineEvent[] = validRows.map(r => {
+      const startYear = dateStrToFracYear(r.fromYear)
+      let endYear: number | undefined
+      let link: TimelineEvent['link']
+
+      if (r.endMode === 'date' && r.toYear.trim()) {
+        endYear = dateStrToFracYear(r.toYear)
+      } else if (r.endMode === 'today') {
+        endYear = currentFracYear
+      } else if (r.endMode === 'ongoing') {
+        endYear = currentFracYear
+        link = { anchorType: 'start_to_today', fixedYear: startYear, startOffset: 0 }
+      }
+
+      return {
+        id: crypto.randomUUID(),
+        laneId: r.laneId,
+        title: r.title.trim(),
+        description: '',
+        type: 'range' as const,
+        startYear,
+        endYear,
+        ...(link ? { link } : {}),
+      }
+    })
 
     // Merge with existing user events (preserve events from previous guide runs)
     let existingUserEvents: TimelineEvent[] = []
@@ -330,8 +352,22 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
                     </div>
                     <span className="text-muted-foreground text-xs pb-2">→</span>
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-xs text-muted-foreground">{t('selector.end')}</span>
-                      <DateInput value={row.toYear} onChange={v => updateRow(row.id, { toYear: v })} minIso="1900-01-01" maxIso="2100-12-31" />
+                      <span className="text-xs text-muted-foreground">{t('guide.endOptional')}</span>
+                      <div className="flex items-center gap-1">
+                        <select
+                          value={row.endMode}
+                          onChange={e => updateRow(row.id, { endMode: e.target.value as EndMode, toYear: '' })}
+                          className="h-8 text-sm border rounded-md px-2 bg-background"
+                        >
+                          <option value="none">{t('guide.endNone')}</option>
+                          <option value="date">{t('guide.endDate')}</option>
+                          <option value="today">{t('guide.endToday')}</option>
+                          <option value="ongoing">{t('guide.endOngoing')}</option>
+                        </select>
+                        {row.endMode === 'date' && (
+                          <DateInput value={row.toYear} onChange={v => updateRow(row.id, { toYear: v })} minIso="1900-01-01" maxIso="2100-12-31" />
+                        )}
+                      </div>
                     </div>
                   </div>
 

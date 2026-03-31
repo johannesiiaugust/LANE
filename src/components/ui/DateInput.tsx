@@ -196,7 +196,7 @@ export function DateInput({
             <CalendarDays className="h-4 w-4 text-muted-foreground" />
           </button>
         </PopoverTrigger>
-        <PopoverContent className="p-0 w-auto" align="start" sideOffset={4}>
+        <PopoverContent className="p-0 w-auto z-[300]" align="start" sideOffset={4}>
           <MiniCalendar
             iso={value}
             onSelect={handleCalendarSelect}

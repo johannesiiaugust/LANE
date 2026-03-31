@@ -549,6 +549,11 @@ const cs: Translations = {
     fillRequiredFields: 'Vyplňte prosím všechna povinná pole',
     continueWithExample: 'Pokračovat s vymyšleným životním příkladem →',
     next: 'Další',
+    endOptional: 'Konec (volitelné)',
+    endNone: '—',
+    endDate: 'Vybrat datum',
+    endToday: 'Dnes',
+    endOngoing: 'Probíhající',
   },
 
   welcome: {

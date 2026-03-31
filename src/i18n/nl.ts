@@ -612,6 +612,11 @@ const nl: Translations = {
     fillRequiredFields: 'Vul alle verplichte velden in',
     continueWithExample: 'Doorgaan met een verzonnen levensvoorbeeld →',
     next: 'Volgende',
+    endOptional: 'Einde (optioneel)',
+    endNone: '—',
+    endDate: 'Datum kiezen',
+    endToday: 'Vandaag',
+    endOngoing: 'Doorlopend',
   },
   demo: {
     comparingYouVs: 'Vergelijking \u2014 Jij vs. Donald Trump',
