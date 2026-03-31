@@ -401,6 +401,8 @@ const cs: Translations = {
   footer: {
     copyright: '\u00a9 {year} LifeLANE',
     about: 'O n\u00e1s',
+    storedInGermany: 'Uloženo & šifrováno v Německu',
+    termsShort: 'T&C',
   },
 
   terms: {

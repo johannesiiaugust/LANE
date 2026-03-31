@@ -423,6 +423,8 @@ const nl: Translations = {
   footer: {
     copyright: '\u00a9 {year} LifeLANE',
     about: 'Over',
+    storedInGermany: 'Opgeslagen & versleuteld in Duitsland',
+    termsShort: 'T&C',
   },
 
   // ── Voorwaardenpagina ──

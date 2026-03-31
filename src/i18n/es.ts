@@ -417,6 +417,8 @@ const es: Translations = {
   footer: {
     copyright: '\u00a9 {year} LifeLANE',
     about: 'Acerca de',
+    storedInGermany: 'Almacenado & cifrado en Alemania',
+    termsShort: 'T&C',
   },
 
   // ── Terms Page ──

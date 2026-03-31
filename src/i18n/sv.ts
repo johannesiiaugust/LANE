@@ -423,6 +423,8 @@ const sv: Translations = {
   footer: {
     copyright: '\u00a9 {year} LifeLANE',
     about: 'Om',
+    storedInGermany: 'Lagrat & krypterat i Tyskland',
+    termsShort: 'T&C',
   },
 
   // ── Villkorssida ──

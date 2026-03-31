@@ -401,6 +401,8 @@ const pl: Translations = {
   footer: {
     copyright: '\u00a9 {year} LifeLANE',
     about: 'O nas',
+    storedInGermany: 'Przechowywane & szyfrowane w Niemczech',
+    termsShort: 'T&C',
   },
 
   terms: {

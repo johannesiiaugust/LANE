@@ -423,6 +423,8 @@ const lv: Translations = {
   footer: {
     copyright: '© {year} LifeLANE',
     about: 'Par mums',
+    storedInGermany: 'Glabāts & šifrēts Vācijā',
+    termsShort: 'T&C',
   },
 
   // ── Terms Page ──
