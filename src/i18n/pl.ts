@@ -540,8 +540,6 @@ const pl: Translations = {
     step2Text: 'Przybliż i oddal czas — prześlizgnij się ku swojej przyszłości i przeszłości. Zobacz, jak rozwija się twoje bogactwo dzięki alternatywnym ścieżkom osi czasu.',
     step3Title: 'Zarządzaj osiami czasu',
     step3Text: 'Tworzenie i modyfikowanie osi czasu dla rodziny, przyjaciół i innych. Importuj z CV, sieci społecznościowych, kalendarzy i innych źródeł — po prostu wklej dowolny tekst z naszym AI lub głosem.',
-    step4Title: 'Dodaj wydarzenia życiowe i planuj z AI',
-    step4Text: 'Dodawaj wydarzenia we wszystkich obszarach LANE życia — praca, gdzie mieszkałeś, zdrowie i wiele więcej. Opisz przyszłość, której chcesz, a nasze AI poda ci konkretne sposoby na jej osiągnięcie.',
     startYourOwnStory: 'Zacznij własną historię',
     addFewEvents: 'Dodaj kilka wydarzeń i zbuduj swoją osobistą oś czasu.',
     birthDate: 'Data urodzenia',

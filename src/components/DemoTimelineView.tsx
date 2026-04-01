@@ -263,6 +263,21 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; title: string; description: string; onConfirm: () => void }>
     ({ open: false, title: '', description: '', onConfirm: () => {} })
 
+  // Compare button shimmer — random 5–12 s interval
+  const [btnShimmer, setBtnShimmer] = useState(false)
+  useEffect(() => {
+    let sweepTimer: ReturnType<typeof setTimeout>
+    let schedTimer: ReturnType<typeof setTimeout>
+    function schedule() {
+      schedTimer = setTimeout(() => {
+        setBtnShimmer(true)
+        sweepTimer = setTimeout(() => { setBtnShimmer(false); schedule() }, 1400)
+      }, 5000 + Math.random() * 7000)
+    }
+    const initTimer = setTimeout(schedule, 1000 + Math.random() * 5000)
+    return () => { clearTimeout(initTimer); clearTimeout(schedTimer); clearTimeout(sweepTimer) }
+  }, [])
+
   const handleEventClick = useCallback((event: TimelineEvent, element: HTMLElement, clientX: number, clientY: number) => {
     setPopover({ event, anchor: element, x: clientX, y: clientY })
   }, [])
@@ -322,10 +337,13 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
         <div className="bg-muted/50 rounded-lg px-1.5 py-0.5">
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5" data-guide="compare">
+            <Button variant="outline" size="sm" className="gap-1.5 relative overflow-hidden" data-guide="compare">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">{t('selector.compareEdit')}</span>
               <ChevronDown className="h-3.5 w-3.5 opacity-50 shrink-0" />
+              {btnShimmer && (
+                <div className="absolute inset-0 animate-shimmer-sweep pointer-events-none" style={{ background: 'linear-gradient(105deg, transparent 25%, rgba(255,255,255,0.18) 50%, transparent 75%)' }} />
+              )}
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-72 p-0 max-h-[80vh] overflow-y-auto">

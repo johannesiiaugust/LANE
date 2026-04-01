@@ -598,8 +598,6 @@ const fr: Translations = {
     step2Text: "Zoomez dans le temps — glissez vers votre avenir et votre passé. Voyez comment votre patrimoine se développe avec des chemins de chronologie alternatifs.",
     step3Title: 'Gérer les chronologies',
     step3Text: "Créez et modifiez des chronologies pour la famille, les amis et les autres. Importez depuis des CV, réseaux sociaux, calendriers et autres sources — collez simplement du texte avec notre IA ou par la voix.",
-    step4Title: "Ajouter des événements de vie & planifier avec l'IA",
-    step4Text: "Ajoutez des événements dans tous les domaines LANE de la vie — travail, où vous avez vécu, santé et plus. Décrivez un avenir que vous souhaitez et notre IA vous donne des moyens concrets pour l’atteindre.",
     startYourOwnStory: 'Commencez votre propre histoire',
     addFewEvents: "Ajoutez quelques événements et construisez votre chronologie personnelle.",
     birthDate: 'Date de naissance',

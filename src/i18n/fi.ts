@@ -602,8 +602,6 @@ const fi: Translations = {
     step2Text: 'Zoomää sisään ja ulos ajassa — liu’u tulevaisuuteesi ja menneisyyteesi. Näe kuinka varallisuutesi kehittyy vaihtoehtoisilla aikajanapolilla.',
     step3Title: 'Hallinnoi aikajanoja',
     step3Text: 'Luo ja muokkaa aikajanoja perheelle, ystäville ja muille. Tuo CV:istä, sosiaalisista verkostoista, kalentereista ja muista lähteistä — liitä vain tekstiä tekoilymme avulla tai äänellä.',
-    step4Title: 'Lisää elämäntapahtumat & suunnittele tekoillyn avulla',
-    step4Text: 'Lisää tapahtumia kaikille elämän LANE-alueille — työ, missä asuit, terveys ja paljon muuta. Kuvaile haluamasi tulevaisuus ja tekoilymme antaa konkreettisia tapoja saavuttaa se.',
     startYourOwnStory: 'Aloita oma tarinasi',
     addFewEvents: 'Lisää muutama tapahtuma ja rakenna henkilökohtainen aikajanasi.',
     birthDate: 'Syntymäpäivä',

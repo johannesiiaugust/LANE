@@ -39,7 +39,7 @@ export function PersonaSeparateTimeline({
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, MIN_TICK_PX, TICK_FONT } = sc
   const width = (yearEnd - yearStart) * pixelsPerYear
 
-  // Total height of this section for the lifespan overlay
+  // Total height: collapsed = 1 row per lane, expanded = rowCount rows per lane
   const sectionHeight = useMemo(() => {
     const lanesH = laneNames.reduce((sum, n) => sum + (laneRowCounts?.get(n) ?? 1) * BASE_LANE_HEIGHT, 0)
     return PERSONA_SUB_ROW_HEIGHT + lanesH
@@ -133,6 +133,7 @@ export function PersonaSeparateTimeline({
         const laneEvents = events.filter(e => e.lane_name === laneName)
         const laneColor = laneColorMap.get(laneName) ?? '#6b7280'
         const rowCount = laneRowCounts?.get(laneName) ?? 1
+        const expanded = rowCount > 1
         const eventRowMap = laneEventRowMaps?.get(laneName)
         return (
           <div
@@ -140,19 +141,23 @@ export function PersonaSeparateTimeline({
             className="relative border-b border-border/30 bg-muted/20"
             style={{ height: rowCount * BASE_LANE_HEIGHT, width }}
           >
-            {laneEvents.map(e => (
-              <PersonaEventBar
-                key={e.id}
-                event={e}
-                yearStart={yearStart}
-                pixelsPerYear={pixelsPerYear}
-                laneColor={laneColor}
-                currentYear={currentYear}
-                rowTopOffset={eventRowMap ? (eventRowMap.get(e.id) ?? 0) * BASE_LANE_HEIGHT : undefined}
-                scrollLeft={scrollLeft}
-                sidebarWidth={sidebarWidth}
-              />
-            ))}
+            {laneEvents.map(e => {
+              const eventRow = eventRowMap?.get(e.id) ?? 0
+              return (
+                <PersonaEventBar
+                  key={e.id}
+                  event={e}
+                  yearStart={yearStart}
+                  pixelsPerYear={pixelsPerYear}
+                  laneColor={laneColor}
+                  currentYear={currentYear}
+                  rowTopOffset={expanded ? eventRow * BASE_LANE_HEIGHT : undefined}
+                  stackDepth={expanded ? undefined : eventRow}
+                  scrollLeft={scrollLeft}
+                  sidebarWidth={sidebarWidth}
+                />
+              )
+            })}
           </div>
         )
       })}

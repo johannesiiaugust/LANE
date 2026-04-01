@@ -554,7 +554,7 @@ const en = {
 
   // ── Seed / demo event content ──
   seed: {
-    exampleTimelineName: 'Example \u2014 edit me!',
+    exampleTimelineName: 'Example \u2013 edit me!',
     // Place
     place1Title: 'Berlin',
     place1Desc: 'Grew up and worked in Berlin',

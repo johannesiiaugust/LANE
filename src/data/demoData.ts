@@ -44,7 +44,7 @@ export const DEMO_EVENTS: TimelineEvent[] = [
 
   // Relations (Relationships + Family merged)
   { id: 'demo-evt-girlfriend', laneId: 'relations',  emoji: '💕', title: 'First Girlfriend',     description: 'High school relationship',                   type: 'range', startYear: 1996, endYear: 1999, color: '#ec4899' },
-  { id: 'demo-evt-married',    laneId: 'relations',  emoji: '💍', title: 'Married',              description: 'Married',                                    type: 'range', startYear: 2007, endYear: 2065, color: '#ec4899' },
+  { id: 'demo-evt-married',    laneId: 'relations',  emoji: '💍', title: 'Married',              description: 'Married',                                    type: 'range', startYear: 2005, endYear: 2065, color: '#ec4899' },
   { id: 'demo-evt-kid',        laneId: 'relations',  emoji: '👶', title: 'Child',                description: 'First child born (Feb 2024)',                type: 'range', startYear: 2024.085, endYear: 2100, color: '#f97316' },
 
   // Activities (Activities + Achievements merged)
@@ -63,7 +63,7 @@ export const DEMO_EVENTS: TimelineEvent[] = [
   },
 
   // Items (Vehicles + Items merged)
-  { id: 'demo-evt-volvo',      laneId: 'items',      emoji: '🚗', title: 'Volvo',                description: 'Current car',                                type: 'range', startYear: 2023, endYear: 2042, color: '#64748b' },
+  { id: 'demo-evt-volvo',      laneId: 'items',      emoji: '🚗', title: 'Volvo',                description: 'Current car',                                type: 'range', startYear: 2019, endYear: 2039, color: '#64748b' },
   { id: 'demo-evt-boat',       laneId: 'items',      emoji: '⛵', title: 'Boat',                 description: 'Future boat',                                type: 'range', startYear: 2053, endYear: 2082, color: '#0ea5e9',
     valueProjection: {
       startValue: 0,
@@ -102,7 +102,7 @@ export function buildDemoEvents(t: TFn): TimelineEvent[] {
 
     // Relations
     { id: 'demo-evt-girlfriend', laneId: 'relations',  emoji: '💕', title: t('seed.firstGirlfriendTitle'), description: t('seed.firstGirlfriendDesc'), type: 'range', startYear: 1996, endYear: 1999, color: '#ec4899' },
-    { id: 'demo-evt-married',    laneId: 'relations',  emoji: '💍', title: t('seed.marriedTitle'),        description: t('seed.marriedTitle'),      type: 'range', startYear: 2007,    endYear: 2065,   color: '#ec4899' },
+    { id: 'demo-evt-married',    laneId: 'relations',  emoji: '💍', title: t('seed.marriedTitle'),        description: t('seed.marriedTitle'),      type: 'range', startYear: 2005,    endYear: 2065,   color: '#ec4899' },
     { id: 'demo-evt-kid',        laneId: 'relations',  emoji: '👶', title: t('seed.childTitle'),          description: t('seed.childDesc'),         type: 'range', startYear: 2024.085, endYear: 2100,  color: '#f97316' },
 
     // Activities
@@ -121,7 +121,7 @@ export function buildDemoEvents(t: TFn): TimelineEvent[] {
     },
 
     // Items
-    { id: 'demo-evt-volvo',      laneId: 'items',      emoji: '🚗', title: t('seed.carTitle'),            description: t('seed.carDesc'),           type: 'range', startYear: 2023, endYear: 2042, color: '#64748b' },
+    { id: 'demo-evt-volvo',      laneId: 'items',      emoji: '🚗', title: t('seed.carTitle'),            description: t('seed.carDesc'),           type: 'range', startYear: 2019, endYear: 2039, color: '#64748b' },
     { id: 'demo-evt-boat',       laneId: 'items',      emoji: '⛵', title: t('seed.boatTitle'),           description: t('seed.boatDesc'),          type: 'range', startYear: 2053, endYear: 2082, color: '#0ea5e9',
       valueProjection: {
         startValue: 0,

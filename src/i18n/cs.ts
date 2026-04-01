@@ -540,8 +540,6 @@ const cs: Translations = {
     step2Text: 'Přibližte a oddálte čas — klouzejte do své budoucnosti a minulosti. Vizíte, jak se rozvíjí vaše bohatství s alternativními cestami časové osy.',
     step3Title: 'Spravujte časové osy',
     step3Text: 'Vytvářejte a upravujte časové osy pro rodinu, přátele a další. Importujte z CV, sociálních sítí, kalendářů a jiných zdrojů — jednoduše vložte text s naší AI nebo hlasem.',
-    step4Title: 'Přidejte životní události a plánujte s AI',
-    step4Text: 'Přidávejte události ve všech LANE oblastech života — práce, kde jste žili, zdraví a další. Popište budoucnost, kterou chcete, a naše AI vám dá konkrétní způsoby, jak jí dosáhnout.',
     startYourOwnStory: 'Začni svůj vlastní příběh',
     addFewEvents: 'Přidej několik událostí a postav svou osobní časovou osu.',
     birthDate: 'Datum narození',

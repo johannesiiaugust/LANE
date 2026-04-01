@@ -540,8 +540,6 @@ const da: Translations = {
     step2Text: 'Zoom ind og ud i tid — gläd mod din fremtid og fortid. Se hvordan din formue udvikler sig med alternative tidslinjestier.',
     step3Title: 'Administrer tidslinjer',
     step3Text: 'Opret og ændr tidslinjer for familie, venner og andre. Importer fra CV’er, sociale netværk, kalendere og andre kilder — indsæt blot tekst med vores AI eller med stemmen.',
-    step4Title: 'Tilføj livshændelser & planlæg med AI',
-    step4Text: 'Tilføj hændelser på tværs af alle livets LANE-områder — arbejde, hvor du har boet, helbred og mere. Beskriv en fremtid, du ønsker, og vores AI giver dig konkrete måder at nå den.',
     startYourOwnStory: 'Start din egen historie',
     addFewEvents: 'Tilføj nogle begivenheder og byg din personlige tidslinje.',
     birthDate: 'Fødselsdato',
