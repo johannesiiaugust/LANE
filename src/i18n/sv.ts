@@ -604,8 +604,6 @@ const sv: Translations = {
     step2Text: 'Zooma in och ut i tid — se din framtid och dåtid. Se hur din förmögenhet utvecklas med alternativa tidslinjebanor.',
     step3Title: 'Hantera tidslinjer',
     step3Text: 'Skapa och ändra tidslinjer för familj, vänner och andra. Importera från CV’n, sociala nätverk, kalendrar och andra källor — klistra in valfri text med vår AI, eller med rösten.',
-    step4Title: 'Lägg till livshändelser & planera med AI',
-    step4Text: 'Lägg till händelser i alla livets LANE-områden — arbete, var du bott, hälsa med mera. Beskriv en framtid du vill ha och vår AI ger dig konkreta sätt att nå den.',
     startYourOwnStory: 'Börja din egen berättelse',
     addFewEvents: 'Lägg till några händelser och bygg din personliga tidslinje.',
     birthDate: 'Födelsedatum',

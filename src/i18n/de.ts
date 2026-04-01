@@ -604,8 +604,6 @@ const de: Translations = {
     step2Text: 'Vergrößere und verkleinere die Zeit — gleite in deine Zukunft und Vergangenheit. Sieh, wie sich dein Vermögen mit alternativen Zeitlinienpfaden entwickelt.',
     step3Title: 'Zeitlinien verwalten',
     step3Text: 'Erstelle und bearbeite Zeitlinien für Familie, Freunde und andere. Importiere aus Leumundäfen, sozialen Netzwerken, Kalendern und anderen Quellen — einfach Text mit unserer KI kopieren oder per Sprache.',
-    step4Title: 'Lebensereignisse hinzufügen & mit KI planen',
-    step4Text: 'Füge Ereignisse in allen LANE-Bereichen des Lebens hinzu — Arbeit, wo du gelebt hast, Gesundheit und mehr. Beschreibe eine Zukunft, die du möchtest, und unsere KI zeigt dir konkrete Wege dorthin.',
     startYourOwnStory: 'Starte deine eigene Geschichte',
     addFewEvents: 'Füge einige Ereignisse hinzu und baue deine persönliche Zeitlinie.',
     birthDate: 'Geburtsdatum',

@@ -598,8 +598,6 @@ const it: Translations = {
     step2Text: 'Ingrandisci e rimpicciolisci nel tempo — scorri verso il tuo futuro e passato. Guarda come si sviluppa il tuo patrimonio con percorsi alternativi della linea temporale.',
     step3Title: 'Gestire le linee temporali',
     step3Text: 'Crea e modifica linee temporali per famiglia, amici e altri. Importa da CV, social network, calendari e altre fonti — incolla semplicemente qualsiasi testo con la nostra IA o con la voce.',
-    step4Title: 'Aggiungere eventi di vita e pianificare con IA',
-    step4Text: "Aggiungi eventi in tutte le aree LANE della vita — lavoro, dove hai vissuto, salute e altro. Descrivi un futuro che desideri e la nostra IA ti darà modi concreti per raggiungerlo.",
     startYourOwnStory: 'Inizia la tua storia',
     addFewEvents: 'Aggiungi alcuni eventi e costruisci la tua linea del tempo personale.',
     birthDate: 'Data di nascita',

@@ -604,8 +604,6 @@ const lv: Translations = {
     step2Text: 'Tūvina un tālina laiku — slīdi uz savu nākotni un paguitni. Skaties, kā tava bagātība attīstās ar alternatīviem laika līniju ceļiem.',
     step3Title: 'Pārvaldīt laika līnijas',
     step3Text: 'Izveido un mainī laika līnijas ģimenei, draugiem un citiem. Importē no CV, sociālajiem tīkliem, kalendāriem un citiem avotiem — vienkrāši ielīmē jebkuru tekstu ar mūsu AI vai ar balsi.',
-    step4Title: 'Pievienot dzīves notīkumus & plānot ar AI',
-    step4Text: 'Pievieno notīkumus visiem dzīves LANE apgabaliem — darbs, kur dzīvoji, veselība un vairāk. Apraksti nākotni, ko vēlies, un mūsu AI sniez tev konkrētus veidus kā to sasniegt.',
     startYourOwnStory: 'Sāc savu stāstu',
     addFewEvents: 'Pievienojiet dažus notikumus un izveidojiet savu personīgo laika skalu.',
     birthDate: 'Dzīmšanas datums',

@@ -602,8 +602,6 @@ const lt: Translations = {
     step2Text: 'Priartinkite ir nutolinkite laiką — slinkite į savo ateitį ir praeitį. Stebėkite, kaip jūsų turtas vystosi su alternatyviais laiko juostos keliais.',
     step3Title: 'Tvarkykite laiko juostas',
     step3Text: 'Kurkite ir keiskite laiko juostas šeimai, draugams ir kitiems. Importuokite iš CV, socialinių tinklų, kalendorių ir kitų šaltinių — tiesiog įklijuokite bet kokį tekstą su mūsų AI arba balsu.',
-    step4Title: 'Pridėkite gyvenimo įvykius ir planuokite su AI',
-    step4Text: 'Pridėkite įvykius visuose gyvenimo LANE srityse — darbas, kur gyvenote, sveikata ir daugiau. Aprašykite norimą ateitį ir mūsų AI suteiks jums konkrečius būdus ją pasiekti.',
     startYourOwnStory: 'Pradėk savo istoriją',
     addFewEvents: 'Pridėkite kelis įvykius ir sukurkite savo asmeninę laiko juostą.',
     birthDate: 'Gimimo data',
