@@ -37,7 +37,7 @@ interface UserEventRow {
 }
 
 function makeRow(laneId: string): UserEventRow {
-  return { id: crypto.randomUUID(), laneId, title: '', fromYear: '', toYear: '', endMode: 'none' }
+  return { id: crypto.randomUUID(), laneId, title: '', fromYear: '', toYear: '', endMode: 'ongoing' }
 }
 
 // ─── Main component ──────────────────────────────────────────────────────────
@@ -73,16 +73,9 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
       align: 'end',
     },
     {
-      target: 'compare',
+      target: 'add-events',
       title: t('guide.step3Title'),
       text: t('guide.step3Text'),
-      side: 'bottom',
-      align: 'start',
-    },
-    {
-      target: 'add-events',
-      title: t('guide.step4Title'),
-      text: t('guide.step4Text'),
       side: 'bottom',
       align: 'end',
     },
@@ -139,7 +132,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
   if (!open) return null
 
   const current = STEPS[step]
-  const total   = STEPS.length
+  const spotlightCount = STEPS.length - 1  // excludes onboarding step
 
   const onboardingStep = STEPS.length - 1
 
@@ -288,7 +281,6 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
           {/* Header */}
           <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b">
             <div>
-              <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">{step + 1} / {total}</div>
               <h2 className="text-xl font-semibold">{t('guide.startYourOwnStory')}</h2>
               <p className="text-sm text-muted-foreground mt-1">{t('guide.addFewEvents')}</p>
             </div>
@@ -304,7 +296,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
                   {t('guide.birthDate')} <span className="text-red-500">*</span>
                 </label>
                 <div className={submitted && !birthDate ? 'ring-2 ring-red-500 rounded-md' : ''}>
-                  <DateInput value={birthDate} onChange={setBirthDate} minIso="1900-01-01" maxIso="2020-12-31" className="w-56" />
+                  <DateInput value={birthDate} onChange={setBirthDate} defaultViewIso="2000-01-01" className="w-36" yearOnly />
                 </div>
               </div>
               {submitted && !birthDate && (
@@ -347,7 +339,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
                     <div className="flex flex-col gap-0.5">
                       <span className="text-xs text-muted-foreground">{t('selector.start')} <span className="text-red-500">*</span></span>
                       <div className={submitted && !row.fromYear.trim() ? 'ring-2 ring-red-500 rounded-md' : ''}>
-                        <DateInput value={row.fromYear} onChange={v => updateRow(row.id, { fromYear: v })} minIso="1900-01-01" maxIso="2100-12-31" />
+                        <DateInput value={row.fromYear} onChange={v => updateRow(row.id, { fromYear: v })} yearOnly className="w-36" />
                       </div>
                     </div>
                     <span className="text-muted-foreground text-xs pb-2">→</span>
@@ -365,7 +357,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
                           <option value="ongoing">{t('guide.endOngoing')}</option>
                         </select>
                         {row.endMode === 'date' && (
-                          <DateInput value={row.toYear} onChange={v => updateRow(row.id, { toYear: v })} minIso="1900-01-01" maxIso="2100-12-31" />
+                          <DateInput value={row.toYear} onChange={v => updateRow(row.id, { toYear: v })} yearOnly className="w-36" />
                         )}
                       </div>
                     </div>
@@ -405,13 +397,9 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
             {submitted && (!birthDate || rows.every(r => !r.title.trim() || !r.fromYear.trim())) && (
               <p className="text-xs text-red-500">{t('guide.fillRequiredFields')}</p>
             )}
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <Button variant="outline" type="button" onClick={onClose}>
               {t('guide.continueWithExample')}
-            </button>
+            </Button>
             <Button onClick={handleStartOwn} className="min-w-[140px]">
               {t('auth.getStarted')}
               <ChevronRight className="h-4 w-4 ml-1" />
@@ -447,7 +435,7 @@ export function GuideOverlay({ open, onClose }: GuideOverlayProps) {
         <div style={arrowStyle} />
 
         <div className="flex items-start justify-between px-4 pt-4 pb-2">
-          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{step + 1} / {total}</span>
+          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{step + 1} / {spotlightCount}</span>
           <button onClick={handleDismiss} className="text-muted-foreground hover:text-foreground transition-colors -mt-0.5 -mr-1">
             <X className="h-4 w-4" />
           </button>

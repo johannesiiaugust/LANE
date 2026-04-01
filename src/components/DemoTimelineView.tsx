@@ -315,10 +315,11 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
       {/* Minimal demo toolbar */}
-      <div className="flex items-center justify-between border-b bg-background px-3 py-2 gap-2 shrink-0">
+      <div className="flex items-center justify-between border-b bg-muted/40 px-3 py-2 gap-2 shrink-0">
         {/* ── Left side ── */}
         <div className="flex items-center gap-2 min-w-0">
         {/* Compare & edit */}
+        <div className="bg-muted/50 rounded-lg px-1.5 py-0.5">
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="gap-1.5" data-guide="compare">
@@ -489,9 +490,10 @@ function DemoTimelineViewInner({ onSignUpWithTimeline: _onSignUpWithTimeline, se
           </PopoverContent>
         </Popover>
         </div>
+        </div>
 
         {/* ── Right side ── */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 bg-muted/50 rounded-lg px-1.5 py-0.5">
         {/* Back to Today — fixed center, only when today is off-screen */}
         {todayOffScreen && (
           <button

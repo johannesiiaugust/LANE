@@ -599,9 +599,9 @@ const sv: Translations = {
 
   guide: {
     step1Title: 'Jämför ditt liv med vem som helst',
-    step1Text: 'Kända personer, vänner och andra. Se som om du börjat samtidigt.',
+    step1Text: 'Kända personer, vänner och andra. Som om ni började samtidigt.',
     step2Title: 'Navigera i tid',
-    step2Text: 'Zooma in och ut i tid — gländ mot din framtid och dåtid. Se hur din förmögenhet utvecklas med alternativa tidslinjepätgar.',
+    step2Text: 'Zooma in och ut i tid — se din framtid och dåtid. Se hur din förmögenhet utvecklas med alternativa tidslinjebanor.',
     step3Title: 'Hantera tidslinjer',
     step3Text: 'Skapa och ändra tidslinjer för familj, vänner och andra. Importera från CV’n, sociala nätverk, kalendrar och andra källor — klistra in valfri text med vår AI, eller med rösten.',
     step4Title: 'Lägg till livshändelser & planera med AI',
