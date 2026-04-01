@@ -1,9 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/i18n'
 import { navigateLocalized, loadTranslation, type Lang } from '@/i18n/context'
 import { en, type Translations } from '@/i18n'
+
+const NUGGETS = [
+  'Same age as Cleopatra in Rome?',
+  'Beat Einstein to a Nobel Prize at 42?',
+  'What had Musk built by your age?',
+  'Richer than Trump at your age?',
+  'How far is Swift now at 36?',
+]
 
 const WELCOME_LANGS: { id: Lang; flag: string; label: string }[] = [
   { id: 'en', flag: '🇬🇧', label: 'English' },
@@ -23,6 +31,22 @@ interface WelcomeModalProps {
 export function WelcomeModal({ currentLang, onDismiss }: WelcomeModalProps) {
   const { t: tApp } = useTranslation()
   const [selectedLang, setSelectedLang] = useState<Lang>(currentLang)
+  const [nuggetIndex, setNuggetIndex] = useState(0)
+  const [nuggetVisible, setNuggetVisible] = useState(true)
+  const nuggetTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    const cycle = () => {
+      setNuggetVisible(false)
+      nuggetTimer.current = setTimeout(() => {
+        setNuggetIndex(i => (i + 1) % NUGGETS.length)
+        setNuggetVisible(true)
+        nuggetTimer.current = setTimeout(cycle, 2500)
+      }, 400)
+    }
+    nuggetTimer.current = setTimeout(cycle, 2500)
+    return () => { if (nuggetTimer.current) clearTimeout(nuggetTimer.current) }
+  }, [])
   const [cookiesAccepted, setCookiesAccepted] = useState(false)
   const [previewTranslations, setPreviewTranslations] = useState<Translations | null>(null)
 
@@ -80,7 +104,12 @@ export function WelcomeModal({ currentLang, onDismiss }: WelcomeModalProps) {
         <div className="text-center">
           <div className="text-3xl mb-2">👋</div>
           <h2 className="text-xl font-bold">{t('welcome.title')}</h2>
-          <p className="text-sm text-muted-foreground mt-1">{t('welcome.subtitle')}</p>
+          <p
+            className="text-sm text-muted-foreground mt-2 italic min-h-[1.25rem] transition-opacity duration-400"
+            style={{ opacity: nuggetVisible ? 1 : 0 }}
+          >
+            {NUGGETS[nuggetIndex]}
+          </p>
         </div>
 
         {/* Language selector */}
@@ -135,6 +164,9 @@ export function WelcomeModal({ currentLang, onDismiss }: WelcomeModalProps) {
             {t('welcome.aboutButton')}
           </Button>
         </div>
+
+        {/* Demo note */}
+        <p className="text-xs text-muted-foreground/80 text-center">Try the demo — it stays on your browser.</p>
 
         {/* Security note */}
         <p className="text-xs text-muted-foreground/60 text-center">🔒 {t('welcome.secureStorage')}</p>
