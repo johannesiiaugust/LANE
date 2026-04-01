@@ -172,7 +172,7 @@ export function OverlayEventBar({
   return (
     <>
       <div
-        className="absolute rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50"
+        className="absolute rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-[25]"
         style={{
           left,
           top,

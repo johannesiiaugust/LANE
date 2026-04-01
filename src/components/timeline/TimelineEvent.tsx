@@ -301,7 +301,7 @@ export function TimelineEventBar({
         All hover / grab transforms are applied here so tails move with the bar.
       */}
       <div
-        className={`absolute cursor-pointer transition-all select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50 ${grabRing}`}
+        className={`absolute cursor-pointer transition-all select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-[25] ${grabRing}`}
         style={{ left: barLeft, top, width: Math.max(barWidth, 4), height: h, zIndex: stackZ, ...draggingStyle }}
         title={event.title}
         {...interactionProps}

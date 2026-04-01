@@ -147,6 +147,8 @@ interface TimelineContainerProps {
   timelineName?: string
   onVisibleWindowChange?: (start: number, end: number) => void
   onRemovePersona?: (personaId: string) => void
+  alignedPersonaIds?: Set<string>
+  onTogglePersonaAlignment?: (personaId: string) => void
 }
 
 export function TimelineContainer({
@@ -179,6 +181,8 @@ export function TimelineContainer({
   timelineName,
   onVisibleWindowChange,
   onRemovePersona,
+  alignedPersonaIds,
+  onTogglePersonaAlignment,
 }: TimelineContainerProps) {
   const { sc, size, updateFitScreenConfig } = useSizeConfig()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, TOTAL_ASSETS_HEIGHT } = sc
@@ -1185,7 +1189,7 @@ export function TimelineContainer({
       {/* Lane sidebar overlay — floats above timeline content, scrolls vertically via sidebarInnerRef */}
       <div
         className="absolute top-0 left-0 overflow-hidden pointer-events-none"
-        style={{ width: actualSidebarWidth, height: '100%', zIndex: 30 }}
+        style={{ width: actualSidebarWidth, height: '100%', zIndex: 40 }}
       >
         <div ref={sidebarInnerRef} className="pointer-events-auto">
           <LaneSidebar
@@ -1213,6 +1217,8 @@ export function TimelineContainer({
             onEditLane={onEditLane}
             onDeleteLane={onDeleteLane}
             onRemovePersona={onRemovePersona}
+            alignedPersonaIds={alignedPersonaIds}
+            onTogglePersonaAlignment={onTogglePersonaAlignment}
             totalAssetsHeight={hasValueEvents ? TOTAL_ASSETS_HEIGHT : undefined}
           />
         </div>
