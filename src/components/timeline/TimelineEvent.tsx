@@ -44,7 +44,7 @@ export function TimelineEventBar({
     ? event.startYear < currentYear
     : (event.endYear ?? event.startYear) < currentYear
 
-  const pastStyle = isPast ? { opacity: 0.35, filter: 'saturate(0.5)' } : undefined
+  const pastBgStyle: React.CSSProperties = isPast ? { opacity: 0.35, filter: 'saturate(0.5)' } : {}
   const draggingStyle: React.CSSProperties | undefined = isDragging ? { opacity: 0.25, pointerEvents: 'none' } : undefined
 
   const hasValue = !!event.valueProjection
@@ -120,9 +120,9 @@ export function TimelineEventBar({
 
   const grabRing = isGrabbing ? 'ring-2 ring-primary scale-105' : ''
 
-  // Rare shimmer — random interval 4–8 s, random initial offset so bars never sync
+  // Shimmer — random interval 2–4 s, random initial offset so bars never sync
   const [shimmer, setShimmer] = useState(false)
-  const shimmerInitialDelay = useMemo(() => Math.random() * 4000, [event.id])
+  const shimmerInitialDelay = useMemo(() => Math.random() * 2000, [event.id])
   useEffect(() => {
     if (event.type !== 'range') return
     let sweepTimer: ReturnType<typeof setTimeout>
@@ -131,7 +131,7 @@ export function TimelineEventBar({
       schedTimer = setTimeout(() => {
         setShimmer(true)
         sweepTimer = setTimeout(() => { setShimmer(false); schedule() }, 1400)
-      }, 4000 + Math.random() * 4000)
+      }, 2000 + Math.random() * 2000)
     }
     const initTimer = setTimeout(schedule, shimmerInitialDelay)
     return () => { clearTimeout(initTimer); clearTimeout(schedTimer); clearTimeout(sweepTimer) }
@@ -176,7 +176,7 @@ export function TimelineEventBar({
         <>
           <div
             className={`absolute flex items-center justify-center cursor-pointer hover:scale-110 transition-transform select-none ${grabRing}`}
-            style={{ left: left - DOT_SIZE / 2, top, width: DOT_SIZE, height: DOT_SIZE, fontSize: DOT_SIZE - 2, lineHeight: 1, ...pastStyle, ...draggingStyle }}
+            style={{ left: left - DOT_SIZE / 2, top, width: DOT_SIZE, height: DOT_SIZE, fontSize: DOT_SIZE - 2, lineHeight: 1, ...pastBgStyle, ...draggingStyle }}
             {...interactionProps}
             onMouseEnter={hasPointValue ? e => setTooltip({ clientX: e.clientX, clientY: e.clientY, value: event.pointValue! }) : undefined}
             onMouseMove={e => {
@@ -198,7 +198,7 @@ export function TimelineEventBar({
       <>
         <div
           className={`absolute rounded-full cursor-pointer transition-all select-none hover:scale-125 hover:shadow-lg ${grabRing}`}
-          style={{ left: left - DOT_SIZE / 2, top, width: DOT_SIZE, height: DOT_SIZE, backgroundColor: color, opacity: 0.88, boxShadow: '0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.35)', ...pastStyle, ...draggingStyle }}
+          style={{ left: left - DOT_SIZE / 2, top, width: DOT_SIZE, height: DOT_SIZE, backgroundColor: color, boxShadow: '0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.35)', ...pastBgStyle, ...draggingStyle }}
           {...interactionProps}
           onMouseEnter={e => {
             if (hasPointValue) setTooltip({ clientX: e.clientX, clientY: e.clientY, value: event.pointValue! })
@@ -302,7 +302,7 @@ export function TimelineEventBar({
       */}
       <div
         className={`absolute cursor-pointer transition-all select-none hover:scale-[1.04] hover:-translate-y-px hover:shadow-lg hover:z-50 ${grabRing}`}
-        style={{ left: barLeft, top, width: Math.max(barWidth, 4), height: h, opacity: 0.88, zIndex: stackZ, ...pastStyle, ...draggingStyle }}
+        style={{ left: barLeft, top, width: Math.max(barWidth, 4), height: h, zIndex: stackZ, ...draggingStyle }}
         title={event.title}
         {...interactionProps}
         onMouseMove={e => {
@@ -318,7 +318,7 @@ export function TimelineEventBar({
         {hasFadeIn && (
           <svg
             className="absolute pointer-events-none"
-            style={{ left: fadeInRelLeft, top: 0, width: fiW, height: h, overflow: 'visible' }}
+            style={{ left: fadeInRelLeft, top: 0, width: fiW, height: h, overflow: 'visible', ...pastBgStyle }}
           >
             <defs>
               <linearGradient id={`fi-${event.id}`} x1="1" x2="0" y1="0" y2="0">
@@ -343,7 +343,7 @@ export function TimelineEventBar({
         {hasFadeOut && (
           <svg
             className="absolute pointer-events-none"
-            style={{ left: fadeOutRelLeft, top: 0, width: foW, height: h, overflow: 'visible' }}
+            style={{ left: fadeOutRelLeft, top: 0, width: foW, height: h, overflow: 'visible', ...pastBgStyle }}
           >
             <defs>
               <linearGradient id={`fo-${event.id}`} x1="0" x2="1" y1="0" y2="0">
@@ -366,10 +366,12 @@ export function TimelineEventBar({
         {/* ── Solid main bar — renders last among fill layers, covers both junction seams ── */}
         <div
           className={`absolute overflow-hidden ${roundedClass}`}
-          style={{ left: solidLeft, top: 0, width: Math.max(solidWidth, 4), height: h, backgroundColor: color, boxShadow: '0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25)', clipPath: barShadowClip }}
+          style={{ left: solidLeft, top: 0, width: Math.max(solidWidth, 4), height: h, boxShadow: '0 2px 6px rgba(0,0,0,0.28)', clipPath: barShadowClip }}
         >
-          {/* 3D sheen */}
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)' }} />
+          {/* Colored background — opacity/filter here so text stays crisp */}
+          <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: color, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35)', ...pastBgStyle }} />
+          {/* 3D depth gradient: bright top highlight → flat → darker bottom (cylinder effect) */}
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.05) 40%, rgba(0,0,0,0.04) 60%, rgba(0,0,0,0.14) 100%)' }} />
           {/* Shimmer — rare light catch */}
           {shimmer && (
             <div className="absolute inset-0 pointer-events-none overflow-hidden">

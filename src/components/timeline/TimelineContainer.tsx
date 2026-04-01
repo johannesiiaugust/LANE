@@ -871,6 +871,7 @@ export function TimelineContainer({
       laneHeight: number
       personaSubRowMap: Map<string, number>
       personaEventRowMaps: Map<string, Map<string, number>>
+      personaExpandedIds: Set<string>
       lanePersonaLabels: { initials: string; name: string; personaId: string; hasOverlaps: boolean; rowCount: number }[]
       filteredPersonaEvents: AlignedPersonaEvent[]
       hasOverlaps: boolean
@@ -897,14 +898,22 @@ export function TimelineContainer({
         const pEvents = lanePersonaEvents.filter(e => e.persona_id === pid)
         const pHasOverlaps = hasAnyOverlapsGeneric(pEvents)
         personaHasOverlapsMap.set(pid, pHasOverlaps)
-        const pExpanded = pHasOverlaps && expandedPersonaRows.has(`${lane.id}:${pid}`)
-        if (pExpanded) {
+        if (pHasOverlaps) {
+          // Always compute row map — used for stack-depth visual offset even when collapsed
           const rowMap = assignRowsGeneric(pEvents)
           personaEventRowMaps.set(pid, rowMap)
-          personaRowCounts.set(pid, rowMap.size > 0 ? Math.max(...rowMap.values()) + 1 : 1)
+          const pExpanded = expandedPersonaRows.has(`${lane.id}:${pid}`)
+          // Only expand sub-rows (extra height) when user has toggled expansion
+          personaRowCounts.set(pid, pExpanded ? (rowMap.size > 0 ? Math.max(...rowMap.values()) + 1 : 1) : 1)
         } else {
           personaRowCounts.set(pid, 1)
         }
+      }
+
+      // Which personas are expanded in this lane
+      const personaExpandedIds = new Set<string>()
+      for (const pid of personaIdsInLane) {
+        if (expandedPersonaRows.has(`${lane.id}:${pid}`)) personaExpandedIds.add(pid)
       }
 
       // Cumulative base sub-row offsets per persona
@@ -972,6 +981,7 @@ export function TimelineContainer({
         laneHeight: numEventRows * BASE_LANE_HEIGHT + totalPersonaRows * PERSONA_SUB_ROW_HEIGHT + totalOverlayRows * PERSONA_SUB_ROW_HEIGHT,
         personaSubRowMap,
         personaEventRowMaps,
+        personaExpandedIds,
         lanePersonaLabels,
         filteredPersonaEvents: lanePersonaEvents,
         hasOverlaps,
@@ -1025,13 +1035,13 @@ export function TimelineContainer({
       for (const laneName of (personaOwnLaneNames.get(persona.id) ?? [])) {
         const laneEvs = personaEvs.filter(e => e.lane_name === laneName)
         const hasOverlaps = hasAnyOverlapsGeneric(laneEvs)
+        const rowMap = hasOverlaps ? assignRowsGeneric(laneEvs) : new Map<string, number>()
         const isExpanded = hasOverlaps && expandedSeparatePersonaLanes.has(`${persona.id}:${laneName}`)
-        if (isExpanded) {
-          const rowMap = assignRowsGeneric(laneEvs)
-          laneMap.set(laneName, { hasOverlaps, rowCount: rowMap.size > 0 ? Math.max(...rowMap.values()) + 1 : 1, eventRowMap: rowMap })
-        } else {
-          laneMap.set(laneName, { hasOverlaps, rowCount: 1, eventRowMap: new Map() })
-        }
+        laneMap.set(laneName, {
+          hasOverlaps,
+          rowCount: isExpanded ? (rowMap.size > 0 ? Math.max(...rowMap.values()) + 1 : 1) : 1,
+          eventRowMap: rowMap,
+        })
       }
       result.set(persona.id, laneMap)
     }
@@ -1047,13 +1057,13 @@ export function TimelineContainer({
       for (const laneName of (overlayOwnLaneNames.get(timeline.id) ?? [])) {
         const laneEvs = timelineEvs.filter(e => e.lane_name === laneName)
         const hasOverlaps = hasAnyOverlapsGeneric(laneEvs)
+        const rowMap = hasOverlaps ? assignRowsGeneric(laneEvs) : new Map<string, number>()
         const isExpanded = hasOverlaps && expandedSeparateOverlayLanes.has(`${timeline.id}:${laneName}`)
-        if (isExpanded) {
-          const rowMap = assignRowsGeneric(laneEvs)
-          laneMap.set(laneName, { hasOverlaps, rowCount: rowMap.size > 0 ? Math.max(...rowMap.values()) + 1 : 1, eventRowMap: rowMap })
-        } else {
-          laneMap.set(laneName, { hasOverlaps, rowCount: 1, eventRowMap: new Map() })
-        }
+        laneMap.set(laneName, {
+          hasOverlaps,
+          rowCount: isExpanded ? (rowMap.size > 0 ? Math.max(...rowMap.values()) + 1 : 1) : 1,
+          eventRowMap: rowMap,
+        })
       }
       result.set(timeline.id, laneMap)
     }
@@ -1248,6 +1258,7 @@ export function TimelineContainer({
                 overlayBaseOffset={laneData[i].overlayBaseOffset}
                 overlayTimelineInfoMap={overlayTimelineInfoMap}
                 personaEventRowMaps={laneData[i].personaEventRowMaps}
+                personaExpandedIds={laneData[i].personaExpandedIds}
               />
             ))}
             {hasValueEvents && (

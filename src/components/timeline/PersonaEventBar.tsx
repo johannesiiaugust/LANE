@@ -12,6 +12,8 @@ interface PersonaEventBarProps {
   subRowIndex?: number
   /** Pixel offset from top of container for the row this event occupies (separate-mode multi-row) */
   rowTopOffset?: number
+  /** Stack depth for overlapping events — each level shifts down by 3px */
+  stackDepth?: number
   currentYear: number
   scrollLeft?: number
   sidebarWidth?: number
@@ -30,6 +32,7 @@ export function PersonaEventBar({
   currentYear,
   scrollLeft = 0,
   sidebarWidth,
+  stackDepth,
 }: PersonaEventBarProps) {
   const { sc } = useSizeConfig()
   const { BASE_LANE_HEIGHT, PERSONA_SUB_ROW_HEIGHT, BAR_HEIGHT, DOT_SIZE, EVENT_FONT, EVENT_LINE_HEIGHT } = sc
@@ -162,7 +165,7 @@ export function PersonaEventBar({
             backgroundColor: color,
             opacity: pastOpacity,
             filter: pastFilter,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)',
           }}
           {...pointerHandlers}
         />
@@ -174,7 +177,8 @@ export function PersonaEventBar({
   const displayEnd = event.display_end_year ?? event.display_start_year + 1
   const width = (displayEnd - event.display_start_year) * pixelsPerYear
   const barHeight = rowHeight < BASE_LANE_HEIGHT ? Math.round(BAR_HEIGHT * 0.75) : BAR_HEIGHT
-  const top = verticalOffset + (rowHeight - barHeight) / 2
+  const stackOff = stackDepth !== undefined ? Math.min(stackDepth, 4) * 4 : 0
+  const top = verticalOffset + (rowHeight - barHeight) / 2 + stackOff
 
   // Sticky label: clamp so text stays visible at the left edge of the viewport
   const textLeft = Math.max(4, scrollLeft - left + effectiveSidebarWidth + 4)
@@ -188,18 +192,17 @@ export function PersonaEventBar({
           top,
           width: Math.max(width, 4),
           height: barHeight,
-          backgroundColor: color,
-          opacity: pastOpacity,
-          filter: pastFilter,
-          boxShadow: '0 2px 5px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.28)',
         }}
         {...pointerHandlers}
       >
-        {/* 3D sheen */}
-        <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 55%)' }} />
+        {/* Colored background — opacity here, not on text */}
+        <div className="absolute inset-0 rounded-lg" style={{ backgroundColor: color, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35)', opacity: pastOpacity, filter: pastFilter }} />
+        {/* 3D depth gradient: bright top highlight → flat → darker bottom (cylinder effect) */}
+        <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.05) 40%, rgba(0,0,0,0.04) 60%, rgba(0,0,0,0.14) 100%)' }} />
         {width > EVENT_FONT * 5 && (
           <span
-            className="absolute text-white font-bold whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]"
+            className="absolute text-white font-bold whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
             style={{ left: textLeft, fontSize: Math.round(EVENT_FONT * 0.9) + 1, lineHeight: `${EVENT_LINE_HEIGHT}px` }}
           >
             {event.title}

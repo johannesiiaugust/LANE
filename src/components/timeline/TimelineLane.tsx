@@ -158,6 +158,7 @@ interface TimelineLaneProps {
   overlayBaseOffset?: number                                   // y-offset where overlay rows start
   overlayTimelineInfoMap?: Map<string, { label: string; name: string; color?: string | null }>
   personaEventRowMaps?: Map<string, Map<string, number>>       // persona_id -> event_id -> row within group
+  personaExpandedIds?: Set<string>
 }
 
 export function TimelineLane({
@@ -186,6 +187,7 @@ export function TimelineLane({
   overlayBaseOffset = 0,
   overlayTimelineInfoMap,
   personaEventRowMaps,
+  personaExpandedIds,
   sidebarWidth,
 }: TimelineLaneProps) {
   const { sc } = useSizeConfig()
@@ -404,19 +406,24 @@ export function TimelineLane({
           />
         )
       )}
-      {personaEvents.map(pe => (
-        <PersonaEventBar
-          key={pe.id}
-          event={pe}
-          yearStart={yearStart}
-          pixelsPerYear={pixelsPerYear}
-          laneColor={lane.color}
-          subRowIndex={(personaSubRowMap.get(pe.persona_id) ?? 0) + (personaEventRowMaps?.get(pe.persona_id)?.get(pe.id) ?? 0)}
-          currentYear={currentYear}
-          scrollLeft={scrollLeft}
-          sidebarWidth={effectiveSidebarWidth}
-        />
-      ))}
+      {personaEvents.map(pe => {
+        const expanded = personaExpandedIds?.has(pe.persona_id) ?? false
+        const eventRow = personaEventRowMaps?.get(pe.persona_id)?.get(pe.id) ?? 0
+        return (
+          <PersonaEventBar
+            key={pe.id}
+            event={pe}
+            yearStart={yearStart}
+            pixelsPerYear={pixelsPerYear}
+            laneColor={lane.color}
+            subRowIndex={(personaSubRowMap.get(pe.persona_id) ?? 0) + (expanded ? eventRow : 0)}
+            stackDepth={expanded ? undefined : eventRow}
+            currentYear={currentYear}
+            scrollLeft={scrollLeft}
+            sidebarWidth={effectiveSidebarWidth}
+          />
+        )
+      })}
       {overlayEvents.map(oe => {
         const baseSubRow = overlaySubRowMap?.get(oe.timeline_id) ?? 0
         const eventRow = overlayEventRowMaps?.get(oe.timeline_id)?.get(oe.id) ?? 0
