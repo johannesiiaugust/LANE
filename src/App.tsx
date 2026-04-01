@@ -515,6 +515,8 @@ function TimelineView() {
               timelineName={selectedTimeline?.name}
               onVisibleWindowChange={notifyVisibleWindow}
               onRemovePersona={togglePersona}
+              alignedPersonaIds={alignedPersonaIds}
+              onTogglePersonaAlignment={togglePersonaAlignment}
             />
 
             {/* Event popover */}

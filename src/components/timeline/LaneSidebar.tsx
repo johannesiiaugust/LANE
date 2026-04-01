@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronDown, ChevronRight, Eye, EyeOff, MoreHorizontal, Pencil, Trash2, TrendingUp, ArrowUp, ArrowDown, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, Eye, EyeOff, MoreHorizontal, Pencil, Trash2, TrendingUp, ArrowUp, ArrowDown, X, Link2, Link2Off } from 'lucide-react'
 import type { Lane } from '@/types/timeline'
 import {
   DropdownMenu,
@@ -114,6 +114,8 @@ interface LaneSidebarProps {
   onEditLane: (lane: Lane) => void
   onDeleteLane: (lane: Lane) => void
   onRemovePersona?: (personaId: string) => void
+  alignedPersonaIds?: Set<string>
+  onTogglePersonaAlignment?: (personaId: string) => void
   totalAssetsHeight?: number
   timelineName?: string
 }
@@ -142,6 +144,8 @@ export function LaneSidebar({
   onEditLane,
   onDeleteLane,
   onRemovePersona,
+  alignedPersonaIds,
+  onTogglePersonaAlignment,
   totalAssetsHeight,
   timelineName,
 }: LaneSidebarProps) {
@@ -385,30 +389,46 @@ export function LaneSidebar({
               gap: Math.round(ICON_SIZE / 6),
             }}
           >
-            {section.bio ? (
-              <BioPop name={section.name} bio={section.bio} fontSize={SIDEBAR_FONT}>
-                {section.name}
-              </BioPop>
-            ) : (
-              <span className="font-semibold text-muted-foreground truncate" style={{ fontSize: SIDEBAR_FONT }}>
-                {section.name}
-              </span>
-            )}
+            <span className="flex-1 min-w-0">
+              {section.bio ? (
+                <BioPop name={section.name} bio={section.bio} fontSize={SIDEBAR_FONT}>
+                  {section.name}
+                </BioPop>
+              ) : (
+                <span className="font-semibold text-muted-foreground truncate block" style={{ fontSize: SIDEBAR_FONT }}>
+                  {section.name}
+                </span>
+              )}
+            </span>
             <span
               className="text-muted-foreground/60 shrink-0 hidden xl:inline"
               style={{ fontSize: Math.round(SIDEBAR_FONT * 0.75) }}
             >
               {section.birthYear}–{section.deathYear ?? 'present'}
             </span>
-            {onRemovePersona && (
-              <button
-                onPointerDown={e => { e.stopPropagation(); onRemovePersona(section.personaId) }}
-                className="ml-auto shrink-0 text-muted-foreground/60 hover:text-foreground transition-colors"
-                style={{ padding: Math.round(ICON_SIZE / 6) }}
-              >
-                <X size={Math.round(ICON_SIZE * 0.75)} />
-              </button>
-            )}
+            <div className="ml-auto flex items-center shrink-0" style={{ gap: Math.round(ICON_SIZE / 6) }}>
+              {onTogglePersonaAlignment && (
+                <button
+                  onPointerDown={e => { e.stopPropagation(); onTogglePersonaAlignment(section.personaId) }}
+                  className={`shrink-0 transition-colors rounded ${alignedPersonaIds?.has(section.personaId) ? 'text-primary bg-primary/10 hover:bg-primary/20' : 'text-muted-foreground/60 hover:text-foreground hover:bg-muted'}`}
+                  style={{ padding: Math.round(ICON_SIZE / 6) }}
+                  title={alignedPersonaIds?.has(section.personaId) ? 'Age-aligned — click for real years' : 'Real years — click to age-align'}
+                >
+                  {alignedPersonaIds?.has(section.personaId)
+                    ? <Link2 size={Math.round(ICON_SIZE * 0.75)} />
+                    : <Link2Off size={Math.round(ICON_SIZE * 0.75)} />}
+                </button>
+              )}
+              {onRemovePersona && (
+                <button
+                  onPointerDown={e => { e.stopPropagation(); onRemovePersona(section.personaId) }}
+                  className="shrink-0 text-muted-foreground/60 hover:text-foreground transition-colors"
+                  style={{ padding: Math.round(ICON_SIZE / 6) }}
+                >
+                  <X size={Math.round(ICON_SIZE * 0.75)} />
+                </button>
+              )}
+            </div>
           </div>
           {/* One label row per lane */}
           {section.laneRowData.map(row => {
