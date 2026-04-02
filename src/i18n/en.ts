@@ -629,14 +629,14 @@ const en = {
     step3Title: 'Manage timelines',
     step3Text: 'Create and modify timelines for family, friends and others. Add or import from CVs, social networks, calendars and other sources — simply copy-paste any text or by voice with our AI.',
     startYourOwnStory: 'Start your own story',
-    addFewEvents: "Add a few events and build your personal timeline.",
+    addFewEvents: "Add a few events and build your timeline.",
     birthDate: 'Birth date',
     yourLifeEvents: 'Your life events',
-    placeholderPlace: 'e.g. New York',
+    placeholderPlace: 'e.g. Lived in New York',
     placeholderWork: 'e.g. Software Engineer at Google',
     addAnotherEvent: 'Add another event',
     fillRequiredFields: 'Please fill in all required fields',
-    continueWithExample: 'Continue with a made up life example →',
+    continueWithExample: 'Continue with the made up example \u2192',
     next: 'Next',
     endOptional: 'End (optional)',
     endNone: '—',
@@ -648,6 +648,7 @@ const en = {
   // ── Welcome Modal ──
   welcome: {
     title: 'Welcome to LifeLANE',
+    tagline: 'Where you\u2019ve been & where you\u2019re going \u2014 compared to everyone else!',
     subtitle: 'Your personal life timeline — visualize where you\u2019ve been and where you\u2019re going.',
     secureStorage: 'Your data is securely stored and encrypted in Germany. Only you can see your private timelines.',
     chooseLanguage: 'Choose your language',
@@ -655,6 +656,7 @@ const en = {
     cookieDescription: 'Unticked means essential cookies only. See our',
     continue: 'Continue',
     aboutButton: 'About LifeLANE',
+    demoNote: 'Try the demo \u2014 it stays on your browser.',
   },
 
   // ── Lena AI Assistant ──

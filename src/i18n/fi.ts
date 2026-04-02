@@ -464,7 +464,7 @@ const fi: Translations = {
     start: 'Alku',
     end: 'Loppu',
     startFrom: 'Aloita kohteesta',
-    startFreshDefault: '— aloita alusta (oletuskaistat) —',
+    startFreshDefault: '– aloita alusta (oletuskaistat) —',
     startFreshEmpty: '— aloita alusta (tyhjä) —',
     whatToCopy: 'Mitä kopioidaan',
     allLanesEvents: 'Kaikki kaistat & tapahtumat',
@@ -550,6 +550,7 @@ const fi: Translations = {
 
   welcome: {
     title: 'Tervetuloa LifeLANEen',
+    tagline: 'Missä olet ollut & minne olet menossa — verrattuna kaikkiin muihin!',
     subtitle: 'Henkilökohtainen elämäsi aikajana — visualisoi missä olet ollut ja minne olet menossa.',
     secureStorage: 'Tietosi tallennetaan ja salataan turvallisesti Saksassa. Vain sinä näet yksityiset aikajanasi.',
     chooseLanguage: 'Valitse kielesi',
@@ -557,6 +558,7 @@ const fi: Translations = {
     cookieDescription: 'Valitsematta jättäminen tarkoittaa vain välttämättömiä evästeitä. Katso meidän',
     continue: 'Jatka',
     aboutButton: 'Tietoa LifeLANEstä',
+    demoNote: 'Kokeile demoa — se pysyy selaimessasi.',
   },
 
   lena: {
@@ -603,14 +605,14 @@ const fi: Translations = {
     step3Title: 'Hallinnoi aikajanoja',
     step3Text: 'Luo ja muokkaa aikajanoja perheelle, ystäville ja muille. Tuo CV:istä, sosiaalisista verkostoista, kalentereista ja muista lähteistä — liitä vain tekstiä tekoilymme avulla tai äänellä.',
     startYourOwnStory: 'Aloita oma tarinasi',
-    addFewEvents: 'Lisää muutama tapahtuma ja rakenna henkilökohtainen aikajanasi.',
+    addFewEvents: "Lisää muutama tapahtuma ja rakenna aikajanasi.",
     birthDate: 'Syntymäpäivä',
     yourLifeEvents: 'Elämäntapahtumasi',
-    placeholderPlace: 'esim. Helsinki',
+    placeholderPlace: 'esim. Asui New Yorkissa',
     placeholderWork: 'esim. Ohjelmistoinsinööri Googlella',
     addAnotherEvent: 'Lisää toinen tapahtuma',
     fillRequiredFields: 'Täytä kaikki pakolliset kentät',
-    continueWithExample: 'Jatka keksityllä elämänesimerkillä →',
+    continueWithExample: 'Jatka esimerkillä →',
     next: 'Seuraava',
     endOptional: 'Loppu (valinnainen)',
     endNone: '—',
@@ -629,7 +631,7 @@ const fi: Translations = {
     health: 'Terveys',
   },
   seed: {
-    exampleTimelineName: 'Esimerkki \u2014 muokkaa!',
+    exampleTimelineName: 'Esimerkki \u2013 muokkaa!',
     place1Title: 'Helsinki',
     place1Desc: 'Kasvanut ja ty\u00f6skennellyt Helsingiss\u00e4',
     place2Title: 'Tampere',

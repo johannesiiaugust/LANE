@@ -552,6 +552,7 @@ const de: Translations = {
 
   welcome: {
     title: 'Willkommen bei LifeLANE',
+    tagline: 'Wo du warst & wohin du gehst – im Vergleich zu allen anderen!',
     subtitle: 'Deine persönliche Lebenszeitachse — visualisiere, wo du warst und wohin du gehst.',
     secureStorage: 'Deine Daten werden sicher in Deutschland gespeichert und verschlüsselt. Nur du kannst deine privaten Zeitleisten sehen.',
     chooseLanguage: 'Wähle deine Sprache',
@@ -559,6 +560,7 @@ const de: Translations = {
     cookieDescription: 'Nicht angehakt bedeutet nur notwendige Cookies. Siehe unsere',
     continue: 'Weiter',
     aboutButton: 'Über LifeLANE',
+    demoNote: 'Demo ausprobieren — bleibt in deinem Browser.',
   },
 
   lena: {
@@ -605,14 +607,14 @@ const de: Translations = {
     step3Title: 'Zeitlinien verwalten',
     step3Text: 'Erstelle und bearbeite Zeitlinien für Familie, Freunde und andere. Importiere aus Leumundäfen, sozialen Netzwerken, Kalendern und anderen Quellen — einfach Text mit unserer KI kopieren oder per Sprache.',
     startYourOwnStory: 'Starte deine eigene Geschichte',
-    addFewEvents: 'Füge einige Ereignisse hinzu und baue deine persönliche Zeitlinie.',
+    addFewEvents: "Füge einige Ereignisse hinzu und baue deine Zeitlinie.",
     birthDate: 'Geburtsdatum',
     yourLifeEvents: 'Deine Lebensereignisse',
-    placeholderPlace: 'z.B. Berlin',
+    placeholderPlace: 'z.B. Gelebt in New York',
     placeholderWork: 'z.B. Softwareentwickler bei Google',
     addAnotherEvent: 'Weiteres Ereignis hinzufügen',
     fillRequiredFields: 'Bitte alle Pflichtfelder ausfüllen',
-    continueWithExample: 'Mit einem erfundenen Lebensbeispiel fortfahren →',
+    continueWithExample: 'Mit dem Beispiel fortfahren →',
     next: 'Weiter',
     endOptional: 'Ende (optional)',
     endNone: '—',
@@ -631,7 +633,7 @@ const de: Translations = {
     health: 'Gesundheit',
   },
   seed: {
-    exampleTimelineName: 'Beispiel \u2014 bearbeiten!',
+    exampleTimelineName: 'Beispiel \u2013 bearbeiten!',
     place1Title: 'Berlin',
     place1Desc: 'Aufgewachsen und gearbeitet in Berlin',
     place2Title: 'M\u00fcnchen',

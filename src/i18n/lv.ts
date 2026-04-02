@@ -55,7 +55,7 @@ const lv: Translations = {
     pleaseChooseUsername: 'Lūdzu, izvēlieties lietotājvārdu',
     usernameAlreadyTaken: 'Lietotājvārds jau ir aizņemts',
     usernameChars: '3–32 rakstzīmes, mazie burti, cipari, pasvītrojumi',
-    usernameAvailableAt: 'Pieejams — jūsu lapa būs',
+    usernameAvailableAt: 'Pieejams – jūsu lapa būs',
     publicPageAt: 'Jūsu publiskā lapa būs',
     aboutYou: 'Par jums',
     tellUsAboutYourself: 'Pastāstiet par sevi...',
@@ -552,6 +552,7 @@ const lv: Translations = {
 
   welcome: {
     title: 'Laipni lūdzam LifeLANE',
+    tagline: 'Kur esi bijis & kurp dodies — salīdzinot ar visiem citiem!',
     subtitle: 'Tava personīgā dzīves laika skala — vizualizē, kur esi bijis un kurp dodies.',
     secureStorage: 'Jūsu dati tiek droši glabāti un šifrēti Vācijā. Tikai jūs varat redzēt savas privātās laika skalas.',
     chooseLanguage: 'Izvēlies savu valodu',
@@ -559,6 +560,7 @@ const lv: Translations = {
     cookieDescription: 'Neatzīmēts nozīmē tikai nepieciešamās sīkdatnes. Skatīt mūsu',
     continue: 'Turpināt',
     aboutButton: 'Par LifeLANE',
+    demoNote: 'Izmēġiniet demo — tas paliek jūsu pārlūkprogrammā.',
   },
 
   lena: {
@@ -605,14 +607,14 @@ const lv: Translations = {
     step3Title: 'Pārvaldīt laika līnijas',
     step3Text: 'Izveido un mainī laika līnijas ģimenei, draugiem un citiem. Importē no CV, sociālajiem tīkliem, kalendāriem un citiem avotiem — vienkrāši ielīmē jebkuru tekstu ar mūsu AI vai ar balsi.',
     startYourOwnStory: 'Sāc savu stāstu',
-    addFewEvents: 'Pievienojiet dažus notikumus un izveidojiet savu personīgo laika skalu.',
+    addFewEvents: "Pievieno dažus notikumus un veido savu laika skalu.",
     birthDate: 'Dzīmšanas datums',
     yourLifeEvents: 'Tavi dzīves notīkumi',
-    placeholderPlace: 'piem. Rīga',
+    placeholderPlace: 'piem. Dzīvoja Ņujorkā',
     placeholderWork: 'piem. Programmatūras inženīeris Google',
     addAnotherEvent: 'Pievienot vēl vienu notīkumu',
     fillRequiredFields: 'Lūdzu, aizpildiet visus obligātos laukus',
-    continueWithExample: 'Turpināt ar izdomātu dzīves piemēru →',
+    continueWithExample: 'Turpināt ar piemēru →',
     next: 'Nākamais',
     endOptional: 'Beigas (neobligāti)',
     endNone: '—',
@@ -631,7 +633,7 @@ const lv: Translations = {
     health: 'Veselība',
   },
   seed: {
-    exampleTimelineName: 'Piem\u0113rs \u2014 redi\u0123\u0113 mani!',
+    exampleTimelineName: 'Piem\u0113rs \u2013 redi\u0123\u0113 mani!',
     place1Title: 'R\u012bga',
     place1Desc: 'Uzauga un str\u0101d\u0101ja R\u012bg\u0101',
     place2Title: 'Daugavpils',

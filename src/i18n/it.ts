@@ -546,6 +546,7 @@ const it: Translations = {
 
   welcome: {
     title: 'Benvenuto su LifeLANE',
+    tagline: 'Dove sei stato & dove stai andando – rispetto a tutti gli altri!',
     subtitle: 'La tua linea del tempo personale — visualizza dove sei stato e dove stai andando.',
     secureStorage: 'I tuoi dati sono archiviati e crittografati in modo sicuro in Germania. Solo tu puoi vedere le tue linee del tempo private.',
     chooseLanguage: 'Scegli la tua lingua',
@@ -553,6 +554,7 @@ const it: Translations = {
     cookieDescription: 'Non selezionato significa solo cookie essenziali. Vedi i nostri',
     continue: 'Continua',
     aboutButton: 'Informazioni su LifeLANE',
+    demoNote: 'Prova la demo — rimane nel tuo browser.',
   },
 
   lena: {
@@ -599,14 +601,14 @@ const it: Translations = {
     step3Title: 'Gestire le linee temporali',
     step3Text: 'Crea e modifica linee temporali per famiglia, amici e altri. Importa da CV, social network, calendari e altre fonti — incolla semplicemente qualsiasi testo con la nostra IA o con la voce.',
     startYourOwnStory: 'Inizia la tua storia',
-    addFewEvents: 'Aggiungi alcuni eventi e costruisci la tua linea del tempo personale.',
+    addFewEvents: "Aggiungi alcuni eventi e costruisci la tua linea del tempo.",
     birthDate: 'Data di nascita',
     yourLifeEvents: 'I tuoi eventi di vita',
-    placeholderPlace: 'es. Roma',
+    placeholderPlace: 'es. Vissuto a New York',
     placeholderWork: 'es. Ingegnere software presso Google',
     addAnotherEvent: 'Aggiungi un altro evento',
     fillRequiredFields: 'Compila tutti i campi obbligatori',
-    continueWithExample: 'Continua con un esempio di vita inventato \u2192',
+    continueWithExample: 'Continua con l’esempio →',
     next: 'Avanti',
     endOptional: 'Fine (opzionale)',
     endNone: '—',
@@ -625,7 +627,7 @@ const it: Translations = {
     health: 'Salute',
   },
   seed: {
-    exampleTimelineName: 'Esempio \u2014 modificami!',
+    exampleTimelineName: 'Esempio \u2013 modificami!',
     place1Title: 'Roma',
     place1Desc: 'Cresciuto e lavorato a Roma',
     place2Title: 'Milano',

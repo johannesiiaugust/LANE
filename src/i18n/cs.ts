@@ -537,18 +537,18 @@ const cs: Translations = {
     step1Title: 'Porovnejte svůj život s kýmkoli',
     step1Text: 'Slavné osobnosti, přátelé a další. Viděte, jako byste začali ve stejnou dobu.',
     step2Title: 'Navigujte časem',
-    step2Text: 'Přibližte a oddálte čas — klouzejte do své budoucnosti a minulosti. Vizíte, jak se rozvíjí vaše bohatství s alternativními cestami časové osy.',
+    step2Text: 'Přibližte a oddálte čas – klouzejte do své budoucnosti a minulosti. Vizíte, jak se rozvíjí vaše bohatství s alternativními cestami časové osy.',
     step3Title: 'Spravujte časové osy',
     step3Text: 'Vytvářejte a upravujte časové osy pro rodinu, přátele a další. Importujte z CV, sociálních sítí, kalendářů a jiných zdrojů — jednoduše vložte text s naší AI nebo hlasem.',
     startYourOwnStory: 'Začni svůj vlastní příběh',
-    addFewEvents: 'Přidej několik událostí a postav svou osobní časovou osu.',
+    addFewEvents: "Přidej několik událostí a vytvoř svou časovou osu.",
     birthDate: 'Datum narození',
     yourLifeEvents: 'Vaše životní události',
-    placeholderPlace: 'např. Praha',
+    placeholderPlace: 'např. Bydlel/a v New Yorku',
     placeholderWork: 'např. Softwarový inženýr v Google',
     addAnotherEvent: 'Přidat další událost',
     fillRequiredFields: 'Vyplňte prosím všechna povinná pole',
-    continueWithExample: 'Pokračovat s vymyšleným životním příkladem →',
+    continueWithExample: 'Pokračovat s příkladem →',
     next: 'Další',
     endOptional: 'Konec (volitelné)',
     endNone: '—',
@@ -559,6 +559,7 @@ const cs: Translations = {
 
   welcome: {
     title: 'Vítejte v LifeLANE',
+    tagline: 'Kde jsi byl/a & kam jdeš — ve srovnání se všemi ostatními!',
     subtitle: 'Tvoje osobní životní osa — vizualizuj, kde jsi byl/a a kam směřuješ.',
     secureStorage: 'Vaše data jsou bezpečně uložena a šifrována v Německu. Pouze vy vidíte své soukromé časové osy.',
     chooseLanguage: 'Vyber si jazyk',
@@ -566,6 +567,7 @@ const cs: Translations = {
     cookieDescription: 'Nezaškrtnuté znamená pouze nezbytné cookies. Viz naše',
     continue: 'Pokračovat',
     aboutButton: 'O LifeLANE',
+    demoNote: 'Vyzkoušejte demo — zůstane ve vašem prohlížeči.',
   },
 
   lena: {
@@ -601,7 +603,7 @@ const cs: Translations = {
     health: 'Zdrav\u00ed',
   },
   seed: {
-    exampleTimelineName: 'P\u0159\u00edklad \u2014 uprav m\u011b!',
+    exampleTimelineName: 'P\u0159\u00edklad \u2013 uprav m\u011b!',
     place1Title: 'Praha',
     place1Desc: 'Vyrost a pracoval v Praze',
     place2Title: 'Brno',

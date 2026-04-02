@@ -537,18 +537,18 @@ const pl: Translations = {
     step1Title: 'Porównaj swoje życie z kimkolwiek',
     step1Text: 'Sławne osoby, przyjaciół i inni. Zobacz, jakbyś zaczął w tym samym czasie.',
     step2Title: 'Nawiguj w czasie',
-    step2Text: 'Przybliż i oddal czas — prześlizgnij się ku swojej przyszłości i przeszłości. Zobacz, jak rozwija się twoje bogactwo dzięki alternatywnym ścieżkom osi czasu.',
+    step2Text: 'Przybliż i oddal czas – prześlizgnij się ku swojej przyszłości i przeszłości. Zobacz, jak rozwija się twoje bogactwo dzięki alternatywnym ścieżkom osi czasu.',
     step3Title: 'Zarządzaj osiami czasu',
     step3Text: 'Tworzenie i modyfikowanie osi czasu dla rodziny, przyjaciół i innych. Importuj z CV, sieci społecznościowych, kalendarzy i innych źródeł — po prostu wklej dowolny tekst z naszym AI lub głosem.',
     startYourOwnStory: 'Zacznij własną historię',
-    addFewEvents: 'Dodaj kilka wydarzeń i zbuduj swoją osobistą oś czasu.',
+    addFewEvents: "Dodaj kilka wydarzeń i zbuduj swoją oś czasu.",
     birthDate: 'Data urodzenia',
     yourLifeEvents: 'Twoje wydarzenia życiowe',
-    placeholderPlace: 'np. Warszawa',
+    placeholderPlace: 'np. Mieszkał/a w Nowym Jorku',
     placeholderWork: 'np. Inżyniera oprogramowania w Google',
     addAnotherEvent: 'Dodaj kolejne wydarzenie',
     fillRequiredFields: 'Proszę wypełnić wszystkie wymagane pola',
-    continueWithExample: 'Kontynuuj z wymyślonym przykładem życia →',
+    continueWithExample: 'Kontynuuj z przykładem →',
     next: 'Dalej',
     endOptional: 'Koniec (opcjonalnie)',
     endNone: '—',
@@ -559,6 +559,7 @@ const pl: Translations = {
 
   welcome: {
     title: 'Witamy w LifeLANE',
+    tagline: 'Gdzie byłeś/aś & dokąd zmierzasz — w porównaniu ze wszystkimi innymi!',
     subtitle: 'Twoja osobista oś czasu życia — wizualizuj, gdzie byłeś i dokąd zmierzasz.',
     secureStorage: 'Twoje dane są bezpiecznie przechowywane i szyfrowane w Niemczech. Tylko Ty możesz zobaczyć swoje prywatne osie czasu.',
     chooseLanguage: 'Wybierz swój język',
@@ -566,6 +567,7 @@ const pl: Translations = {
     cookieDescription: 'Niezaznaczone oznacza tylko niezbędne pliki cookie. Zobacz nasze',
     continue: 'Kontynuuj',
     aboutButton: 'O LifeLANE',
+    demoNote: 'Wypróbuj demo — pozostaje w Twojej przeglądarce.',
   },
 
   lena: {
@@ -601,7 +603,7 @@ const pl: Translations = {
     health: 'Zdrowie',
   },
   seed: {
-    exampleTimelineName: 'Przyk\u0142ad \u2014 edytuj mnie!',
+    exampleTimelineName: 'Przyk\u0142ad \u2013 edytuj mnie!',
     place1Title: 'Warszawa',
     place1Desc: 'Dorasta\u0142 i pracowa\u0142 w Warszawie',
     place2Title: 'Krak\u00f3w',

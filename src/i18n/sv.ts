@@ -552,13 +552,15 @@ const sv: Translations = {
 
   welcome: {
     title: 'Välkommen till LifeLANE',
-    subtitle: 'Din personliga livstidslinje — visualisera var du har varit och vart du är på väg.',
+    tagline: 'Var du har varit & vart du är på väg \u2014 jämfört med alla andra!',
+    subtitle: 'Din personliga livstidslinje – visualisera var du har varit och vart du är på väg.',
     secureStorage: 'Dina uppgifter lagras och krypteras säkert i Tyskland. Bara du kan se dina privata tidslinjer.',
     chooseLanguage: 'Välj ditt språk',
     cookieLabel: 'Acceptera analytiska cookies',
     cookieDescription: 'Avbockat innebär endast nödvändiga cookies. Se våra',
     continue: 'Fortsätt',
     aboutButton: 'Om LifeLANE',
+    demoNote: 'Prova demon \u2014 den stannar i din webbläsare.',
   },
 
   lena: {
@@ -605,14 +607,14 @@ const sv: Translations = {
     step3Title: 'Hantera tidslinjer',
     step3Text: 'Skapa och ändra tidslinjer för familj, vänner och andra. Importera från CV’n, sociala nätverk, kalendrar och andra källor — klistra in valfri text med vår AI, eller med rösten.',
     startYourOwnStory: 'Börja din egen berättelse',
-    addFewEvents: 'Lägg till några händelser och bygg din personliga tidslinje.',
+    addFewEvents: "Lägg till några händelser och bygg din tidslinje.",
     birthDate: 'Födelsedatum',
     yourLifeEvents: 'Dina livshändelser',
-    placeholderPlace: 't.ex. Stockholm',
+    placeholderPlace: 't.ex. Bodde i New York',
     placeholderWork: 't.ex. Mjukvaruingeniör på Google',
     addAnotherEvent: 'Lägg till ytterligare händelse',
     fillRequiredFields: 'Fyll i alla obligatoriska fält',
-    continueWithExample: 'Fortsätt med ett påhittat livsexempel →',
+    continueWithExample: 'Fortsätt med exemplet →',
     next: 'Nästa',
     endOptional: 'Slut (valfritt)',
     endNone: '—',
@@ -631,7 +633,7 @@ const sv: Translations = {
     health: 'Hälsa',
   },
   seed: {
-    exampleTimelineName: 'Exempel \u2014 redigera!',
+    exampleTimelineName: 'Exempel \u2013 redigera!',
     place1Title: 'Stockholm',
     place1Desc: 'V\u00e4xte upp och jobbade i Stockholm',
     place2Title: 'G\u00f6teborg',

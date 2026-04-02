@@ -546,6 +546,7 @@ const es: Translations = {
 
   welcome: {
     title: 'Bienvenido a LifeLANE',
+    tagline: '¿Dónde has estado & a dónde vas? – ¡comparado con todos los demás!',
     subtitle: 'Tu línea de tiempo de vida personal — visualiza dónde has estado y hacia dónde vas.',
     secureStorage: 'Tus datos se almacenan y cifran de forma segura en Alemania. Solo tú puedes ver tus líneas de tiempo privadas.',
     chooseLanguage: 'Elige tu idioma',
@@ -553,6 +554,7 @@ const es: Translations = {
     cookieDescription: 'Sin marcar significa solo cookies esenciales. Ver nuestros',
     continue: 'Continuar',
     aboutButton: 'Acerca de LifeLANE',
+    demoNote: 'Prueba la demo — se queda en tu navegador.',
   },
 
   lena: {
@@ -599,14 +601,14 @@ const es: Translations = {
     step3Title: 'Gestionar líneas de tiempo',
     step3Text: 'Crea y modifica líneas de tiempo para familia, amigos y otros. Importa desde CV, redes sociales, calendarios y otras fuentes — simplemente pega cualquier texto con nuestra IA o por voz.',
     startYourOwnStory: 'Comienza tu propia historia',
-    addFewEvents: 'Añade algunos eventos y construye tu línea de tiempo personal.',
+    addFewEvents: "Añade algunos eventos y construye tu línea de tiempo.",
     birthDate: 'Fecha de nacimiento',
     yourLifeEvents: 'Tus eventos vitales',
-    placeholderPlace: 'p.ej. Madrid',
+    placeholderPlace: 'ej. Vivió en Nueva York',
     placeholderWork: 'p.ej. Ingeniero de software en Google',
     addAnotherEvent: 'Añadir otro evento',
     fillRequiredFields: 'Por favor, rellena todos los campos obligatorios',
-    continueWithExample: 'Continuar con un ejemplo de vida inventado →',
+    continueWithExample: 'Continuar con el ejemplo →',
     next: 'Siguiente',
     endOptional: 'Fin (opcional)',
     endNone: '—',
@@ -625,7 +627,7 @@ const es: Translations = {
     health: 'Salud',
   },
   seed: {
-    exampleTimelineName: 'Ejemplo \u2014 \u00a1ed\u00edtame!',
+    exampleTimelineName: 'Ejemplo \u2013 \u00a1ed\u00edtame!',
     place1Title: 'Madrid',
     place1Desc: 'Creci\u00f3 y trabaj\u00f3 en Madrid',
     place2Title: 'Barcelona',
