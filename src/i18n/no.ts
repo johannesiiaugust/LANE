@@ -464,7 +464,7 @@ const no: Translations = {
     start: 'Start',
     end: 'Slutt',
     startFrom: 'Begynn med',
-    startFreshDefault: '— begynn på nytt (standardspor) —',
+    startFreshDefault: '– begynn på nytt (standardspor) —',
     startFreshEmpty: '— begynn på nytt (tomt) —',
     whatToCopy: 'Hva som kopieres',
     allLanesEvents: 'Alle spor & hendelser',
@@ -550,6 +550,7 @@ const no: Translations = {
 
   welcome: {
     title: 'Velkommen til LifeLANE',
+    tagline: 'Hvor du har vært & hvor du er på vei — sammenlignet med alle andre!',
     subtitle: 'Din personlige livstidslinje — visualiser hvor du har vært og hvor du er på vei.',
     secureStorage: 'Dataene dine lagres og krypteres trygt i Tyskland. Bare du kan se dine private tidslinjer.',
     chooseLanguage: 'Velg ditt språk',
@@ -557,6 +558,7 @@ const no: Translations = {
     cookieDescription: 'Ikke avkrysset betyr kun nødvendige informasjonskapsler. Se våre',
     continue: 'Fortsett',
     aboutButton: 'Om LifeLANE',
+    demoNote: 'Prøv demoen — den forblir i nettleseren din.',
   },
 
   lena: {
@@ -603,14 +605,14 @@ const no: Translations = {
     step3Title: 'Administrer tidslinjer',
     step3Text: 'Opprett og endre tidslinjer for familie, venner og andre. Importer fra CV-er, sosiale nettverk, kalendere og andre kilder — bare lim inn tekst med vår AI, eller med stemmen.',
     startYourOwnStory: 'Start din egen historie',
-    addFewEvents: 'Legg til noen hendelser og bygg din personlige tidslinje.',
+    addFewEvents: "Legg til noen hendelser og bygg tidslinjen din.",
     birthDate: 'Fødselsdato',
     yourLifeEvents: 'Dine livshendelser',
-    placeholderPlace: 'f.eks. Oslo',
+    placeholderPlace: 'f.eks. Bodde i New York',
     placeholderWork: 'f.eks. Programvareutvikler hos Google',
     addAnotherEvent: 'Legg til en hendelse til',
     fillRequiredFields: 'Fyll inn alle obligatoriske felt',
-    continueWithExample: 'Fortsett med et oppdiktet livseksempel →',
+    continueWithExample: 'Fortsett med eksempelet →',
     next: 'Neste',
     endOptional: 'Slutt (valgfritt)',
     endNone: '—',
@@ -629,7 +631,7 @@ const no: Translations = {
     health: 'Helse',
   },
   seed: {
-    exampleTimelineName: 'Eksempel \u2014 rediger meg!',
+    exampleTimelineName: 'Eksempel \u2013 rediger meg!',
     place1Title: 'Oslo',
     place1Desc: 'Vokste opp og jobbet i Oslo',
     place2Title: 'Bergen',

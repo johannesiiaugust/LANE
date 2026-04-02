@@ -55,7 +55,7 @@ const lt: Translations = {
     pleaseChooseUsername: 'Pasirinkite vartotojo vardą',
     usernameAlreadyTaken: 'Vartotojo vardas jau užimtas',
     usernameChars: '3–32 simboliai, mažosios raidės, skaičiai, pabraukimai',
-    usernameAvailableAt: 'Laisvas — jūsų puslapis bus',
+    usernameAvailableAt: 'Laisvas – jūsų puslapis bus',
     publicPageAt: 'Jūsų viešas puslapis bus',
     aboutYou: 'Apie jus',
     tellUsAboutYourself: 'Papasakokite apie save...',
@@ -550,6 +550,7 @@ const lt: Translations = {
 
   welcome: {
     title: 'Sveiki atvykę į LifeLANE',
+    tagline: 'Kur buvai & kur eini — palyginti su visais kitais!',
     subtitle: 'Jūsų asmeninė gyvenimo laiko juosta — vizualizuokite, kur buvote ir kur einate.',
     secureStorage: 'Jūsų duomenys saugiai saugomi ir šifruojami Vokietijoje. Tik jūs galite matyti savo privačias laiko juostas.',
     chooseLanguage: 'Pasirinkite savo kalbą',
@@ -557,6 +558,7 @@ const lt: Translations = {
     cookieDescription: 'Nepažymėta reiškia tik būtinus slapukus. Žiūrėti mūsų',
     continue: 'Tęsti',
     aboutButton: 'Apie LifeLANE',
+    demoNote: 'Išbandykite demonstraciją — ji liks jūsų naršyklėje.',
   },
 
   lena: {
@@ -603,14 +605,14 @@ const lt: Translations = {
     step3Title: 'Tvarkykite laiko juostas',
     step3Text: 'Kurkite ir keiskite laiko juostas šeimai, draugams ir kitiems. Importuokite iš CV, socialinių tinklų, kalendorių ir kitų šaltinių — tiesiog įklijuokite bet kokį tekstą su mūsų AI arba balsu.',
     startYourOwnStory: 'Pradėk savo istoriją',
-    addFewEvents: 'Pridėkite kelis įvykius ir sukurkite savo asmeninę laiko juostą.',
+    addFewEvents: "Pridėk keletą įvykių ir sukurk savo laiko juostą.",
     birthDate: 'Gimimo data',
     yourLifeEvents: 'Jūsų gyvenimo įvykiai',
-    placeholderPlace: 'pvz. Vilnius',
+    placeholderPlace: 'pvz. Gyveno Niujorke',
     placeholderWork: 'pvz. Programinės įrangos inžinierius Google',
     addAnotherEvent: 'Pridėti dar vieną įvykį',
     fillRequiredFields: 'Užpildykite visus privalomus laukus',
-    continueWithExample: 'Tęsti su sugalvotu gyvenimo pavyzdžiu →',
+    continueWithExample: 'Tęsti su pavyzdžiu →',
     next: 'Kitas',
     endOptional: 'Pabaiga (neprivaloma)',
     endNone: '—',
@@ -629,7 +631,7 @@ const lt: Translations = {
     health: 'Sveikata',
   },
   seed: {
-    exampleTimelineName: 'Pavyzdys \u2014 redaguok mane!',
+    exampleTimelineName: 'Pavyzdys \u2013 redaguok mane!',
     place1Title: 'Vilnius',
     place1Desc: 'U\u017eaugo ir dirbo Vilniuje',
     place2Title: 'Kaunas',

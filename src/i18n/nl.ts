@@ -552,6 +552,7 @@ const nl: Translations = {
 
   welcome: {
     title: 'Welkom bij LifeLANE',
+    tagline: 'Waar je was & waar je naartoe gaat – vergeleken met iedereen!',
     subtitle: 'Jouw persoonlijke levenslijn — visualiseer waar je bent geweest en waar je naartoe gaat.',
     secureStorage: 'Uw gegevens worden veilig opgeslagen en versleuteld in Duitsland. Alleen u kunt uw privé-tijdlijnen zien.',
     chooseLanguage: 'Kies je taal',
@@ -559,6 +560,7 @@ const nl: Translations = {
     cookieDescription: 'Niet aangevinkt betekent alleen essentiële cookies. Zie onze',
     continue: 'Doorgaan',
     aboutButton: 'Over LifeLANE',
+    demoNote: 'Probeer de demo — blijft in je browser.',
   },
 
   lena: {
@@ -605,14 +607,14 @@ const nl: Translations = {
     step3Title: 'Tijdlijnen beheren',
     step3Text: 'Maak en wijzig tijdlijnen voor familie, vrienden en anderen. Importeer uit cv’s, sociale netwerken, kalenders en andere bronnen — plak gewoon tekst met onze AI, of met je stem.',
     startYourOwnStory: 'Begin je eigen verhaal',
-    addFewEvents: 'Voeg een paar evenementen toe en bouw je persoonlijke tijdlijn.',
+    addFewEvents: "Voeg een paar gebeurtenissen toe en bouw je tijdlijn.",
     birthDate: 'Geboortedatum',
     yourLifeEvents: 'Jouw levensgebeurtenissen',
-    placeholderPlace: 'bijv. Amsterdam',
+    placeholderPlace: 'bijv. Gewoond in New York',
     placeholderWork: 'bijv. Software Engineer bij Google',
     addAnotherEvent: 'Nog een gebeurtenis toevoegen',
     fillRequiredFields: 'Vul alle verplichte velden in',
-    continueWithExample: 'Doorgaan met een verzonnen levensvoorbeeld →',
+    continueWithExample: 'Doorgaan met het voorbeeld →',
     next: 'Volgende',
     endOptional: 'Einde (optioneel)',
     endNone: '—',
@@ -631,7 +633,7 @@ const nl: Translations = {
     health: 'Gezondheid',
   },
   seed: {
-    exampleTimelineName: 'Voorbeeld \u2014 bewerk mij!',
+    exampleTimelineName: 'Voorbeeld \u2013 bewerk mij!',
     place1Title: 'Amsterdam',
     place1Desc: 'Opgegroeid en gewerkt in Amsterdam',
     place2Title: 'Rotterdam',

@@ -537,18 +537,18 @@ const da: Translations = {
     step1Title: 'Sammenlign dit liv med hvem som helst',
     step1Text: 'Berømte mennesker, venner og andre. Se som om du startede på samme tid.',
     step2Title: 'Naviger i tid',
-    step2Text: 'Zoom ind og ud i tid — gläd mod din fremtid og fortid. Se hvordan din formue udvikler sig med alternative tidslinjestier.',
+    step2Text: 'Zoom ind og ud i tid – gläd mod din fremtid og fortid. Se hvordan din formue udvikler sig med alternative tidslinjestier.',
     step3Title: 'Administrer tidslinjer',
     step3Text: 'Opret og ændr tidslinjer for familie, venner og andre. Importer fra CV’er, sociale netværk, kalendere og andre kilder — indsæt blot tekst med vores AI eller med stemmen.',
     startYourOwnStory: 'Start din egen historie',
-    addFewEvents: 'Tilføj nogle begivenheder og byg din personlige tidslinje.',
+    addFewEvents: "Tilføj et par begivenheder og byg din tidslinje.",
     birthDate: 'Fødselsdato',
     yourLifeEvents: 'Dine livshændelser',
-    placeholderPlace: 'f.eks. København',
+    placeholderPlace: 'f.eks. Boede i New York',
     placeholderWork: 'f.eks. Softwareudvikler hos Google',
     addAnotherEvent: 'Tilføj endnu en hændelse',
     fillRequiredFields: 'Udfyld venligst alle obligatoriske felter',
-    continueWithExample: 'Fortsæt med et opdigtet livseksempel →',
+    continueWithExample: 'Fortsæt med eksemplet →',
     next: 'Næste',
     endOptional: 'Slut (valgfrit)',
     endNone: '—',
@@ -559,6 +559,7 @@ const da: Translations = {
 
   welcome: {
     title: 'Velkommen til LifeLANE',
+    tagline: 'Hvor du har været & hvor du er på vej — sammenlignet med alle andre!',
     subtitle: 'Din personlige livstidslinje — visualiser, hvor du har været, og hvor du er på vej hen.',
     secureStorage: 'Dine data er sikkert gemt og krypteret i Tyskland. Kun du kan se dine private tidslinjer.',
     chooseLanguage: 'Vælg dit sprog',
@@ -566,6 +567,7 @@ const da: Translations = {
     cookieDescription: 'Ikke afkrydset betyder kun nødvendige cookies. Se vores',
     continue: 'Fortsæt',
     aboutButton: 'Om LifeLANE',
+    demoNote: 'Prøv demoen — den forbliver i din browser.',
   },
 
   lena: {
@@ -601,7 +603,7 @@ const da: Translations = {
     health: 'Sundhed',
   },
   seed: {
-    exampleTimelineName: 'Eksempel \u2014 rediger mig!',
+    exampleTimelineName: 'Eksempel \u2013 rediger mig!',
     place1Title: 'K\u00f8benhavn',
     place1Desc: 'Voksede op og arbejdede i K\u00f8benhavn',
     place2Title: 'Aarhus',

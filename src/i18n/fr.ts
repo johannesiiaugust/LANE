@@ -546,6 +546,7 @@ const fr: Translations = {
 
   welcome: {
     title: 'Bienvenue sur LifeLANE',
+    tagline: 'D’où tu viens & où tu vas – comparé à tout le monde !',
     subtitle: 'Ta chronologie de vie personnelle — visualise d\'où tu viens et où tu vas.',
     secureStorage: "Vos données sont stockées et chiffrées en toute sécurité en Allemagne. Vous seul pouvez voir vos chronologies privées.",
     chooseLanguage: 'Choisir ta langue',
@@ -553,6 +554,7 @@ const fr: Translations = {
     cookieDescription: 'Non coché signifie cookies essentiels uniquement. Voir nos',
     continue: 'Continuer',
     aboutButton: 'À propos de LifeLANE',
+    demoNote: 'Essayez la démo — elle reste dans votre navigateur.',
   },
 
   lena: {
@@ -599,14 +601,14 @@ const fr: Translations = {
     step3Title: 'Gérer les chronologies',
     step3Text: "Créez et modifiez des chronologies pour la famille, les amis et les autres. Importez depuis des CV, réseaux sociaux, calendriers et autres sources — collez simplement du texte avec notre IA ou par la voix.",
     startYourOwnStory: 'Commencez votre propre histoire',
-    addFewEvents: "Ajoutez quelques événements et construisez votre chronologie personnelle.",
+    addFewEvents: "Ajoutez quelques événements et construisez votre chronologie.",
     birthDate: 'Date de naissance',
     yourLifeEvents: 'Vos événements de vie',
-    placeholderPlace: 'ex. Paris',
+    placeholderPlace: 'ex. Vécu à New York',
     placeholderWork: 'ex. Ingénieur logiciel chez Google',
     addAnotherEvent: 'Ajouter un autre événement',
     fillRequiredFields: 'Veuillez remplir tous les champs obligatoires',
-    continueWithExample: 'Continuer avec un exemple de vie fictif \u2192',
+    continueWithExample: 'Continuer avec l’exemple →',
     next: 'Suivant',
     endOptional: 'Fin (optionnel)',
     endNone: '—',
@@ -625,7 +627,7 @@ const fr: Translations = {
     health: 'Santé',
   },
   seed: {
-    exampleTimelineName: 'Exemple \u2014 \u00e9diter!',
+    exampleTimelineName: 'Exemple \u2013 \u00e9diter!',
     place1Title: 'Paris',
     place1Desc: 'A grandi et travaill\u00e9 \u00e0 Paris',
     place2Title: 'Lyon',

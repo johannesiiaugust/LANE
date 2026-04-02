@@ -13,14 +13,14 @@ const NUGGETS = [
   'How far is Swift now at 36?',
 ]
 
-const WELCOME_LANGS: { id: Lang; flag: string; label: string }[] = [
-  { id: 'en', flag: '🇬🇧', label: 'English' },
-  { id: 'de', flag: '🇩🇪', label: 'Deutsch' },
-  { id: 'fr', flag: '🇫🇷', label: 'Français' },
-  { id: 'es', flag: '🇪🇸', label: 'Español' },
-  { id: 'it', flag: '🇮🇹', label: 'Italiano' },
-  { id: 'nl', flag: '🇳🇱', label: 'Nederlands' },
-  { id: 'sv', flag: '🇸🇪', label: 'Svenska' },
+const WELCOME_LANGS: { id: Lang; code: string; label: string }[] = [
+  { id: 'en', code: 'gb', label: 'English' },
+  { id: 'de', code: 'de', label: 'Deutsch' },
+  { id: 'fr', code: 'fr', label: 'Français' },
+  { id: 'es', code: 'es', label: 'Español' },
+  { id: 'it', code: 'it', label: 'Italiano' },
+  { id: 'nl', code: 'nl', label: 'Nederlands' },
+  { id: 'sv', code: 'se', label: 'Svenska' },
 ]
 
 interface WelcomeModalProps {
@@ -102,7 +102,8 @@ export function WelcomeModal({ currentLang, onDismiss }: WelcomeModalProps) {
       >
         {/* Header */}
         <div className="text-center">
-          <div className="text-3xl mb-2">👋</div>
+          <div className="text-3xl mb-1">👋</div>
+          <p className="text-xs font-medium text-primary/80 mb-2 leading-snug">{t('welcome.tagline')}</p>
           <h2 className="text-xl font-bold">{t('welcome.title')}</h2>
           <p
             className="text-sm text-muted-foreground mt-2 italic min-h-[1.25rem] transition-opacity duration-400"
@@ -116,7 +117,7 @@ export function WelcomeModal({ currentLang, onDismiss }: WelcomeModalProps) {
         <div>
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t('welcome.chooseLanguage')}</p>
           <div className="grid grid-cols-7 gap-1">
-            {WELCOME_LANGS.map(({ id, flag, label }) => (
+            {WELCOME_LANGS.map(({ id, code, label }) => (
               <button
                 key={id}
                 onClick={() => setSelectedLang(id)}
@@ -127,7 +128,14 @@ export function WelcomeModal({ currentLang, onDismiss }: WelcomeModalProps) {
                     : 'hover:bg-accent'
                 }`}
               >
-                <span className="text-xl leading-none">{flag}</span>
+                <img
+                  src={`https://flagcdn.com/w40/${code}.png`}
+                  width="24"
+                  height="16"
+                  alt={label}
+                  className="rounded-sm object-cover"
+                  style={{ imageRendering: 'auto' }}
+                />
                 <span className="text-[9px] text-muted-foreground leading-tight truncate w-full text-center">{label}</span>
               </button>
             ))}
@@ -166,7 +174,7 @@ export function WelcomeModal({ currentLang, onDismiss }: WelcomeModalProps) {
         </div>
 
         {/* Demo note */}
-        <p className="text-xs text-muted-foreground/80 text-center">Try the demo — it stays on your browser.</p>
+        <p className="text-xs text-muted-foreground/80 text-center">{t('welcome.demoNote')}</p>
 
         {/* Security note */}
         <p className="text-xs text-muted-foreground/60 text-center">🔒 {t('welcome.secureStorage')}</p>
