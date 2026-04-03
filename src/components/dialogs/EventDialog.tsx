@@ -631,7 +631,7 @@ export function EventDialog({
                         onChange={e => setLinkAnchorType(e.target.value as 'none' | 'today' | 'event' | 'start_to_today' | 'today_to_end')}
                         className="h-7 text-xs border rounded-md px-1 bg-background flex-1"
                       >
-                        <option value="none">— {t('common.none')} —</option>
+                        <option value="none">—</option>
                         <option value="today">{t('event.anchorTodayFull')}</option>
                         <option value="event">{t('event.anchorEventFull')}</option>
                         <option value="start_to_today">{t('event.startToToday')}</option>
