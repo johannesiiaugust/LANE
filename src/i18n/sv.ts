@@ -563,6 +563,13 @@ const sv: Translations = {
     continue: 'Fortsätt',
     aboutButton: 'Om LifeLANE',
     demoNote: 'Prova demon \u2014 den stannar i din webbläsare.',
+    nugget1: 'Samma ålder som Kleopatra i Rom?',
+    nugget2: 'Slå Einstein till ett Nobelpris vid 42?',
+    nugget3: 'Är du på rätt spår?',
+    nugget4: 'Vad hade Musk byggt i din ålder?',
+    nugget5: 'Hur långt är Swift nu vid 36?',
+    nugget6: 'Rikare än Trump i din ålder?',
+    nugget7: 'Se om du ligger efter eller före de andra!',
   },
 
   lena: {

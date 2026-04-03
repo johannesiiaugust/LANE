@@ -557,6 +557,13 @@ const fr: Translations = {
     continue: 'Continuer',
     aboutButton: 'À propos de LifeLANE',
     demoNote: 'Essayez la démo — elle reste dans votre navigateur.',
+    nugget1: 'Au même âge que Cléopâtre à Rome?',
+    nugget2: 'Battre Einstein au Nobel à 42 ans?',
+    nugget3: 'Êtes-vous sur la bonne voie?',
+    nugget4: 'Qu\'avait construit Musk à votre âge?',
+    nugget5: 'Où en est Swift maintenant à 36 ans?',
+    nugget6: 'Plus riche que Trump à votre âge?',
+    nugget7: 'Voyez si vous êtes en retard ou en avance sur les autres!',
   },
 
   lena: {

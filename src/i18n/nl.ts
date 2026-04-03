@@ -563,6 +563,13 @@ const nl: Translations = {
     continue: 'Doorgaan',
     aboutButton: 'Over LifeLANE',
     demoNote: 'Probeer de demo — blijft in je browser.',
+    nugget1: 'Dezelfde leeftijd als Cleopatra in Rome?',
+    nugget2: 'Einstein verslaan met een Nobelprijs op 42?',
+    nugget3: 'Ben je op koers?',
+    nugget4: 'Wat had Musk gebouwd op jouw leeftijd?',
+    nugget5: 'Hoe ver is Swift nu op 36?',
+    nugget6: 'Rijker dan Trump op jouw leeftijd?',
+    nugget7: 'Kijk of je voor of achter ligt op de anderen!',
   },
 
   lena: {

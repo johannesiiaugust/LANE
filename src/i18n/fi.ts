@@ -561,6 +561,13 @@ const fi: Translations = {
     continue: 'Jatka',
     aboutButton: 'Tietoa LifeLANEstä',
     demoNote: 'Kokeile demoa — se pysyy selaimessasi.',
+    nugget1: 'Samassa iässä kuin Kleopatra Roomassa?',
+    nugget2: 'Päihittää Einstein Nobelin palkinnolla 42-vuotiaana?',
+    nugget3: 'Oletko oikealla tiellä?',
+    nugget4: 'Mitä Musk oli rakentanut ikäisenäsi?',
+    nugget5: 'Kuinka pitkälle Swift on nyt 36-vuotiaana?',
+    nugget6: 'Rikkaampi kuin Trump ikäisenäsi?',
+    nugget7: 'Katso oletko jäljessä vai edellä muita!',
   },
 
   lena: {

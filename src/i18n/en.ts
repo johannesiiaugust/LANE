@@ -659,6 +659,13 @@ const en = {
     continue: 'Continue',
     aboutButton: 'About LifeLANE',
     demoNote: 'Try the demo \u2014 it stays on your browser.',
+    nugget1: 'Same age as Cleopatra in Rome?',
+    nugget2: 'Beat Einstein to a Nobel Prize at 42?',
+    nugget3: 'Are you on track?',
+    nugget4: 'What had Musk built by your age?',
+    nugget5: 'How far is Swift now at 36?',
+    nugget6: 'Richer than Trump at your age?',
+    nugget7: "See if you\u2019re behind or ahead of the others!",
   },
 
   // ── Lena AI Assistant ──

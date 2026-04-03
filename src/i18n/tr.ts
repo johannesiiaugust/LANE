@@ -644,6 +644,13 @@ const tr: Translations = {
     continue: 'Devam Et',
     aboutButton: 'LifeLANE Hakk\u0131nda',
     demoNote: 'Demoyu deneyin \u2014 taray\u0131c\u0131n\u0131zda kal\u0131r.',
+    nugget1: "Roma'daki Kleopatra ile ayn\u0131 ya\u015fta m\u0131s\u0131n\u0131z?",
+    nugget2: "42'de Nobel ile Einstein'\u0131 ge\u00e7mek mi?",
+    nugget3: 'Do\u011fru yolda m\u0131s\u0131n\u0131z?',
+    nugget4: 'Musk sizin ya\u015f\u0131n\u0131zda ne kurmu\u015ftu?',
+    nugget5: "Swift 36's\u0131nda ne kadar ilerledi?",
+    nugget6: "Sizin ya\u015f\u0131n\u0131zda Trump'tan daha zengin mi?",
+    nugget7: 'Di\u011ferlerinin gerisinde mi yoksa \u00f6n\u00fcnde mi oldu\u011funuzu g\u00f6r\u00fcn!',
   },
 
   // ── Lena ──

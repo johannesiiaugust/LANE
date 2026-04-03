@@ -563,6 +563,13 @@ const lv: Translations = {
     continue: 'Turpināt',
     aboutButton: 'Par LifeLANE',
     demoNote: 'Izmēġiniet demo — tas paliek jūsu pārlūkprogrammā.',
+    nugget1: 'Tikpat vecs kā Kleopatra Romā?',
+    nugget2: 'Pārspēt Einšteinu Nobelā 42 gados?',
+    nugget3: 'Vai esi uz pareizā ceļa?',
+    nugget4: 'Ko Musks bija uzbūvējis tavā vecumā?',
+    nugget5: 'Cik tālu ir Svifta tagad 36 gados?',
+    nugget6: 'Bagātāks nekā Tramps tavā vecumā?',
+    nugget7: 'Paskaties, vai esi aiz vai priekšā citiem!',
   },
 
   lena: {
