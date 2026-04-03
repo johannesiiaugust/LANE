@@ -519,7 +519,7 @@ const en = {
     it: 'Italiano',
     da: 'Dansk',
     pl: 'Polski',
-    cs: '\u010ce\u0161tina',
+    ro: 'Romanian',
     pt: 'Portugu\u00eas',
     tr: 'T\u00fcrk\u00e7e',
   },

@@ -19,7 +19,7 @@ const WELCOME_LANGS: { id: Lang; code: string; label: string }[] = [
   { id: 'no', code: 'no', label: 'Norsk' },
   { id: 'da', code: 'dk', label: 'Dansk' },
   { id: 'pl', code: 'pl', label: 'Polski' },
-  { id: 'cs', code: 'cz', label: 'Čeština' },
+  { id: 'ro', code: 'ro', label: 'Română' },
   { id: 'pt', code: 'pt', label: 'Português' },
   { id: 'tr', code: 'tr', label: 'Türkçe' },
 ]

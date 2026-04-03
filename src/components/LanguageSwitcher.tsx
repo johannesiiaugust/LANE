@@ -12,7 +12,7 @@ const LANG_FLAGS: Record<string, { code: string; name: string }> = {
   no: { code: 'no', name: 'Norsk' },
   da: { code: 'dk', name: 'Dansk' },
   pl: { code: 'pl', name: 'Polski' },
-  cs: { code: 'cz', name: 'Čeština' },
+  ro: { code: 'ro', name: 'Română' },
   pt: { code: 'pt', name: 'Português' },
   tr: { code: 'tr', name: 'Türkçe' },
 }
