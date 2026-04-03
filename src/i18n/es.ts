@@ -512,6 +512,8 @@ const es: Translations = {
     da: 'Dansk',
     pl: 'Polski',
     cs: '\u010ce\u0161tina',
+    pt: 'Portugu\u00eas',
+    tr: 'T\u00fcrk\u00e7e',
   },
 
   // ── Language Switcher ──

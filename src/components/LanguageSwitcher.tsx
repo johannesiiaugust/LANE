@@ -1,13 +1,20 @@
 import { useTranslation, localizedPath, stripLangPrefix, type Lang } from '@/i18n'
 
-const LANG_FLAGS: Record<string, { flag: string; name: string }> = {
-  en: { flag: '🇬🇧', name: 'English' },
-  de: { flag: '🇩🇪', name: 'Deutsch' },
-  fr: { flag: '🇫🇷', name: 'Français' },
-  es: { flag: '🇪🇸', name: 'Español' },
-  it: { flag: '🇮🇹', name: 'Italiano' },
-  nl: { flag: '🇳🇱', name: 'Nederlands' },
-  sv: { flag: '🇸🇪', name: 'Svenska' },
+const LANG_FLAGS: Record<string, { code: string; name: string }> = {
+  en: { code: 'gb', name: 'English' },
+  de: { code: 'de', name: 'Deutsch' },
+  fr: { code: 'fr', name: 'Français' },
+  es: { code: 'es', name: 'Español' },
+  it: { code: 'it', name: 'Italiano' },
+  nl: { code: 'nl', name: 'Nederlands' },
+  sv: { code: 'se', name: 'Svenska' },
+  fi: { code: 'fi', name: 'Suomi' },
+  no: { code: 'no', name: 'Norsk' },
+  da: { code: 'dk', name: 'Dansk' },
+  pl: { code: 'pl', name: 'Polski' },
+  cs: { code: 'cz', name: 'Čeština' },
+  pt: { code: 'pt', name: 'Português' },
+  tr: { code: 'tr', name: 'Türkçe' },
 }
 
 const ALL_LANG_KEYS = Object.keys(LANG_FLAGS)
@@ -42,7 +49,7 @@ export function LanguageSwitcherInline({ onSelect }: { onSelect?: () => void } =
                 : 'hover:bg-accent cursor-pointer'
             }`}
           >
-            {info.flag}
+            <img src={`https://flagcdn.com/w40/${info.code}.png`} width="20" height="14" className="rounded-sm object-cover" alt={info.name} />
           </button>
         )
       })}
@@ -53,15 +60,17 @@ export function LanguageSwitcherInline({ onSelect }: { onSelect?: () => void } =
 /** Standalone dropdown for navbars (About page, etc.) */
 export function LanguageSwitcherDropdown() {
   const { lang } = useTranslation()
-  const currentFlag = LANG_FLAGS[lang]?.flag ?? '🌐'
+  const currentLang = LANG_FLAGS[lang]
 
   return (
     <div className="relative group">
       <button
-        className="flex items-center justify-center w-8 h-8 rounded-full text-lg hover:bg-muted/50 transition-colors"
+        className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-muted/50 transition-colors"
         title="Language"
       >
-        {currentFlag}
+        {currentLang
+          ? <img src={`https://flagcdn.com/w40/${currentLang.code}.png`} width="20" height="14" className="rounded-sm object-cover" alt={currentLang.name} />
+          : '🌐'}
       </button>
       <div className="absolute right-0 top-full mt-1 hidden group-hover:flex flex-col bg-background border border-border rounded-lg shadow-lg z-50 p-1.5 min-w-[140px]">
         {ALL_LANG_KEYS.map(l => {
@@ -78,7 +87,7 @@ export function LanguageSwitcherDropdown() {
                   : 'hover:bg-accent cursor-pointer'
               }`}
             >
-              <span className="text-lg leading-none">{info.flag}</span>
+              <img src={`https://flagcdn.com/w40/${info.code}.png`} width="20" height="14" className="rounded-sm object-cover" alt={info.name} />
               <span>{info.name}</span>
             </button>
           )
