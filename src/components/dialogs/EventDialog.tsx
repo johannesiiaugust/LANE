@@ -138,7 +138,9 @@ export function EventDialog({
   const [linkEventId, setLinkEventId] = useState('')
   const [linkEventAnchor, setLinkEventAnchor] = useState<'start' | 'end'>('start')
   const [linkStartOffsetStr, setLinkStartOffsetStr] = useState('0')
+  const [linkOffsetUnit, setLinkOffsetUnit] = useState<'years' | 'months' | 'days' | 'hours'>('years')
   const [linkDurationStr, setLinkDurationStr] = useState('')
+  const [linkDurationUnit, setLinkDurationUnit] = useState<'years' | 'months' | 'days' | 'hours'>('years')
   const [linkOnDelete, setLinkOnDelete] = useState<'freeze' | 'delete'>('freeze')
   // Fixed date for 'start_to_today' (fixed start) and 'today_to_end' (fixed end)
   const [linkFixedDate, setLinkFixedDate] = useState('')
@@ -255,7 +257,9 @@ export function EventDialog({
       setLinkEventId('')
       setLinkEventAnchor('start')
       setLinkStartOffsetStr('0')
+      setLinkOffsetUnit('years')
       setLinkDurationStr('')
+      setLinkDurationUnit('years')
       setLinkOnDelete('freeze')
       setLinkFixedDate(''); setLinkFixedTime('')
       setFadeInDate(''); setFadeInTime('')
@@ -271,6 +275,8 @@ export function EventDialog({
       setSubmitAttempted(false)
     }
   }, [editingEvent, open, lanes, defaultLaneId, defaultStartYear, defaultEndYear])
+
+  const UNIT_TO_YEARS: Record<string, number> = { years: 1, months: 1 / 12, days: 1 / 365.25, hours: 1 / (365.25 * 24) }
 
   // Compute resolved dates from the dependency link for preview
   const computedLink = useMemo(() => {
@@ -288,7 +294,7 @@ export function EventDialog({
       return { startYear: today, endYear }
     }
 
-    const offset = parseFloat(linkStartOffsetStr) || 0
+    const offset = (parseFloat(linkStartOffsetStr) || 0) * UNIT_TO_YEARS[linkOffsetUnit]
     let anchor: number | null = null
     if (linkAnchorType === 'today') {
       anchor = today
@@ -298,10 +304,10 @@ export function EventDialog({
     }
     if (anchor === null) return null
     const startYear = anchor + offset
-    const dur = parseFloat(linkDurationStr)
-    const endYear = !isNaN(dur) && dur > 0 ? startYear + dur : undefined
+    const durRaw = parseFloat(linkDurationStr)
+    const endYear = !isNaN(durRaw) && durRaw > 0 ? startYear + durRaw * UNIT_TO_YEARS[linkDurationUnit] : undefined
     return { startYear, endYear }
-  }, [linkAnchorType, linkFixedDate, linkFixedTime, linkEventId, linkEventAnchor, linkStartOffsetStr, linkDurationStr, events])
+  }, [linkAnchorType, linkFixedDate, linkFixedTime, linkEventId, linkEventAnchor, linkStartOffsetStr, linkOffsetUnit, linkDurationStr, linkDurationUnit, events])
 
   // Fractional years for the event boundaries — used to validate value-tracking dates
   const evStartFrac = startDate.length === 10 ? dmyToFracYear(startDate) : null
@@ -410,8 +416,9 @@ export function EventDialog({
         const fixedYear = linkFixedDate ? dmyTimeToFracYear(linkFixedDate, linkFixedTime) : undefined
         linkOut = { anchorType: linkAnchorType, startOffset: 0, ...(fixedYear != null ? { fixedYear } : {}) }
       } else {
-      const startOffset = parseFloat(linkStartOffsetStr) || 0
-      const dur = parseFloat(linkDurationStr)
+      const startOffset = (parseFloat(linkStartOffsetStr) || 0) * UNIT_TO_YEARS[linkOffsetUnit]
+      const durRaw = parseFloat(linkDurationStr)
+      const dur = !isNaN(durRaw) && durRaw > 0 ? durRaw * UNIT_TO_YEARS[linkDurationUnit] : NaN
       linkOut = {
         anchorType: linkAnchorType,
         ...(linkAnchorType === 'event' ? {
@@ -420,7 +427,7 @@ export function EventDialog({
           onDelete: linkOnDelete,
         } : {}),
         startOffset,
-        ...(!isNaN(dur) && dur > 0 ? { duration: dur } : {}),
+        ...(!isNaN(dur) ? { duration: dur } : {}),
       }
       }
     }
@@ -700,20 +707,39 @@ export function EventDialog({
                             <div className="flex items-center gap-2">
                               <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.startOffsetLabel')}</Label>
                               <Input
-                                type="number" step="0.01" value={linkStartOffsetStr}
+                                type="number" step="1" value={linkStartOffsetStr}
                                 onChange={e => setLinkStartOffsetStr(e.target.value)}
-                                className="w-24 h-7 text-xs" placeholder="0"
+                                className="w-16 h-7 text-xs" placeholder="0"
                               />
-                              <span className="text-xs text-muted-foreground">{t('event.startOffsetHint')}</span>
+                              <select
+                                value={linkOffsetUnit}
+                                onChange={e => setLinkOffsetUnit(e.target.value as 'years' | 'months' | 'days' | 'hours')}
+                                className="h-7 text-xs border rounded-md px-1 bg-background"
+                              >
+                                <option value="years">years</option>
+                                <option value="months">months</option>
+                                <option value="days">days</option>
+                                <option value="hours">hours</option>
+                              </select>
+                              <span className="text-xs text-muted-foreground">(− before, + after)</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.durationLabel')}</Label>
                               <Input
-                                type="number" step="0.01" min="0" value={linkDurationStr}
+                                type="number" step="1" min="0" value={linkDurationStr}
                                 onChange={e => setLinkDurationStr(e.target.value)}
-                                className="w-24 h-7 text-xs" placeholder={t('common.optional')}
+                                className="w-16 h-7 text-xs" placeholder={t('common.optional')}
                               />
-                              <span className="text-xs text-muted-foreground">{t('event.durationHint')}</span>
+                              <select
+                                value={linkDurationUnit}
+                                onChange={e => setLinkDurationUnit(e.target.value as 'years' | 'months' | 'days' | 'hours')}
+                                className="h-7 text-xs border rounded-md px-1 bg-background"
+                              >
+                                <option value="years">years</option>
+                                <option value="months">months</option>
+                                <option value="days">days</option>
+                                <option value="hours">hours</option>
+                              </select>
                             </div>
                           </>
                         )}
