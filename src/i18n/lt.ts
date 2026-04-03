@@ -561,6 +561,13 @@ const lt: Translations = {
     continue: 'Tęsti',
     aboutButton: 'Apie LifeLANE',
     demoNote: 'Išbandykite demonstraciją — ji liks jūsų naršyklėje.',
+    nugget1: 'Toks pat amžius kaip Kleopatros Romoje?',
+    nugget2: 'Aplenkti Einšteiną Nobel prizu 42-ejų?',
+    nugget3: 'Ar esi teisingame kelyje?',
+    nugget4: 'Ką Muskas buvo sukūręs tavo amžiuje?',
+    nugget5: 'Kiek pažengusi Swift dabar 36-erių?',
+    nugget6: 'Turtingesnis nei Trumpas tavo amžiuje?',
+    nugget7: 'Pažiūrėk, ar esi priekyje ar gale kitų!',
   },
 
   lena: {

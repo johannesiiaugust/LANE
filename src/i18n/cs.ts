@@ -570,6 +570,13 @@ const cs: Translations = {
     continue: 'Pokračovat',
     aboutButton: 'O LifeLANE',
     demoNote: 'Vyzkoušejte demo — zůstane ve vašem prohlížeči.',
+    nugget1: 'Stejně starý jako Kleopatra v Římě?',
+    nugget2: 'Předběhnout Einsteina v Nobelovce ve 42?',
+    nugget3: 'Jsi na správné cestě?',
+    nugget4: 'Co Musk postavil v tvém věku?',
+    nugget5: 'Jak daleko je Swift teď ve 36?',
+    nugget6: 'Bohatší než Trump v tvém věku?',
+    nugget7: 'Zjisti, jestli jsi za ostatními nebo před nimi!',
   },
 
   lena: {

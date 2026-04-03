@@ -561,6 +561,13 @@ const no: Translations = {
     continue: 'Fortsett',
     aboutButton: 'Om LifeLANE',
     demoNote: 'Prøv demoen — den forblir i nettleseren din.',
+    nugget1: 'Samme alder som Kleopatra i Roma?',
+    nugget2: 'Slå Einstein til en Nobelpris ved 42?',
+    nugget3: 'Er du på rett spor?',
+    nugget4: 'Hva hadde Musk bygget i din alder?',
+    nugget5: 'Hvor langt er Swift nå ved 36?',
+    nugget6: 'Rikere enn Trump i din alder?',
+    nugget7: 'Se om du er bak eller foran de andre!',
   },
 
   lena: {

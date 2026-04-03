@@ -5,15 +5,7 @@ import { useTranslation } from '@/i18n'
 import { navigateLocalized, loadTranslation, type Lang } from '@/i18n/context'
 import { en, type Translations } from '@/i18n'
 
-const NUGGETS = [
-  'Same age as Cleopatra in Rome?',
-  'Beat Einstein to a Nobel Prize at 42?',
-  'Are you on track?',
-  'What had Musk built by your age?',
-  'How far is Swift now at 36?',
-  'Richer than Trump at your age?',
-  "Don't fall behind the others!",
-]
+const NUGGET_COUNT = 7
 
 const WELCOME_LANGS: { id: Lang; code: string; label: string }[] = [
   { id: 'en', code: 'gb', label: 'English' },
@@ -48,7 +40,7 @@ export function WelcomeModal({ currentLang, onDismiss }: WelcomeModalProps) {
     const cycle = () => {
       setNuggetVisible(false)
       nuggetTimer.current = setTimeout(() => {
-        setNuggetIndex(i => (i + 1) % NUGGETS.length)
+        setNuggetIndex(i => (i + 1) % NUGGET_COUNT)
         setNuggetVisible(true)
         nuggetTimer.current = setTimeout(cycle, 2500)
       }, 400)
@@ -118,7 +110,7 @@ export function WelcomeModal({ currentLang, onDismiss }: WelcomeModalProps) {
             className="text-sm text-muted-foreground mt-2 italic min-h-[1.25rem] transition-opacity duration-400"
             style={{ opacity: nuggetVisible ? 1 : 0 }}
           >
-            {NUGGETS[nuggetIndex]}
+            {t(`welcome.nugget${nuggetIndex + 1}`)}
           </p>
         </div>
 
