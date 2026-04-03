@@ -2,7 +2,7 @@ import { createContext, useContext, useMemo, useCallback, useSyncExternalStore }
 import en, { type Translations } from './en'
 
 // ── Supported languages ──────────────────────────────────────────────────────
-export const SUPPORTED_LANGS = ['en', 'sv', 'no', 'fi', 'lv', 'lt', 'de', 'nl', 'fr', 'es', 'it', 'da', 'pl', 'cs'] as const
+export const SUPPORTED_LANGS = ['en', 'sv', 'no', 'fi', 'lv', 'lt', 'de', 'nl', 'fr', 'es', 'it', 'da', 'pl', 'cs', 'pt', 'tr'] as const
 export type Lang = (typeof SUPPORTED_LANGS)[number]
 
 const LANG_SET = new Set<string>(SUPPORTED_LANGS)
@@ -23,6 +23,8 @@ const translationModules: Record<Lang, () => Promise<{ default: Translations }>>
   da: () => import('./da'),
   pl: () => import('./pl'),
   cs: () => import('./cs'),
+  pt: () => import('./pt'),
+  tr: () => import('./tr'),
 }
 
 const loadedTranslations = new Map<Lang, Translations>([['en', en]])

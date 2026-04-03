@@ -8,9 +8,11 @@ import { en, type Translations } from '@/i18n'
 const NUGGETS = [
   'Same age as Cleopatra in Rome?',
   'Beat Einstein to a Nobel Prize at 42?',
+  'Are you on track?',
   'What had Musk built by your age?',
-  'Richer than Trump at your age?',
   'How far is Swift now at 36?',
+  'Richer than Trump at your age?',
+  "Don't fall behind the others!",
 ]
 
 const WELCOME_LANGS: { id: Lang; code: string; label: string }[] = [
@@ -21,6 +23,13 @@ const WELCOME_LANGS: { id: Lang; code: string; label: string }[] = [
   { id: 'it', code: 'it', label: 'Italiano' },
   { id: 'nl', code: 'nl', label: 'Nederlands' },
   { id: 'sv', code: 'se', label: 'Svenska' },
+  { id: 'fi', code: 'fi', label: 'Suomi' },
+  { id: 'no', code: 'no', label: 'Norsk' },
+  { id: 'da', code: 'dk', label: 'Dansk' },
+  { id: 'pl', code: 'pl', label: 'Polski' },
+  { id: 'cs', code: 'cz', label: 'Čeština' },
+  { id: 'pt', code: 'pt', label: 'Português' },
+  { id: 'tr', code: 'tr', label: 'Türkçe' },
 ]
 
 interface WelcomeModalProps {
