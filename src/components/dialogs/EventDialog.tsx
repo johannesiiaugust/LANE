@@ -134,8 +134,7 @@ export function EventDialog({
   }, [userId])
 
   // Dependency link state
-  const [linkEnabled, setLinkEnabled] = useState(false)
-  const [linkAnchorType, setLinkAnchorType] = useState<'today' | 'event' | 'start_to_today' | 'today_to_end'>('today')
+  const [linkAnchorType, setLinkAnchorType] = useState<'none' | 'today' | 'event' | 'start_to_today' | 'today_to_end'>('none')
   const [linkEventId, setLinkEventId] = useState('')
   const [linkEventAnchor, setLinkEventAnchor] = useState<'start' | 'end'>('start')
   const [linkStartOffsetStr, setLinkStartOffsetStr] = useState('0')
@@ -224,8 +223,7 @@ export function EventDialog({
       )
       // Link
       const lnk = editingEvent.link
-      setLinkEnabled(!!lnk)
-      setLinkAnchorType(lnk?.anchorType ?? 'today')
+      setLinkAnchorType(lnk?.anchorType ?? 'none')
       setLinkEventId(lnk?.linkedEventId ?? '')
       setLinkEventAnchor(lnk?.linkedAnchor ?? 'start')
       setLinkStartOffsetStr(lnk ? String(lnk.startOffset) : '0')
@@ -253,8 +251,7 @@ export function EventDialog({
       setStartValueGrowthStr('')
       setSpotChanges([])
       setDeposits([])
-      setLinkEnabled(false)
-      setLinkAnchorType('today')
+      setLinkAnchorType('none')
       setLinkEventId('')
       setLinkEventAnchor('start')
       setLinkStartOffsetStr('0')
@@ -277,7 +274,7 @@ export function EventDialog({
 
   // Compute resolved dates from the dependency link for preview
   const computedLink = useMemo(() => {
-    if (!linkEnabled) return null
+    if (linkAnchorType === 'none') return null
     const today = dateToFracYear(new Date())
 
     if (linkAnchorType === 'start_to_today') {
@@ -304,7 +301,7 @@ export function EventDialog({
     const dur = parseFloat(linkDurationStr)
     const endYear = !isNaN(dur) && dur > 0 ? startYear + dur : undefined
     return { startYear, endYear }
-  }, [linkEnabled, linkAnchorType, linkFixedDate, linkFixedTime, linkEventId, linkEventAnchor, linkStartOffsetStr, linkDurationStr, events])
+  }, [linkAnchorType, linkFixedDate, linkFixedTime, linkEventId, linkEventAnchor, linkStartOffsetStr, linkDurationStr, events])
 
   // Fractional years for the event boundaries — used to validate value-tracking dates
   const evStartFrac = startDate.length === 10 ? dmyToFracYear(startDate) : null
@@ -324,7 +321,7 @@ export function EventDialog({
     setSubmitAttempted(true)
     // When link is active, start date isn't required (computed); otherwise validate
     if (!title.trim() || !laneId) return
-    if (!linkEnabled && !startDate) return
+    if (linkAnchorType === 'none' && !startDate) return
 
     const isRange = !!endDate.trim()
     let valueProjectionOut: ValueProjection | undefined
@@ -408,7 +405,7 @@ export function EventDialog({
 
     // Build link object
     let linkOut: EventLink | undefined
-    if (linkEnabled) {
+    if (linkAnchorType !== 'none') {
       if (linkAnchorType === 'start_to_today' || linkAnchorType === 'today_to_end') {
         const fixedYear = linkFixedDate ? dmyTimeToFracYear(linkFixedDate, linkFixedTime) : undefined
         linkOut = { anchorType: linkAnchorType, startOffset: 0, ...(fixedYear != null ? { fixedYear } : {}) }
@@ -526,28 +523,28 @@ export function EventDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">
-              <Label htmlFor="start" className={submitAttempted && !startDate && !linkEnabled ? 'text-destructive' : ''}>
+              <Label htmlFor="start" className={submitAttempted && !startDate && linkAnchorType === 'none' ? 'text-destructive' : ''}>
                 {t('event.startDate')} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="start" type="text"
-                value={linkEnabled && computedLink ? fracYearToDMY(computedLink.startYear) : startDate}
-                placeholder={linkEnabled ? t('event.computed') : 'DD/MM/YYYY'}
-                onChange={e => !linkEnabled && setStartDate(formatDMYInput(e.target.value))}
-                disabled={linkEnabled}
-                required={!linkEnabled}
-                className={linkEnabled ? 'opacity-60' : submitAttempted && !startDate ? 'border-destructive focus-visible:ring-destructive' : ''}
+                value={linkAnchorType !== 'none' && computedLink ? fracYearToDMY(computedLink.startYear) : startDate}
+                placeholder={linkAnchorType !== 'none' ? t('event.computed') : 'DD/MM/YYYY'}
+                onChange={e => linkAnchorType === 'none' && setStartDate(formatDMYInput(e.target.value))}
+                disabled={linkAnchorType !== 'none'}
+                required={linkAnchorType === 'none'}
+                className={linkAnchorType !== 'none' ? 'opacity-60' : submitAttempted && !startDate ? 'border-destructive focus-visible:ring-destructive' : ''}
               />
             </div>
             <div className="grid gap-1.5">
               <Label htmlFor="end">{t('event.endDate')} <span className="text-muted-foreground font-normal">({t('common.optional')})</span></Label>
               <Input
                 id="end" type="text"
-                value={linkEnabled && computedLink?.endYear != null ? fracYearToDMY(computedLink.endYear) : endDate}
-                placeholder={linkEnabled && computedLink?.endYear != null ? '(computed)' : 'DD/MM/YYYY'}
-                onChange={e => !linkEnabled && setEndDate(formatDMYInput(e.target.value))}
-                disabled={linkEnabled && computedLink?.endYear != null}
-                className={linkEnabled && computedLink?.endYear != null ? 'opacity-60' : ''}
+                value={linkAnchorType !== 'none' && computedLink?.endYear != null ? fracYearToDMY(computedLink.endYear) : endDate}
+                placeholder={linkAnchorType !== 'none' && computedLink?.endYear != null ? '(computed)' : 'DD/MM/YYYY'}
+                onChange={e => linkAnchorType === 'none' && setEndDate(formatDMYInput(e.target.value))}
+                disabled={linkAnchorType !== 'none' && computedLink?.endYear != null}
+                className={linkAnchorType !== 'none' && computedLink?.endYear != null ? 'opacity-60' : ''}
               />
             </div>
           </div>
@@ -560,7 +557,7 @@ export function EventDialog({
             >
               <span className="flex items-center gap-2">
                 {t('event.moreTimeOptions')}
-                {(fadeInDate || fadeOutDate || linkEnabled) && (
+                {(fadeInDate || fadeOutDate || linkAnchorType !== 'none') && (
                   <span className="h-1.5 w-1.5 rounded-full bg-primary" title="Has values" />
                 )}
               </span>
@@ -621,141 +618,141 @@ export function EventDialog({
 
                 {/* Dependency */}
                 <div className="space-y-3 pt-2 border-t">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Link2 className="h-4 w-4 text-muted-foreground" />
-                      <Label className="text-sm font-medium">{t('event.dependency')}</Label>
-                    </div>
-                    <Switch checked={linkEnabled} onCheckedChange={setLinkEnabled} />
+                  <div className="flex items-center gap-2">
+                    <Link2 className="h-4 w-4 text-muted-foreground" />
+                    <Label className="text-sm font-medium">{t('event.dependency')}</Label>
                   </div>
 
-                  {linkEnabled && (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.anchorTo')}</Label>
-                        <select
-                          value={linkAnchorType}
-                          onChange={e => setLinkAnchorType(e.target.value as 'today' | 'event' | 'start_to_today' | 'today_to_end')}
-                          className="h-7 text-xs border rounded-md px-1 bg-background flex-1"
-                        >
-                          <option value="today">{t('event.anchorTodayFull')}</option>
-                          <option value="event">{t('event.anchorEventFull')}</option>
-                          <option value="start_to_today">{t('event.startToToday')}</option>
-                          <option value="today_to_end">{t('event.todayToEnd')}</option>
-                        </select>
-                      </div>
-
-                      {(linkAnchorType === 'start_to_today' || linkAnchorType === 'today_to_end') && (
-                        <div className="flex items-center gap-2">
-                          <Label className="text-xs text-muted-foreground shrink-0 w-20">
-                            {linkAnchorType === 'start_to_today' ? t('event.startDate') : t('event.endDate')}
-                          </Label>
-                          <Input
-                            type="text" value={linkFixedDate} placeholder="DD/MM/YYYY"
-                            onChange={e => setLinkFixedDate(formatDMYInput(e.target.value))}
-                            className="w-32 h-7 text-xs"
-                          />
-                          <input
-                            type="time" value={linkFixedTime}
-                            onChange={e => setLinkFixedTime(e.target.value)}
-                            className="h-7 text-xs border rounded-md px-1 bg-background"
-                          />
-                        </div>
-                      )}
-
-                      {linkAnchorType === 'event' && (
-                        <>
-                          <div className="flex items-center gap-2">
-                            <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.anchorEventFull')}</Label>
-                            <select
-                              value={linkEventId}
-                              onChange={e => setLinkEventId(e.target.value)}
-                              className="h-7 text-xs border rounded-md px-1 bg-background flex-1 min-w-0"
-                            >
-                              <option value="">— {t('event.selectLane')} —</option>
-                              {events
-                                .filter(e => e.id !== editingEvent?.id)
-                                .map(e => {
-                                  const lane = lanes.find(l => l.id === e.laneId)
-                                  return (
-                                    <option key={e.id} value={e.id}>
-                                      {lane ? `[${translateLaneName(lane.name)}] ` : ''}{e.emoji ? `${e.emoji} ` : ''}{e.title}
-                                    </option>
-                                  )
-                                })}
-                            </select>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.anchorAt')}</Label>
-                            <select
-                              value={linkEventAnchor}
-                              onChange={e => setLinkEventAnchor(e.target.value as 'start' | 'end')}
-                              className="h-7 text-xs border rounded-md px-1 bg-background"
-                            >
-                              <option value="start">{t('event.startOfEvent')}</option>
-                              <option value="end">{t('event.endOfEvent')}</option>
-                            </select>
-                          </div>
-                        </>
-                      )}
-
-                      {linkAnchorType !== 'start_to_today' && linkAnchorType !== 'today_to_end' && (
-                        <>
-                          <div className="flex items-center gap-2">
-                            <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.startOffsetLabel')}</Label>
-                            <Input
-                              type="number" step="0.01" value={linkStartOffsetStr}
-                              onChange={e => setLinkStartOffsetStr(e.target.value)}
-                              className="w-24 h-7 text-xs" placeholder="0"
-                            />
-                            <span className="text-xs text-muted-foreground">{t('event.startOffsetHint')}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.durationLabel')}</Label>
-                            <Input
-                              type="number" step="0.01" min="0" value={linkDurationStr}
-                              onChange={e => setLinkDurationStr(e.target.value)}
-                              className="w-24 h-7 text-xs" placeholder={t('common.optional')}
-                            />
-                            <span className="text-xs text-muted-foreground">{t('event.durationHint')}</span>
-                          </div>
-                        </>
-                      )}
-
-                      {computedLink ? (
-                        <div className="rounded bg-muted/50 px-2 py-1.5 text-xs text-muted-foreground space-y-0.5">
-                          <div>{t('event.previewStart')} <span className="text-foreground font-medium">{fracYearToDMY(computedLink.startYear)}</span></div>
-                          {computedLink.endYear != null && (
-                            <div>{t('event.previewEnd')} <span className="text-foreground font-medium">{fracYearToDMY(computedLink.endYear)}</span></div>
-                          )}
-                        </div>
-                      ) : linkAnchorType === 'event' && !linkEventId ? (
-                        <p className="text-xs text-muted-foreground italic">{t('event.selectEventHint')}</p>
-                      ) : null}
-
-                      {linkAnchorType === 'event' && (
-                        <div className="space-y-1 pt-1 border-t">
-                          <Label className="text-xs text-muted-foreground">{t('event.ifLinkedDeleted')}</Label>
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() => setLinkOnDelete('freeze')}
-                              className={`flex-1 h-7 rounded-md border text-xs transition-colors ${linkOnDelete === 'freeze' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-muted/50'}`}
-                            >
-                              {t('event.freezeDates')}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setLinkOnDelete('delete')}
-                              className={`flex-1 h-7 rounded-md border text-xs transition-colors ${linkOnDelete === 'delete' ? 'bg-destructive text-destructive-foreground border-destructive' : 'bg-background hover:bg-muted/50'}`}
-                            >
-                              {t('event.deleteEventToo')}
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.anchorTo')}</Label>
+                      <select
+                        value={linkAnchorType}
+                        onChange={e => setLinkAnchorType(e.target.value as 'none' | 'today' | 'event' | 'start_to_today' | 'today_to_end')}
+                        className="h-7 text-xs border rounded-md px-1 bg-background flex-1"
+                      >
+                        <option value="none">— {t('common.none')} —</option>
+                        <option value="today">{t('event.anchorTodayFull')}</option>
+                        <option value="event">{t('event.anchorEventFull')}</option>
+                        <option value="start_to_today">{t('event.startToToday')}</option>
+                        <option value="today_to_end">{t('event.todayToEnd')}</option>
+                      </select>
                     </div>
-                  )}
+
+                    {linkAnchorType !== 'none' && (
+                      <div className="space-y-3">
+                        {(linkAnchorType === 'start_to_today' || linkAnchorType === 'today_to_end') && (
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground shrink-0 w-20">
+                              {linkAnchorType === 'start_to_today' ? t('event.startDate') : t('event.endDate')}
+                            </Label>
+                            <Input
+                              type="text" value={linkFixedDate} placeholder="DD/MM/YYYY"
+                              onChange={e => setLinkFixedDate(formatDMYInput(e.target.value))}
+                              className="w-32 h-7 text-xs"
+                            />
+                            <input
+                              type="time" value={linkFixedTime}
+                              onChange={e => setLinkFixedTime(e.target.value)}
+                              className="h-7 text-xs border rounded-md px-1 bg-background"
+                            />
+                          </div>
+                        )}
+
+                        {linkAnchorType === 'event' && (
+                          <>
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.anchorEventFull')}</Label>
+                              <select
+                                value={linkEventId}
+                                onChange={e => setLinkEventId(e.target.value)}
+                                className="h-7 text-xs border rounded-md px-1 bg-background flex-1 min-w-0"
+                              >
+                                <option value="">— {t('event.selectLane')} —</option>
+                                {events
+                                  .filter(e => e.id !== editingEvent?.id)
+                                  .map(e => {
+                                    const lane = lanes.find(l => l.id === e.laneId)
+                                    return (
+                                      <option key={e.id} value={e.id}>
+                                        {lane ? `[${translateLaneName(lane.name)}] ` : ''}{e.emoji ? `${e.emoji} ` : ''}{e.title}
+                                      </option>
+                                    )
+                                  })}
+                              </select>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.anchorAt')}</Label>
+                              <select
+                                value={linkEventAnchor}
+                                onChange={e => setLinkEventAnchor(e.target.value as 'start' | 'end')}
+                                className="h-7 text-xs border rounded-md px-1 bg-background"
+                              >
+                                <option value="start">{t('event.startOfEvent')}</option>
+                                <option value="end">{t('event.endOfEvent')}</option>
+                              </select>
+                            </div>
+                          </>
+                        )}
+
+                        {linkAnchorType !== 'start_to_today' && linkAnchorType !== 'today_to_end' && (
+                          <>
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.startOffsetLabel')}</Label>
+                              <Input
+                                type="number" step="0.01" value={linkStartOffsetStr}
+                                onChange={e => setLinkStartOffsetStr(e.target.value)}
+                                className="w-24 h-7 text-xs" placeholder="0"
+                              />
+                              <span className="text-xs text-muted-foreground">{t('event.startOffsetHint')}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs text-muted-foreground shrink-0 w-20">{t('event.durationLabel')}</Label>
+                              <Input
+                                type="number" step="0.01" min="0" value={linkDurationStr}
+                                onChange={e => setLinkDurationStr(e.target.value)}
+                                className="w-24 h-7 text-xs" placeholder={t('common.optional')}
+                              />
+                              <span className="text-xs text-muted-foreground">{t('event.durationHint')}</span>
+                            </div>
+                          </>
+                        )}
+
+                        {computedLink ? (
+                          <div className="rounded bg-muted/50 px-2 py-1.5 text-xs text-muted-foreground space-y-0.5">
+                            <div>{t('event.previewStart')} <span className="text-foreground font-medium">{fracYearToDMY(computedLink.startYear)}</span></div>
+                            {computedLink.endYear != null && (
+                              <div>{t('event.previewEnd')} <span className="text-foreground font-medium">{fracYearToDMY(computedLink.endYear)}</span></div>
+                            )}
+                          </div>
+                        ) : linkAnchorType === 'event' && !linkEventId ? (
+                          <p className="text-xs text-muted-foreground italic">{t('event.selectEventHint')}</p>
+                        ) : null}
+
+                        {linkAnchorType === 'event' && (
+                          <div className="space-y-1 pt-1 border-t">
+                            <Label className="text-xs text-muted-foreground">{t('event.ifLinkedDeleted')}</Label>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setLinkOnDelete('freeze')}
+                                className={`flex-1 h-7 rounded-md border text-xs transition-colors ${linkOnDelete === 'freeze' ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-muted/50'}`}
+                              >
+                                {t('event.freezeDates')}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setLinkOnDelete('delete')}
+                                className={`flex-1 h-7 rounded-md border text-xs transition-colors ${linkOnDelete === 'delete' ? 'bg-destructive text-destructive-foreground border-destructive' : 'bg-background hover:bg-muted/50'}`}
+                              >
+                                {t('event.deleteEventToo')}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
               </div>
